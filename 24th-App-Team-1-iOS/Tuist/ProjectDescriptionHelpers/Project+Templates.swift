@@ -7,11 +7,7 @@
 
 import ProjectDescription
 
-//additionalFiles : Xcode에서 자동으로 연결 해주지 않는 파일을 연결 하기 위해 사용하는 인스턴스 프로퍼티
-// options : Xcode > Setting에 대한 설정을 정의함
-
-
-//name, target
+// name과 targets만 수정할 수 있게 하고, 다른 인자는 기본값을 사용하도록 설정
 struct ProjectConfig {
     var name: String
     var organizationName: String?
@@ -50,21 +46,10 @@ struct ProjectConfig {
         self.additionalFiles = additionalFiles
         self.resourceSynthesizers = resourceSynthesizers
     }
-}
-
-extension Project {
-
-    static func makeProject(
+    
+    func makeProject(
         name: String,
-        organizationName: String?,
-        options: Project.Options,
-        packages: [Package],
-        settings: Settings?,
-        targets: [Target],
-        schemes: [Scheme],
-        fileHeaderTemplate: FileHeaderTemplate? = nil,
-        additionalFiles: [FileElement],
-        resourceSynthesizers: [ResourceSynthesizer]
+        targets: [Target]
     ) -> Project {
         return Project(
             name: name,
@@ -81,17 +66,60 @@ extension Project {
     }
 }
 
+extension Project {
+    /**
+     Feature Module Project 생성 메서드
+     - Parameters:
+        - module: ModulePaths.Feature 타입
+        - target: Target 배열
+     - Returns: Project Type
+     */
+    static func feature(module: ModulePaths.Feature, targets: [Target] = []) -> Self {
+        return ProjectConfig().makeProject(name: module.name, targets: targets)
+    }
 
 
-let app = Project
-    .makeProject(
-        name: <#T##String#>,
-        organizationName: <#T##String?#>,
-        options: <#T##Project.Options#>,
-        packages: <#T##[Package]#>,
-        settings: <#T##Settings?#>,
-        targets: <#T##[Target]#>,
-        schemes: <#T##[Scheme]#>,
-        additionalFiles: <#T##[FileElement]#>,
-        resourceSynthesizers: <#T##[ResourceSynthesizer]#>
-    )
+    /**
+     Domain Module Project 생성 메서드
+     - Parameters:
+        - module: ModulePaths.Domain 타입
+        - target: Target 배열
+     - Returns: Project Type
+     */
+    static func domain(module: ModulePaths.Doamin, targets: [Target] = []) -> Self {
+        return ProjectConfig().makeProject(name: module.name, targets: targets)
+    }
+
+    /**
+     Service Module Project 생성 메서드
+     - Parameters:
+        - module: ModulePaths.Service 타입
+        - target: Target 배열
+     - Returns: Project Type
+     */
+    static func service(module: ModulePaths.Service, targets: [Target] = []) -> Self {
+        return ProjectConfig().makeProject(name: module.name, targets: targets)
+    }
+
+    /**
+     Core Module Project 생성 메서드
+     - Parameters:
+        - module: ModulePaths.Core 타입
+        - target: Target 배열
+     - Returns: Project Type
+     */
+    static func core(module: ModulePaths.Doamin, targets: [Target] = []) -> Self {
+        return ProjectConfig().makeProject(name: module.name, targets: targets)
+    }
+
+    /**
+     Shared Module Project 생성 메서드
+     - Parameters:
+        - module: ModulePaths.Shared 타입
+        - target: Target 배열
+     - Returns: Project Type
+     */
+    static func share(module: ModulePaths.Share, targets: [Target]) -> Self {
+        return ProjectConfig().makeProject(name: module.name, targets: targets)
+    }
+}
