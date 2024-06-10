@@ -17,9 +17,12 @@ import ProjectDescriptionHelpers
 let package = Package(
     name: "App",
     dependencies: [
-        .package(url: "https://github.com/Swinject/Swinject", exact: Version(stringLiteral: "2.9.1")),
-        .package(id: "https://github.com/ReactiveX/RxSwift", exact: Version(stringLiteral: "6.7.1")),
-        .package(url: "https://github.com/RxSwiftCommunity/RxDataSources", exact: Version(stringLiteral: "5.0.2")),
-        .package(url: "https://github.com/SnapKit/SnapKit", exact: Version(stringLiteral: "5.7.1")),
+        .package(url: "https://github.com/Swinject/Swinject", from: "2.9.1"),
+        .package(url: "https://github.com/ReactiveX/RxSwift", from: "6.7.1"),
+        .package(url: "https://github.com/RxSwiftCommunity/RxDataSources", from: "5.0.2"),
+        .package(url: "https://github.com/SnapKit/SnapKit", from: "5.7.1"),
+        .package(url: "https://github.com/devxoul/Then", from: "3.0.0"),
+        .package(url: "https://github.com/Alamofire/Alamofire", from: "5.9.1"),
+        .package(url: "https://github.com/ReactorKit/ReactorKit", from: "3.2.0")
     ]
 )

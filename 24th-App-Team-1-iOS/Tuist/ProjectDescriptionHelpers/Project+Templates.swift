@@ -86,7 +86,7 @@ extension Project {
         - target: Target 배열
      - Returns: Project Type
      */
-    static func domain(module: ModulePaths.Doamin, targets: [Target] = []) -> Self {
+    static func domain(module: ModulePaths.Domain, targets: [Target] = []) -> Self {
         return ProjectConfig().makeProject(name: module.name, targets: targets)
     }
 
@@ -108,7 +108,7 @@ extension Project {
         - target: Target 배열
      - Returns: Project Type
      */
-    static func core(module: ModulePaths.Doamin, targets: [Target] = []) -> Self {
+    static func core(module: ModulePaths.Core, targets: [Target] = []) -> Self {
         return ProjectConfig().makeProject(name: module.name, targets: targets)
     }
 

@@ -42,7 +42,6 @@ extension TargetDependency.SPM {
     static let rxCocoa: TargetDependency = .external(name: "RxCocoa", condition: .none)
     static let reactorKit: TargetDependency = .external(name: "ReactorKit", condition: .none)
     static let rxDataSources: TargetDependency = .external(name: "RxDataSources", condition: .none)
-    static let swinject: TargetDependency = .external(name: "Swinject", condition: .none)
     
     //MARK: DesignSystems
     static let snapKit: TargetDependency = .external(name: "snapKit", condition: .none)
@@ -52,4 +51,5 @@ extension TargetDependency.SPM {
     static let alamofire: TargetDependency = .external(name: "Alamofire", condition: .none)
     
     //MARK: DI
+    static let swinject: TargetDependency = .external(name: "Swinject", condition: .none)
 }

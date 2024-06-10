@@ -126,7 +126,7 @@ extension Target {
         - product: Target Product Type
      - Returns: Target Type
      */
-    static func domain(module: ModulePaths.Doamin, dependencies: [TargetDependency]) -> Self {
+    static func domain(module: ModulePaths.Domain, dependencies: [TargetDependency]) -> Self {
         TargetConfig(sources: .sources, dependencies: dependencies)
             .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
@@ -150,7 +150,7 @@ extension Target {
      */
     static func core(module: ModulePaths.Core, dependencies: [TargetDependency] = []) -> Self {
         TargetConfig(sources: .sources, dependencies: dependencies)
-            .makeTarget(with: module.name, bundleId: module.bundleId, product: .staticLibrary)
+            .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
     
     /**
@@ -160,7 +160,7 @@ extension Target {
      - Returns: Target Type
      */
     static func share(module: ModulePaths.Share, dependencies: [TargetDependency] = []) -> Self {
-        TargetConfig(sources: .sources, resources: .resources)
-            .makeTarget(with: module.name, bundleId: module.bundleId, product: .staticLibrary)
+        TargetConfig(sources: .sources, resources: .resources, dependencies: dependencies)
+            .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
 }

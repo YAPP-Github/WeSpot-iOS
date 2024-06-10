@@ -22,7 +22,7 @@ extension ModulePathProtocol {
 
 enum ModulePaths {
     case feature(Feature)
-    case domain(Doamin)
+    case domain(Domain)
     case service(Service)
     case shared
     case core
@@ -36,7 +36,7 @@ extension ModulePaths {
 }
 
 extension ModulePaths {
-    enum Doamin: String, ModulePathProtocol {
+    enum Domain: String, ModulePathProtocol {
         case HomeDomain
     }
 }
