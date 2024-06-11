@@ -15,41 +15,41 @@ extension TargetDependency {
 extension TargetDependency {
     
     static func feature(module: ModulePaths.Feature) -> Self {
-        .project(target: module.name, path: .relativeToRoot("Feature/\(module.name)"), condition: .none)
+        .project(target: module.name, path: .relativeToRoot("Feature/\(module.name)"))
     }
     
-    static func domain(module: ModulePaths.Doamin) -> Self {
-        .project(target: module.name, path: .relativeToRoot("Domain/\(module.name)"), condition: .none)
+    static func domain(module: ModulePaths.Domain) -> Self {
+        .project(target: module.name, path: .relativeToRoot("Domain/\(module.name)"))
     }
     
     static func service(module: ModulePaths.Service) -> Self {
-        .project(target: module.name, path: .relativeToRoot("Service/\(module.name)"), condition: .none)
+        .project(target: module.name, path: .relativeToRoot("Service/\(module.name)"))
     }
     
     static func core(module: ModulePaths.Core) -> Self {
-        .project(target: module.name, path: .relativeToRoot("Core/\(module.name)"), condition: .none)
+        .project(target: module.name, path: .relativeToRoot("Core/\(module.name)"))
     }
     
     static func share(module: ModulePaths.Share) -> Self {
-        .project(target: module.name, path: .relativeToRoot("Share/\(module.name)"), condition: .none)
+        .project(target: module.name, path: .relativeToRoot("Share/\(module.name)"))
     }
 }
 
 extension TargetDependency.SPM {
     
     //MARK: Rx
-    static let rxSwift: TargetDependency = .external(name: "RxSwift", condition: .none)
-    static let rxCocoa: TargetDependency = .external(name: "RxCocoa", condition: .none)
-    static let reactorKit: TargetDependency = .external(name: "ReactorKit", condition: .none)
-    static let rxDataSources: TargetDependency = .external(name: "RxDataSources", condition: .none)
+    static let rxSwift: TargetDependency = .external(name: "RxSwift")
+    static let rxCocoa: TargetDependency = .external(name: "RxCocoa")
+    static let reactorKit: TargetDependency = .external(name: "ReactorKit")
+    static let rxDataSources: TargetDependency = .external(name: "RxDataSources")
     
     //MARK: DesignSystems
-    static let snapKit: TargetDependency = .external(name: "snapKit", condition: .none)
-    static let then: TargetDependency = .external(name: "Then", condition: .none)
+    static let snapKit: TargetDependency = .external(name: "snapKit")
+    static let then: TargetDependency = .external(name: "Then")
     
     //MARK: Network
-    static let alamofire: TargetDependency = .external(name: "Alamofire", condition: .none)
+    static let alamofire: TargetDependency = .external(name: "Alamofire")
     
     //MARK: DI
-    static let swinject: TargetDependency = .external(name: "Swinject", condition: .none)
+    static let swinject: TargetDependency = .external(name: "Swinject")
 }
