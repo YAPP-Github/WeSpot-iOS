@@ -31,6 +31,8 @@ extension Project {
         
         let name: String
         switch module {
+        case .app(let app):
+            name = app.name
         case .feature(let feature):
             name = feature.name
         case .domain(let domain):

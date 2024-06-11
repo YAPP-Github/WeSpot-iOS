@@ -18,9 +18,18 @@ public extension ModulePathProtocol {
     var bundleId: String {
         return "com.\(self.rawValue).app"
     }
+    
+    var appName: String {
+        return "wespot"
+    }
+    
+    var appBundleId: String {
+        return "com.wespot.app"
+    }
 }
 
 public enum ModulePaths {
+    case app(App)
     case feature(Feature)
     case domain(Domain)
     case service(Service)
@@ -28,37 +37,43 @@ public enum ModulePaths {
     case core(Core)
 }
 
-public extension ModulePaths {
-    enum Feature: String, ModulePathProtocol {
+extension ModulePaths {
+    public enum App: String, ModulePathProtocol {
+        case app
+    }
+}
+
+extension ModulePaths {
+    public enum Feature: String, ModulePathProtocol {
         case HomeFeature
         case ProfileFeature
     }
 }
 
-public extension ModulePaths {
-    enum Domain: String, ModulePathProtocol {
+extension ModulePaths {
+    public enum Domain: String, ModulePathProtocol {
         case HomeDomain
         case ProfileDomain
     }
 }
 
-public extension ModulePaths {
-    enum Service: String, ModulePathProtocol {
+extension ModulePaths {
+    public enum Service: String, ModulePathProtocol {
         case HomeService
         case ProfileService
     }
 }
 
-public extension ModulePaths {
-    enum Core: String, ModulePathProtocol {
+extension ModulePaths {
+    public enum Core: String, ModulePathProtocol {
         case Netwroking
         case Storage
         case Extensions
     }
 }
 
-public extension ModulePaths {
-    enum Shared: String, ModulePathProtocol {
+extension ModulePaths {
+    public enum Shared: String, ModulePathProtocol {
         case ThirdPartyLib
         case DesignSystem
     }

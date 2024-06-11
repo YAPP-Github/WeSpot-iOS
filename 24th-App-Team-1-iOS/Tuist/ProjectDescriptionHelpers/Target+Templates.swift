@@ -77,6 +77,33 @@ struct TargetConfig {
         self.mergeable = mergeable
     }
     
+    func makeApp(with name: String, bundleId: String, product: Product = .app, dependencies: [TargetDependency]) -> Target {
+        .target(
+            name: name,
+            destinations: self.destinations,
+            product: product,
+            productName: self.productName,
+            bundleId: bundleId,
+            deploymentTargets: self.deploymentTargets,
+            infoPlist: self.infoPlist,
+            sources: self.sources,
+            resources: self.resources,
+            copyFiles: self.copyFiles,
+            headers: self.headers,
+            entitlements: self.entitlements,
+            scripts: self.scripts,
+            dependencies: dependencies,
+            settings: self.settings,
+            coreDataModels: self.coreDataModels,
+            environmentVariables: self.environmentVariables,
+            launchArguments: self.launchArguments,
+            additionalFiles: self.additionalFiles,
+            buildRules: self.buildRules,
+            mergedBinaryType: self.mergedBinaryType,
+            mergeable: self.mergeable
+        )
+    }
+    
     
     func makeTarget(with name: String, bundleId: String, product: Product? = nil) -> Target {
         .target(
@@ -107,6 +134,18 @@ struct TargetConfig {
 }
 
 extension Target {
+    
+    /**
+     App Module Target 생성 메서드
+     - Parameters:
+        - module: ModulePaths Type
+        - Returns: Target Type
+     */
+    public static func app(module: ModulePaths.App, dependencies: [TargetDependency]) -> Self {
+        TargetConfig(sources: .sources, resources: .resources)
+            .makeApp(with: module.appName, bundleId: module.appBundleId, dependencies: dependencies)
+    }
+    
     
     /**
      Feature Module Target 생성 메서드
