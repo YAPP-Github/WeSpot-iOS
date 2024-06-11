@@ -6,6 +6,7 @@
 //
 
 import ProjectDescription
+import ProjectDescriptionHelpers
 
 let profileFeature = Project.makeProject(
     module: .feature(.ProfileFeature),
@@ -13,7 +14,7 @@ let profileFeature = Project.makeProject(
         .feature(
             module: .ProfileFeature,
             dependencies: [.domain(module: .ProfileDomain),
-                           .share(module: .ThirdPartyLib)
+                           .shared(module: .ThirdPartyLib)
             ])
     ]
 )

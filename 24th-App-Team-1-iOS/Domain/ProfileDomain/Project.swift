@@ -6,12 +6,13 @@
 //
 
 import ProjectDescription
+import ProjectDescriptionHelpers
 
 let profileDomain = Project.makeProject(
     module: .domain(.ProfileDomain),
     targets: [
         .domain(
             module: .ProfileDomain,
-            dependencies: [.share(module: .ThirdPartyLib)])
+            dependencies: [.shared(module: .ThirdPartyLib)])
     ]
 )

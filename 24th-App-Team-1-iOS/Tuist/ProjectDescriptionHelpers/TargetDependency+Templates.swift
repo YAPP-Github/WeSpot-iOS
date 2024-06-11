@@ -14,24 +14,24 @@ extension TargetDependency {
 
 extension TargetDependency {
     
-    static func feature(module: ModulePaths.Feature) -> Self {
+    public static func feature(module: ModulePaths.Feature) -> Self {
         .project(target: module.name, path: .relativeToRoot("Feature/\(module.name)"))
     }
     
-    static func domain(module: ModulePaths.Domain) -> Self {
+    public static func domain(module: ModulePaths.Domain) -> Self {
         .project(target: module.name, path: .relativeToRoot("Domain/\(module.name)"))
     }
     
-    static func service(module: ModulePaths.Service) -> Self {
+    public static func service(module: ModulePaths.Service) -> Self {
         .project(target: module.name, path: .relativeToRoot("Service/\(module.name)"))
     }
     
-    static func core(module: ModulePaths.Core) -> Self {
+    public static func core(module: ModulePaths.Core) -> Self {
         .project(target: module.name, path: .relativeToRoot("Core/\(module.name)"))
     }
     
-    static func share(module: ModulePaths.Share) -> Self {
-        .project(target: module.name, path: .relativeToRoot("Share/\(module.name)"))
+    public static func shared(module: ModulePaths.Shared) -> Self {
+        .project(target: module.name, path: .relativeToRoot("Shared/\(module.name)"))
     }
 }
 

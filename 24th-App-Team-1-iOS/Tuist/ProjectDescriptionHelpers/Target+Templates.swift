@@ -114,7 +114,7 @@ extension Target {
         - module: ModulePaths Type
      - Returns: Target Type
      */
-    static func feature(module: ModulePaths.Feature, dependencies: [TargetDependency]) -> Self {
+    public static func feature(module: ModulePaths.Feature, dependencies: [TargetDependency]) -> Self {
         TargetConfig(sources: .sources, dependencies: dependencies)
             .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
@@ -126,7 +126,7 @@ extension Target {
         - product: Target Product Type
      - Returns: Target Type
      */
-    static func domain(module: ModulePaths.Domain, dependencies: [TargetDependency]) -> Self {
+    public static func domain(module: ModulePaths.Domain, dependencies: [TargetDependency]) -> Self {
         TargetConfig(sources: .sources, dependencies: dependencies)
             .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
@@ -137,7 +137,7 @@ extension Target {
         - module: ModulePaths Type
      - Returns: Target Type
      */
-    static func service(module: ModulePaths.Service, dependencies: [TargetDependency]) -> Self {
+    public static func service(module: ModulePaths.Service, dependencies: [TargetDependency]) -> Self {
         TargetConfig(sources: .sources, dependencies: dependencies)
             .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
@@ -148,7 +148,7 @@ extension Target {
         - module: ModulePaths Type
      - Returns: Target Type
      */
-    static func core(module: ModulePaths.Core, dependencies: [TargetDependency] = []) -> Self {
+    public static func core(module: ModulePaths.Core, dependencies: [TargetDependency] = []) -> Self {
         TargetConfig(sources: .sources, dependencies: dependencies)
             .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
@@ -159,7 +159,7 @@ extension Target {
         - module: ModulePaths Type
      - Returns: Target Type
      */
-    static func share(module: ModulePaths.Share, dependencies: [TargetDependency] = []) -> Self {
+    public static func share(module: ModulePaths.Shared, dependencies: [TargetDependency] = []) -> Self {
         TargetConfig(sources: .sources, resources: .resources, dependencies: dependencies)
             .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }

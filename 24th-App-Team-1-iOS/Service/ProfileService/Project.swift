@@ -6,6 +6,7 @@
 //
 
 import ProjectDescription
+import ProjectDescriptionHelpers
 
 let profileService = Project.makeProject(
     module: .service(.ProfileService),
@@ -13,7 +14,7 @@ let profileService = Project.makeProject(
         .service(
             module: .ProfileService,
             dependencies: [.domain(module: .ProfileDomain),
-                           .share(module: .ThirdPartyLib),
+                           .shared(module: .ThirdPartyLib),
                            .core(module: .Storage),
                            .core(module: .Netwroking)
             ])

@@ -13,7 +13,7 @@ import ProjectDescription
 
 extension Project {
 
-    static func makeProject(
+    public static func makeProject(
         module: ModulePaths,
         targets: [Target],
         organizationName: String? = nil,
