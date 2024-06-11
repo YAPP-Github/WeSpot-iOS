@@ -38,12 +38,14 @@ extension ModulePaths {
 extension ModulePaths {
     enum Domain: String, ModulePathProtocol {
         case HomeDomain
+        case ProfileDomain
     }
 }
 
 extension ModulePaths {
     enum Service: String, ModulePathProtocol {
         case HomeService
+        case ProfileService
     }
 }
 
