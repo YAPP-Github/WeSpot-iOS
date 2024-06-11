@@ -24,8 +24,8 @@ enum ModulePaths {
     case feature(Feature)
     case domain(Domain)
     case service(Service)
-    case shared
-    case core
+    case shared(Service)
+    case core(Core)
 }
 
 extension ModulePaths {

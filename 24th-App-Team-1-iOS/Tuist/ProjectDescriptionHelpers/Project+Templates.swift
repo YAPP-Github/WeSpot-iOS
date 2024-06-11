@@ -2,55 +2,47 @@
 //  Project+Templates.swift
 //  ProjectDescriptionHelpers
 //
-//  Created by Kim dohyun on 6/10/24.
+//  Created by eunseou on 6/10/24.
 //
 
 import ProjectDescription
 
-// name과 targets만 수정할 수 있게 하고, 다른 인자는 기본값을 사용하도록 설정
-struct ProjectConfig {
-    var name: String
-    var organizationName: String?
-    var options: Project.Options
-    var packages: [Package]
-    var targets: [Target]
-    var schemes: [Scheme]
-    var settings: Settings?
-    var fileHeaderTemplate: FileHeaderTemplate?
-    var additionalFiles: [FileElement]
-    var resourceSynthesizers: [ResourceSynthesizer]
+//additionalFiles : Xcode에서 자동으로 연결 해주지 않는 파일을 연결 하기 위해 사용하는 인스턴스 프로퍼티
+// options : Xcode > Setting에 대한 설정을 정의함
 
-    init(
-        name: String = "",
+
+extension Project {
+
+    static func makeProject(
+        module: ModulePaths,
+        targets: [Target],
         organizationName: String? = nil,
         options: Project.Options = .options(
             disableBundleAccessors: true,
             disableSynthesizedResourceAccessors: true
         ),
         packages: [Package] = [],
-        targets: [Target] = [],
         schemes: [Scheme] = [],
         settings: Settings? = nil,
         fileHeaderTemplate: FileHeaderTemplate? = nil,
         additionalFiles: [FileElement] = [],
         resourceSynthesizers: [ResourceSynthesizer] = []
-    ) {
-        self.name = name
-        self.organizationName = organizationName
-        self.options = options
-        self.packages = packages
-        self.targets = targets
-        self.schemes = schemes
-        self.settings = settings
-        self.fileHeaderTemplate = fileHeaderTemplate
-        self.additionalFiles = additionalFiles
-        self.resourceSynthesizers = resourceSynthesizers
-    }
-    
-    func makeProject(
-        name: String,
-        targets: [Target]
-    ) -> Project {
+    ) -> Self {
+        
+        let name: String
+        switch module {
+        case .feature(let feature):
+            name = feature.name
+        case .domain(let domain):
+            name = domain.name
+        case .service(let service):
+            name = service.name
+        case .shared(let shared):
+            name = shared.name
+        case .core(let core):
+            name = core.name
+        }
+        
         return Project(
             name: name,
             organizationName: organizationName,
@@ -66,60 +58,4 @@ struct ProjectConfig {
     }
 }
 
-extension Project {
-    /**
-     Feature Module Project 생성 메서드
-     - Parameters:
-        - module: ModulePaths.Feature 타입
-        - target: Target 배열
-     - Returns: Project Type
-     */
-    static func feature(module: ModulePaths.Feature, targets: [Target] = []) -> Self {
-        return ProjectConfig().makeProject(name: module.name, targets: targets)
-    }
-
-
-    /**
-     Domain Module Project 생성 메서드
-     - Parameters:
-        - module: ModulePaths.Domain 타입
-        - target: Target 배열
-     - Returns: Project Type
-     */
-    static func domain(module: ModulePaths.Domain, targets: [Target] = []) -> Self {
-        return ProjectConfig().makeProject(name: module.name, targets: targets)
-    }
-
-    /**
-     Service Module Project 생성 메서드
-     - Parameters:
-        - module: ModulePaths.Service 타입
-        - target: Target 배열
-     - Returns: Project Type
-     */
-    static func service(module: ModulePaths.Service, targets: [Target] = []) -> Self {
-        return ProjectConfig().makeProject(name: module.name, targets: targets)
-    }
-
-    /**
-     Core Module Project 생성 메서드
-     - Parameters:
-        - module: ModulePaths.Core 타입
-        - target: Target 배열
-     - Returns: Project Type
-     */
-    static func core(module: ModulePaths.Core, targets: [Target] = []) -> Self {
-        return ProjectConfig().makeProject(name: module.name, targets: targets)
-    }
-
-    /**
-     Shared Module Project 생성 메서드
-     - Parameters:
-        - module: ModulePaths.Shared 타입
-        - target: Target 배열
-     - Returns: Project Type
-     */
-    static func share(module: ModulePaths.Share, targets: [Target]) -> Self {
-        return ProjectConfig().makeProject(name: module.name, targets: targets)
-    }
-}
+let project = Project.makeProject(module: .feature(.HomeFeature), targets: <#T##[Target]#>)
