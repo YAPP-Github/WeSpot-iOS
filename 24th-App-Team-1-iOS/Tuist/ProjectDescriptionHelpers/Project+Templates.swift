@@ -57,5 +57,3 @@ extension Project {
         )
     }
 }
-
-let project = Project.makeProject(module: .feature(.HomeFeature), targets: <#T##[Target]#>)
