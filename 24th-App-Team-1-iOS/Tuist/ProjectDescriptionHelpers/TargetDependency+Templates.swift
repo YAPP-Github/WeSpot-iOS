@@ -46,7 +46,7 @@ extension TargetDependency.SPM {
     public static let rxDataSources: TargetDependency = .external(name: "RxDataSources")
     
     //MARK: DesignSystems
-    public static let snapKit: TargetDependency = .external(name: "snapKit")
+    public static let snapKit: TargetDependency = .external(name: "SnapKit")
     public static let then: TargetDependency = .external(name: "Then")
     
     //MARK: Network
