@@ -11,12 +11,11 @@ import ProjectDescriptionHelpers
 let profileService = Project.makeProject(
     module: .service(.ProfileService),
     targets: [
-        .makeTarget(module: ModulePaths.Service.ProfileService, dependencies: [
-            .makeDependency(module: ModulePaths.Domain.ProfileDomain),
-            .makeDependency(module: ModulePaths.Shared.ThirdPartyLib),
-            .makeDependency(module: ModulePaths.Core.Storage),
-            .makeDependency(module: ModulePaths.Core.Networking)
-            ]
-        )
+        .service(module: .ProfileService, dependencies: [
+            .domain(module: .ProfileDomain),
+            .core(module: .Storage),
+            .core(module: .Networking),
+            .shared(module: .ThirdPartyLib)
+        ])
     ]
 )

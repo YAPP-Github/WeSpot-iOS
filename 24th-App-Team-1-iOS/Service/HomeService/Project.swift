@@ -11,15 +11,12 @@ import ProjectDescriptionHelpers
 let project = Project.makeProject(
     module: .service(.HomeService),
     targets: [
-        .makeTarget(
-            module: ModulePaths.Service.HomeService,
-            dependencies: [
-                .makeDependency(module: ModulePaths.Domain.HomeDomain),
-                .makeDependency(module: ModulePaths.Core.Networking),
-                .makeDependency(module: ModulePaths.Core.Storage),
-                .makeDependency(module: ModulePaths.Shared.ThirdPartyLib)
-            ]
-        )
+        .service(module: .HomeService, dependencies: [
+            .domain(module: .HomeDomain),
+            .core(module: .Networking),
+            .core(module: .Storage),
+            .shared(module: .ThirdPartyLib)
+        ])
     ]
 )
 

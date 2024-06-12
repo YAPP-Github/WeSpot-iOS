@@ -134,15 +134,72 @@ struct TargetConfig {
 }
 
 extension Target {
+    
     /**
-     Target 통합 생성 메서드
+     Feature Module Target 생성 메서드
      - Parameters:
-        - M: ModulePathProtocol 채택한 Type
-        - dependencies : 외부 의존성 Type
+        - module: ModulePaths Type
      - Returns: Target Type
      */
-    public static func makeTarget<M: ModulePathProtocol>(module: M, dependencies: [TargetDependency]) -> Self {
-        TargetConfig(sources: .sources, resources: .resources)
-            .makeApp(with: module.name, bundleId: module.appBundleId, dependencies: dependencies)
+    public static func feature(module: ModulePaths.Feature, dependencies: [TargetDependency]) -> Self {
+        TargetConfig(sources: .sources, dependencies: dependencies)
+            .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
+    
+    /**
+     Domain Module Target 생성 메서드
+     - Parameters:
+        - module: ModulePaths Type
+        - product: Target Product Type
+     - Returns: Target Type
+     */
+    public static func domain(module: ModulePaths.Domain, dependencies: [TargetDependency]) -> Self {
+        TargetConfig(sources: .sources, dependencies: dependencies)
+            .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
+    }
+    
+    /**
+     Service Module Target 생성 메서드
+     - Parameters:
+        - module: ModulePaths Type
+     - Returns: Target Type
+     */
+    public static func service(module: ModulePaths.Service, dependencies: [TargetDependency]) -> Self {
+        TargetConfig(sources: .sources, dependencies: dependencies)
+            .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
+    }
+    
+    /**
+     Core Module Target 생성 메서드
+     - Parameters:
+        - module: ModulePaths Type
+     - Returns: Target Type
+     */
+    public static func core(module: ModulePaths.Core, dependencies: [TargetDependency] = []) -> Self {
+        TargetConfig(sources: .sources, dependencies: dependencies)
+            .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
+    }
+    
+    /**
+     share Module Target 생성 메서드
+     - Parameters:
+        - module: ModulePaths Type
+     - Returns: Target Type
+     */
+    public static func share(module: ModulePaths.Shared, dependencies: [TargetDependency] = []) -> Self {
+        TargetConfig(sources: .sources, resources: .resources, dependencies: dependencies)
+            .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
+    }
+    
+    /**
+     App Module Target 생성 메서드
+     - Parameters:
+        - module: ModulePaths Type
+        - Returns: Target Type
+     */
+    public static func app(module: ModulePaths.App, dependencies: [TargetDependency]) -> Self {
+        TargetConfig(sources: .sources, resources: .resources)
+            .makeApp(with: module.appName, bundleId: module.appBundleId, dependencies: dependencies)
+    }
+
 }

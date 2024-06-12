@@ -12,13 +12,10 @@ import ProjectDescriptionHelpers
 let project = Project.makeProject(
     module: .feature(.HomeFeature),
     targets: [
-        .makeTarget(
-            module: ModulePaths.Feature.HomeFeature,
-            dependencies: [
-                .makeDependency(module: ModulePaths.Domain.HomeDomain),
-                .makeDependency(module: ModulePaths.Shared.ThirdPartyLib)
-            ]
-        )
+        .feature(module: .HomeFeature, dependencies: [
+            .domain(module: .HomeDomain),
+            .shared(module: .ThirdPartyLib)
+        ])
     ]
 )
 

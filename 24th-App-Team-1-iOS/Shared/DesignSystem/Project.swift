@@ -11,11 +11,8 @@ import ProjectDescriptionHelpers
 let project = Project.makeProject(
     module: .shared(.DesignSystem),
     targets: [
-        .makeTarget(
-            module: ModulePaths.Shared.DesignSystem,
-            dependencies: [
-                .makeDependency(module: ModulePaths.Shared.ThirdPartyLib)
-            ]
-        )
+        .share(module: .DesignSystem, dependencies: [
+            .shared(module: .ThirdPartyLib)
+        ])
     ]
 )

@@ -12,10 +12,8 @@ let project = Project
     .makeProject(
         module: .core(.Extensions),
         targets: [
-            .makeTarget(
-                module: ModulePaths.Core.Extensions,
-                dependencies: [
-                    .makeDependency(module: ModulePaths.Shared.ThirdPartyLib)
-                ])
+            .core(module: .Extensions, dependencies: [
+                .shared(module: .ThirdPartyLib)
+            ])
         ]
     )

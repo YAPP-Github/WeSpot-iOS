@@ -12,11 +12,9 @@ let project = Project
     .makeProject(
         module: .core(.Networking),
         targets: [
-            .makeTarget(
-                module: ModulePaths.Core.Networking,
-                dependencies: [
-                    .makeDependency(module: ModulePaths.Shared.ThirdPartyLib)
-                ])
+            .core(module: .Networking, dependencies: [
+                .shared(module: .ThirdPartyLib)
+            ])
         ]
     )
 
