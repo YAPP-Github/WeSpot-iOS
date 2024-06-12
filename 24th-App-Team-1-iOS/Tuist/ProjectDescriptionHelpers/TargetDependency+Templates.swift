@@ -8,7 +8,7 @@
 import ProjectDescription
 
 extension TargetDependency {
-    struct SPM { }
+    public struct SPM { }
 }
 
 extension TargetDependency {
@@ -34,18 +34,18 @@ extension TargetDependency {
 
 extension TargetDependency.SPM {
     //MARK: Rx
-    static let rxSwift: TargetDependency = .external(name: "RxSwift")
-    static let rxCocoa: TargetDependency = .external(name: "RxCocoa")
-    static let reactorKit: TargetDependency = .external(name: "ReactorKit")
-    static let rxDataSources: TargetDependency = .external(name: "RxDataSources")
+    public static let rxSwift: TargetDependency = .external(name: "RxSwift")
+    public static let rxCocoa: TargetDependency = .external(name: "RxCocoa")
+    public static let reactorKit: TargetDependency = .external(name: "ReactorKit")
+    public static let rxDataSources: TargetDependency = .external(name: "RxDataSources")
     
     //MARK: DesignSystems
-    static let snapKit: TargetDependency = .external(name: "snapKit")
-    static let then: TargetDependency = .external(name: "Then")
+    public static let snapKit: TargetDependency = .external(name: "snapKit")
+    public static let then: TargetDependency = .external(name: "Then")
     
     //MARK: Network
-    static let alamofire: TargetDependency = .external(name: "Alamofire")
+    public static let alamofire: TargetDependency = .external(name: "Alamofire")
     
     //MARK: DI
-    static let swinject: TargetDependency = .external(name: "Swinject")
+    public static let swinject: TargetDependency = .external(name: "Swinject")
 }
