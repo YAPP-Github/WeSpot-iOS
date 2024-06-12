@@ -12,7 +12,7 @@ let project = Project
     .makeProject(
         module: .shared(.ThirdPartyLib),
         targets: [
-            .make(module: ModulePaths.Shared.ThirdPartyLib, dependencies: [
+            .makeTarget(module: ModulePaths.Shared.ThirdPartyLib, dependencies: [
                 .SPM.rxSwift,
                 .SPM.rxCocoa,
                 .SPM.reactorKit,

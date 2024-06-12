@@ -12,10 +12,10 @@ let project = Project
     .makeProject(
         module: .core(.Extensions),
         targets: [
-            .make(
+            .makeTarget(
                 module: ModulePaths.Core.Extensions,
                 dependencies: [
-                    .make(module: ModulePaths.Shared.ThirdPartyLib)
+                    .makeDependency(module: ModulePaths.Shared.ThirdPartyLib)
                 ])
         ]
     )

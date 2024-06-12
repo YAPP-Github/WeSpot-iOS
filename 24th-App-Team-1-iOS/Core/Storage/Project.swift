@@ -12,10 +12,10 @@ let project = Project
     .makeProject(
         module: .core(.Storage),
         targets: [
-            .make(
+            .makeTarget(
                 module: ModulePaths.Core.Storage,
                 dependencies: [
-                    .make(module: ModulePaths.Shared.ThirdPartyLib)
+                    .makeDependency(module: ModulePaths.Shared.ThirdPartyLib)
                 ])
         ]
     )

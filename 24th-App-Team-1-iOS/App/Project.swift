@@ -5,9 +5,9 @@ let project = Project
     .makeProject(
         module: .app(.app),
         targets: [
-            .make(module: ModulePaths.App.app, dependencies: [
-                .make(module: ModulePaths.Feature.HomeFeature),
-                .make(module: ModulePaths.Feature.ProfileFeature)
+            .makeTarget(module: ModulePaths.App.app, dependencies: [
+                .makeDependency(module: ModulePaths.Feature.HomeFeature),
+                .makeDependency(module: ModulePaths.Feature.ProfileFeature)
             ])
         ]
     )
