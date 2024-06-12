@@ -11,32 +11,28 @@ extension TargetDependency {
     struct SPM { }
 }
 
-
 extension TargetDependency {
-    
-    public static func feature(module: ModulePaths.Feature) -> Self {
-        .project(target: module.name, path: .relativeToRoot("Feature/\(module.name)"))
-    }
-    
-    public static func domain(module: ModulePaths.Domain) -> Self {
-        .project(target: module.name, path: .relativeToRoot("Domain/\(module.name)"))
-    }
-    
-    public static func service(module: ModulePaths.Service) -> Self {
-        .project(target: module.name, path: .relativeToRoot("Service/\(module.name)"))
-    }
-    
-    public static func core(module: ModulePaths.Core) -> Self {
-        .project(target: module.name, path: .relativeToRoot("Core/\(module.name)"))
-    }
-    
-    public static func shared(module: ModulePaths.Shared) -> Self {
-        .project(target: module.name, path: .relativeToRoot("Shared/\(module.name)"))
+    /**
+     - Parameters:
+        - module: ModulePathProtocol 채택한 Type
+     - Returns: TargetDependency Type
+     */
+    public static func make<M: ModulePathProtocol>(module: M) -> Self {
+        if module.name.contains("Feature") {
+            return .project(target: module.name, path: .relativeToRoot("Feature/\(module.name)"))
+        } else if module.name.contains("Domain") {
+            return .project(target: module.name, path: .relativeToRoot("Domain/\(module.name)"))
+        } else if module.name.contains("Service") {
+            return .project(target: module.name, path: .relativeToRoot("Service/\(module.name)"))
+        } else if module.name.contains("Core") {
+            return .project(target: module.name, path: .relativeToRoot("Core/\(module.name)"))
+        } else {
+            return .project(target: module.name, path: .relativeToRoot("Shared/\(module.name)"))
+        }
     }
 }
 
 extension TargetDependency.SPM {
-    
     //MARK: Rx
     static let rxSwift: TargetDependency = .external(name: "RxSwift")
     static let rxCocoa: TargetDependency = .external(name: "RxCocoa")

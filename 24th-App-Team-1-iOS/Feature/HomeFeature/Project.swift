@@ -9,15 +9,17 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 
-let project = Project
-    .makeProject(
-        module: .feature(.HomeFeature),
-        targets: [
-            .feature(module: .HomeFeature, dependencies: [
-                .domain(module: .HomeDomain),
-                .shared(module: .ThirdPartyLib)
-            ])
-        ]
+let project = Project.makeProject(
+    module: .feature(.HomeFeature),
+    targets: [
+        .make(
+            module: ModulePaths.Feature.HomeFeature,
+            dependencies: [
+                .make(module: ModulePaths.Domain.HomeDomain),
+                .make(module: ModulePaths.Shared.ThirdPartyLib)
+            ]
+        )
+    ]
 )
 
 

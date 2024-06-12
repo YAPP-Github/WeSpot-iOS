@@ -8,13 +8,15 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-let profileFeature = Project.makeProject(
+let project = Project.makeProject(
     module: .feature(.ProfileFeature),
     targets: [
-        .feature(
-            module: .ProfileFeature,
-            dependencies: [.domain(module: .ProfileDomain),
-                           .shared(module: .ThirdPartyLib)
-            ])
+        .make(
+            module: ModulePaths.Feature.ProfileFeature,
+            dependencies: [
+                .make(module: ModulePaths.Domain.ProfileDomain),
+                .make(module: ModulePaths.Shared.ThirdPartyLib)
+            ]
+        )
     ]
 )

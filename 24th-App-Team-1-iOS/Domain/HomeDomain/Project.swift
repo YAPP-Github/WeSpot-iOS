@@ -11,8 +11,11 @@ import ProjectDescriptionHelpers
 let project = Project.makeProject(
     module: .domain(.HomeDomain),
     targets: [
-        .domain(module: .HomeDomain, dependencies: [
-            .share(module: .ThirdPartyLib)
-        ])
+        .make(
+            module: ModulePaths.Domain.HomeDomain,
+            dependencies: [
+                .make(module: ModulePaths.Shared.ThirdPartyLib)
+            ]
+        )
     ]
 )

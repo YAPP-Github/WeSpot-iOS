@@ -5,8 +5,10 @@ let project = Project
     .makeProject(
         module: .app(.app),
         targets: [
-            .feature(module: .HomeFeature, dependencies: []),
-            .feature(module: .ProfileFeature, dependencies: [])
+            .make(module: ModulePaths.App.app, dependencies: [
+                .make(module: ModulePaths.Feature.HomeFeature),
+                .make(module: ModulePaths.Feature.ProfileFeature)
+            ])
         ]
     )
 
