@@ -66,7 +66,7 @@ extension ModulePaths {
 
 extension ModulePaths {
     public enum Core: String, ModulePathProtocol {
-        case Netwroking
+        case Networking
         case Storage
         case Extensions
     }

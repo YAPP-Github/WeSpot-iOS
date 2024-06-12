@@ -15,7 +15,7 @@ let project = Project.makeProject(
             module: ModulePaths.Service.HomeService,
             dependencies: [
                 .make(module: ModulePaths.Domain.HomeDomain),
-                .make(module: ModulePaths.Core.Netwroking),
+                .make(module: ModulePaths.Core.Networking),
                 .make(module: ModulePaths.Core.Storage),
                 .make(module: ModulePaths.Shared.ThirdPartyLib)
             ]

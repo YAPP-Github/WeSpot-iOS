@@ -15,7 +15,7 @@ let profileService = Project.makeProject(
             .make(module: ModulePaths.Domain.ProfileDomain),
             .make(module: ModulePaths.Shared.ThirdPartyLib),
             .make(module: ModulePaths.Core.Storage),
-            .make(module: ModulePaths.Core.Netwroking)
+            .make(module: ModulePaths.Core.Networking)
             ]
         )
     ]
