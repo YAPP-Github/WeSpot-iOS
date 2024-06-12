@@ -14,7 +14,8 @@ let project = Project.makeProject(
     targets: [
         .feature(module: .HomeFeature, dependencies: [
             .domain(module: .HomeDomain),
-            .shared(module: .ThirdPartyLib)
+            .shared(module: .ThirdPartyLib),
+            .core(module: .Util)
         ])
     ]
 )

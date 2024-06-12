@@ -69,6 +69,7 @@ extension ModulePaths {
         case Networking
         case Storage
         case Extensions
+        case Util
     }
 }
 
