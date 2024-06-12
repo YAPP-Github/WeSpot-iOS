@@ -141,7 +141,7 @@ extension Target {
         - dependencies : 외부 의존성 Type
      - Returns: Target Type
      */
-    public static func make<M: ModulePathProtocol>(module: M, dependencies: [TargetDependency]) -> Self {
+    public static func makeTarget<M: ModulePathProtocol>(module: M, dependencies: [TargetDependency]) -> Self {
         TargetConfig(sources: .sources, resources: .resources)
             .makeApp(with: module.name, bundleId: module.appBundleId, dependencies: dependencies)
     }

@@ -17,7 +17,7 @@ extension TargetDependency {
         - module: ModulePathProtocol 채택한 Type
      - Returns: TargetDependency Type
      */
-    public static func make<M: ModulePathProtocol>(module: M) -> Self {
+    public static func makeDependency<M: ModulePathProtocol>(module: M) -> Self {
         if module.name.contains("Feature") {
             return .project(target: module.name, path: .relativeToRoot("Feature/\(module.name)"))
         } else if module.name.contains("Domain") {
