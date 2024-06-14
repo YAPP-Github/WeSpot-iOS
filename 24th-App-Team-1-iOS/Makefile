@@ -7,6 +7,7 @@ INSTALL_DIR := $(HOME)/Library/Developer/Xcode/Templates/feature.xctemplate
 
 # 파일 목록 지정
 FILES := templates/feature.xctemplate/___FILEBASENAME___Feature.swift \
+	templates/feature.xctemplate/___FILEBASENAME___Reactor.swift \
          templates/feature.xctemplate/TemplateIcon-1016.png \
          templates/feature.xctemplate/TemplateInfo.plist
 

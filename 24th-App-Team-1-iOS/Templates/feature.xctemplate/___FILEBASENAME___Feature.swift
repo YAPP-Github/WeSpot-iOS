@@ -21,9 +21,7 @@ class ___FILEBASENAMEASIDENTIFIER___: BaseViewController<Reactor> {
     //MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        setupAutoLayout()
-        setupAttributes()
+        
     }
 
     //MARK: - Configure

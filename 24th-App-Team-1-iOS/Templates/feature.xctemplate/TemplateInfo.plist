@@ -3,22 +3,22 @@
 <plist version="1.0">
 <dict>
 	<key>DefaultCompletionName</key>
-	<string>feature</string>
+	<string>파일의 기본명</string>
 	<key>Kind</key>
 	<string>Xcode.IDEFoundation.TextSubstitutionFileTemplateKind</string>
 	<key>Description</key>
-	<string>BaseViewController</string>
+	<string>ViewController, ViewModel 생성</string>
 	<key>Summary</key>
-	<string>BaseViewController을 위한 템플릿입니다</string>
+	<string>가본 설정을 위한 템플릿입니다</string>
 	<key>SortOrder</key>
 	<string>30</string>
 	<key>Options</key>
 	<array>
 		<dict>
 			<key>Name</key>
-			<string>Scene Name</string>
+			<string>Class Name</string>
 			<key>Description</key>
-			<string>Scene</string>
+			<string>ViewController, Reactor를 위한 Class Name</string>
 			<key>Type</key>
 			<string>text</string>
 			<key>Required</key>

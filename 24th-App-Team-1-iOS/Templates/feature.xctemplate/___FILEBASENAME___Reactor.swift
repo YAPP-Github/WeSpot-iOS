@@ -1,45 +1,38 @@
 //
-//  BaseViewModel.swift
-//  Util
+//  ___FILENAME___
+//  ___PROJECTNAME___
 //
-//  Created by eunseou on 6/14/24.
+//  Created by ___FULLUSERNAME___ on ___DATE___.
 //
 
-import UIKit
+import Foundation
 
 import ReactorKit
 
-final class BaseViewModel: Reactor {
+class ___FILEBASENAMEASIDENTIFIER___: Reactor {
+    
     
     struct State {
-       
-    }
-  
-    enum Action {
         
     }
     
+    enum Action {
+        
+    }
     
     enum Mutation {
         
     }
     
-    let initialState: State
+    let initialState: State = State()
     
-    init(initialState: State = State()) {
-        self.initialState = initialState
-    }
-    
-    // Action -> Mutation
     func mutate(action: Action) -> Observable<Mutation> {
-     
+        
         return .empty()
     }
     
-    // Mutation -> State
     func reduce(state: State, mutation: Mutation) -> State {
         
         return state
     }
 }
-
