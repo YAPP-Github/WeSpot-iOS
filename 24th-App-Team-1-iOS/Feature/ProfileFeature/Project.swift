@@ -13,7 +13,8 @@ let project = Project.makeProject(
     targets: [
         .feature(module: .ProfileFeature, dependencies: [
             .domain(module: .ProfileDomain),
-            .shared(module: .ThirdPartyLib)
+            .shared(module: .ThirdPartyLib),
+            .core(module: .Util)
         ])
     ]
 )
