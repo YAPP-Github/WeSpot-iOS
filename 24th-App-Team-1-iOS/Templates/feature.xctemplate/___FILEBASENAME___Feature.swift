@@ -14,7 +14,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-class ___FILEBASENAMEASIDENTIFIER___: BaseViewController<Reactor> {
+final class ___FILEBASENAMEASIDENTIFIER___: BaseViewController<Reactor> {
 
     //MARK: - Properties
     
