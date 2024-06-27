@@ -32,7 +32,7 @@ extension Project {
         let name: String
         switch module {
         case .app(let app):
-            name = app.name
+            name = app.name.capitalized
         case .feature(let feature):
             name = feature.name
         case .domain(let domain):
