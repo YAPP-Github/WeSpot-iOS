@@ -12,19 +12,23 @@ extension InfoPlist {
     static func makeInfoPlist() -> Self {
         
         var basePlist: [String: Plist.Value] = [
-            "CFBundleShortVersionString": "1.0",
-            "CFBundleVersion": "1",
-            "UILaunchStoryboardName": "LaunchScreen",
-            "UIApplicationSceneManifest": [
-                "UIApplicationSupportsMultipleScenes": false,
+            "CFBundleDisplayName": .string("wespot"),
+            "UIUserInterfaceStyle": .string("Light"),
+            "CFBundleShortVersionString": .string("1.0"),
+            "CFBundleVersion": .string("1"),
+            "UILaunchStoryboardName": .string("LaunchScreen"),
+            "UIApplicationSceneManifest": .dictionary([
+                "UIApplicationSupportsMultipleScenes": .boolean(false),
                 "UISceneConfigurations": [
-                    "UIWindowSceneSessionRoleApplication": [
-                        "UISceneConfigurationName": "Default Configuration",
-                        "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate",
-                        "UISceneStoryboardFile": "Main"
-                    ]
+                    "UIWindowSceneSessionRoleApplication": .array([
+                        .dictionary([
+                            "UISceneConfigurationName": .string("Default Configuration"),
+                            "UISceneDelegateClassName": .string("$(PRODUCT_MODULE_NAME).SceneDelegate")
+                        ])
+                    ])
                 ]
-            ]
+            ])
+        
         ]
         
         return InfoPlist.extendingDefault(with: basePlist)

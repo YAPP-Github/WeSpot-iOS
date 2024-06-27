@@ -142,7 +142,7 @@ extension Target {
      - Returns: Target Type
      */
     public static func feature(module: ModulePaths.Feature, dependencies: [TargetDependency]) -> Self {
-        TargetConfig(sources: .sources, dependencies: dependencies)
+        TargetConfig(infoPlist: .default, sources: .sources, dependencies: dependencies)
             .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
     
@@ -154,7 +154,7 @@ extension Target {
      - Returns: Target Type
      */
     public static func domain(module: ModulePaths.Domain, dependencies: [TargetDependency]) -> Self {
-        TargetConfig(sources: .sources, dependencies: dependencies)
+        TargetConfig(infoPlist: .default, sources: .sources, dependencies: dependencies)
             .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
     
@@ -165,7 +165,7 @@ extension Target {
      - Returns: Target Type
      */
     public static func service(module: ModulePaths.Service, dependencies: [TargetDependency]) -> Self {
-        TargetConfig(sources: .sources, dependencies: dependencies)
+        TargetConfig(infoPlist: .default, sources: .sources, dependencies: dependencies)
             .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
     
@@ -176,7 +176,7 @@ extension Target {
      - Returns: Target Type
      */
     public static func core(module: ModulePaths.Core, dependencies: [TargetDependency] = []) -> Self {
-        TargetConfig(sources: .sources, dependencies: dependencies)
+        TargetConfig(infoPlist: .default, sources: .sources, dependencies: dependencies)
             .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
     
@@ -187,7 +187,7 @@ extension Target {
      - Returns: Target Type
      */
     public static func share(module: ModulePaths.Shared, dependencies: [TargetDependency] = []) -> Self {
-        TargetConfig(sources: .sources, resources: .resources, dependencies: dependencies)
+        TargetConfig(infoPlist: .default ,sources: .sources, resources: .resources, dependencies: dependencies, settings: module == .ThirdPartyLib ? .makeSettings() : nil)
             .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
     
@@ -198,7 +198,7 @@ extension Target {
         - Returns: Target Type
      */
     public static func app(module: ModulePaths.App, dependencies: [TargetDependency]) -> Self {
-        TargetConfig(sources: .sources, resources: .resources)
+        TargetConfig(infoPlist: .makeInfoPlist() ,sources: .sources, resources: .resources)
             .makeApp(with: module.appName, bundleId: module.appBundleId, dependencies: dependencies)
     }
 
