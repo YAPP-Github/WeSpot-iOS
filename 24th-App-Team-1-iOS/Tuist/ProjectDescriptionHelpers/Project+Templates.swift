@@ -18,15 +18,15 @@ extension Project {
         targets: [Target],
         organizationName: String? = nil,
         options: Project.Options = .options(
-            disableBundleAccessors: true,
-            disableSynthesizedResourceAccessors: true
+            disableBundleAccessors: false,
+            disableSynthesizedResourceAccessors: false
         ),
         packages: [Package] = [],
         schemes: [Scheme] = [],
         settings: Settings? = nil,
         fileHeaderTemplate: FileHeaderTemplate? = nil,
         additionalFiles: [FileElement] = [],
-        resourceSynthesizers: [ResourceSynthesizer] = []
+        resourceSynthesizers: [ResourceSynthesizer] = .default
     ) -> Self {
         
         let name: String
