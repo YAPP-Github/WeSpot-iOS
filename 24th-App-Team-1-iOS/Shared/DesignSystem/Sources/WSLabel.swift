@@ -7,33 +7,21 @@
 
 import UIKit
 
-class WSLabel: UILabel {
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-    }
-    
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
+public class WSLabel: UILabel {
     
     /// 텍스트와 WSFont를 받아 초기화
     /// - Parameters:
-    ///   - text: 설정할 텍스트입니다.
+    ///   - text: 설정할 텍스트입니다. 기본값은 nil입니다.
     ///   - wsFont: 사용할 WSFont입니다. ex) Header01, Body01
-    init(text: String?, wsFont: WSFont) {
+    ///   - textAlignment: 텍스트 정렬 방식입니다. default는 .left
+    public init(wsFont: WSFont, text: String? = nil, textAlignment: NSTextAlignment = .left) {
         super.init(frame: .zero)
         self.text = text
         font(wsFont)
     }
     
-    /// WSFont만 받아 초기화
-    /// - Parameters:
-    ///   - wsFont: 사용할 WSFont입니다.  ex) Header01, Body01
-    init(wsFont: WSFont) {
-        super.init(frame: .zero)
-        font(wsFont)
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
     }
     
     /// WSFont를 적용
@@ -57,10 +45,11 @@ class WSLabel: UILabel {
         paragraphStyle.lineHeightMultiple = wsFont.lineHeight
         paragraphStyle.alignment = self.textAlignment
         
+        // 텍스트 베이스라인 오프셋 계산
         let baselineOffset = (lineHeight - wsFont.size) / 2
         let attributes: [NSAttributedString.Key: Any] = [
-            .paragraphStyle: paragraphStyle,
-            .baselineOffset: baselineOffset
+            .paragraphStyle: paragraphStyle, // 문단 스타일 설정
+            .baselineOffset: baselineOffset // 베이스라인 오프셋 설정
         ]
         
         return NSAttributedString(string: self.text ?? "", attributes: attributes)

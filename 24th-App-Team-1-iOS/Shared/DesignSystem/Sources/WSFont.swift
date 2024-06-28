@@ -7,14 +7,14 @@
 
 import UIKit
 
-enum PretendardFont: String {
+public enum PretendardFont: String {
     case bold = "Pretendard-Bold"
     case semibold = "Pretendard-SemiBold"
     case medium = "Pretendard-Medium"
     case regular = "Pretendard-Regular"
 }
 
-enum WSFont {
+public enum WSFont {
     case Header01
     case Header02
     case Header03
