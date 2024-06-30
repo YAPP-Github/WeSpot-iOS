@@ -6,7 +6,8 @@ let project = Project
         module: .app(.app),
         targets: [
             .app(module: .app, dependencies: [
-                .feature(module: .ProfileFeature)
+                .feature(module: .ProfileFeature),
+                .shared(module: .DesignSystem)
             ])
         ]
     )
