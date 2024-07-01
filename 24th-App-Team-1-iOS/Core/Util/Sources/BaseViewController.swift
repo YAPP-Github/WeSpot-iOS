@@ -7,14 +7,14 @@
 
 import UIKit
 
-import RxSwift
-import RxCocoa
+import DesignSystem
 import ReactorKit
 
 
 open class BaseViewController<R>: UIViewController, ReactorKit.View where R: Reactor {
     //MARK: Properties
     public typealias Reactor = R
+    public var navigationBar: WSNavigationBar = WSNavigationBar()
     public var disposeBag: DisposeBag = DisposeBag()
     
     public init() {
@@ -42,14 +42,44 @@ open class BaseViewController<R>: UIViewController, ReactorKit.View where R: Rea
     //MARK: Configure
     
     /// 서브 뷰 추가를 위한 메서드
-    open func setupUI() { }
+    open func setupUI() {
+        view.addSubview(navigationBar)
+    }
     
     /// 오토레이아웃 설정을 위한 메서드
-    open func setupAutoLayout() { }
+    open func setupAutoLayout() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(44)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(60)
+        }
+    }
     
     /// 뷰의 속성 설정을 위한 메서드
-    open func setupAttributes() { }
+    open func setupAttributes() {
+        navigationController?.navigationBar.isHidden = true
+    }
     
     /// 리엑터와 바인딩을 위한 메서드
-    open func bind(reactor: R) { }
+    open func bind(reactor: R) {
+        navigationBar.rx.leftBarButtonItem
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, type in
+                switch type {
+                case .leftIcon:
+                    owner.navigationController?.popViewController(animated: true)
+                case .leftWithRightItem:
+                    owner.navigationController?.popViewController(animated: true)
+                case .leftWithCenterItem:
+                    owner.navigationController?.popViewController(animated: true)
+                case .all:
+                    owner.navigationController?.popViewController(animated: true)
+                default:
+                    break
+                }
+            }.disposed(by: disposeBag)
+    }
+    
 }
+
+
