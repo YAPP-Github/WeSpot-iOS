@@ -61,8 +61,7 @@ public final class WSNavigationBar: UIView {
     /// - Parameters:
     ///  - property: WSNavigationPropertyType을 통해 해당 leftBarButtonItem, rightBarButtonItem의 Spacing, Scale 값을 설정하도록 합니다.
     ///  - Returns: WSNavigationBar Type을 반환합니다.
-    @discardableResult
-    public func setNavigationBarAutoLayout(property: WSNavigationPropertyType) -> Self {
+    public func setNavigationBarAutoLayout(property: WSNavigationPropertyType) {
         
         leftBarButton.snp.makeConstraints {
             $0.left.equalToSuperview().offset(property.constraints.leftBarButtonItemLeftSpacing)
@@ -76,12 +75,10 @@ public final class WSNavigationBar: UIView {
         }
         
         rightBarButton.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(10)
-            $0.right.equalToSuperview().offset(-18)
+            $0.top.equalToSuperview().offset(property.constraints.rightBarButtonItemTopSpacing)
+            $0.right.equalToSuperview().offset(-property.constraints.rightBarButtonItemRightSpacing)
             $0.centerY.equalToSuperview()
         }
-        
-        return self
     }
     
 }
