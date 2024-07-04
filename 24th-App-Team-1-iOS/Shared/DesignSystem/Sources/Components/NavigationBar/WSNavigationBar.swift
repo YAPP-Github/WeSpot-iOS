@@ -52,7 +52,7 @@ public final class WSNavigationBar: UIView {
         rightBarButton.setImage(property.items.rightImageItem, for: .normal)
         
         navigationTitleLabel.text = property.items.centerItem
-        navigationTitleLabel.textColor = DesignSystemAsset.Colors.gray300.color
+        navigationTitleLabel.textColor = DesignSystemAsset.Colors.gray100.color
         
         return self
     }
