@@ -7,88 +7,9 @@
 
 import UIKit
 
-public enum WSButtonColor {
-    case primary
-    case secondary
-    case tertiary
-    
-    var color: UIColor {
-        switch self {
-        case .primary:
-            return DesignSystemAsset.Colors.primary300.color
-        case .secondary:
-            return DesignSystemAsset.Colors.gray500.color
-        case .tertiary:
-            return DesignSystemAsset.Colors.gray700.color
-        }
-    }
-}
-
-
-public struct WSButtonProperty {
-    let backgroundColor: WSButtonColor
-    let textColor: UIColor?
-    let textFont: UIFont?
-    let radius: CGFloat
-    let borderColor: CGColor?
-    let borderWidth: CGFloat?
-}
-
-public enum WSButtonType {
-    case `default`
-    case supplementaryButton(WSButtonColor)
-    case strokeButton
-    case disableButton
-    
-    
-    var buttonProperties: WSButtonProperty {
-        switch self {
-        case .default:
-            
-            //TODO: BorderColor, BorderWidth 나중에 없애기
-            return .init(
-                backgroundColor: .primary,
-                textColor: DesignSystemAsset.Colors.gray900.color,
-                textFont: WSFont.Body03.font(),
-                radius: 12,
-                borderColor: nil,
-                borderWidth: 0
-            )
-        case let .supplementaryButton(colorType):
-            return .init(
-                backgroundColor: colorType,
-                textColor: colorType == .primary ? DesignSystemAsset.Colors.gray900.color : DesignSystemAsset.Colors.gray100.color,
-                textFont: WSFont.Body03.font(),
-                radius: 10,
-                borderColor: nil,
-                borderWidth: 0
-            )
-        case .strokeButton:
-            return .init(
-                backgroundColor: .tertiary,
-                textColor: DesignSystemAsset.Colors.gray100.color,
-                textFont: WSFont.Body03.font(),
-                radius: 12,
-                borderColor: DesignSystemAsset.Colors.primary400.color.cgColor,
-                borderWidth: 1
-            )
-        case .disableButton:
-            return .init(
-                backgroundColor: .secondary,
-                textColor: DesignSystemAsset.Colors.gray300.color.withAlphaComponent(0.8),
-                textFont: WSFont.Body03.font(),
-                radius: 12,
-                borderColor: nil,
-                borderWidth: 0
-            )
-        }
-        
-    }
-}
-
-
 public final class WSButton: UIButton {
     
+    //MARK: - Properties
     public let wsButtonType: WSButtonType
     
     public override var isHighlighted: Bool {
@@ -97,8 +18,7 @@ public final class WSButton: UIButton {
         }
     }
     
-    
-    
+    //MARK: - Initializer
     public init(wsButtonType: WSButtonType) {
         self.wsButtonType = wsButtonType
         super.init(frame: .zero)
@@ -108,10 +28,8 @@ public final class WSButton: UIButton {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func configure() {
-        
-    }
     
+    //MARK: Functions
     @discardableResult
     public func setupButton(text: String) -> Self {
         
@@ -128,8 +46,8 @@ public final class WSButton: UIButton {
     }
     
     private func setupHighlighted(_ isHighlighted: Bool) {
-        backgroundColor = isHighlighted ? DesignSystemAsset.Colors.primary500.color : wsButtonType.buttonProperties.backgroundColor.color
+        backgroundColor = isHighlighted ? wsButtonType.pressedBackgroundColor : wsButtonType.buttonProperties.backgroundColor.color
+        setTitleColor(wsButtonType.pressedTextColor, for: .highlighted)
+        layer.borderColor = wsButtonType.pressedBorderColor
     }
-    
-    
 }
