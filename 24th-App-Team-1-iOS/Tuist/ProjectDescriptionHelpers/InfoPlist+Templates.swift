@@ -27,8 +27,13 @@ extension InfoPlist {
                         ])
                     ])
                 ]
+            ]),
+            "UIAppFonts": .array([
+                .string("Pretendard-Regular.otf"),
+                .string("Pretendard-Bold.otf"),
+                .string("Pretendard-Medium.otf"),
+                .string("Pretendard-SemiBold.otf")
             ])
-        
         ]
         
         return InfoPlist.extendingDefault(with: basePlist)
