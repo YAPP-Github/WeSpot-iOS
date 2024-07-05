@@ -92,7 +92,7 @@ public final class WSBanner: UIView {
         }
     }
     
-    // 외부에서 접근 가능한 색상 변경 함수
+    // 외부에서 접근 가능한 배경 색상 변경 함수
     public func setBackgroundColor(_ color: UIColor) {
         backgroundColor = color
     }
@@ -101,5 +101,10 @@ public final class WSBanner: UIView {
     public func setBorderColor() {
         layer.borderColor = DesignSystemAsset.Colors.primary400.color.cgColor
         layer.borderWidth = 0.6
+    }
+    
+    // 외부에서 접근 가능한 subLabel 색상 변경 함수
+    public func setSubLabelColor(_ color: UIColor) {
+        subLabel.textColor = color
     }
 }
