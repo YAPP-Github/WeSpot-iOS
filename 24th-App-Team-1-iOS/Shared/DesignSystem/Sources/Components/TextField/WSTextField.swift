@@ -54,7 +54,6 @@ public final class WSTextField: UITextField {
         self.titleText = title
         self.placeholderText = placeholder
         setupUI()
-        bindUI()
     }
     
     required init?(coder: NSCoder) {
@@ -79,25 +78,13 @@ public final class WSTextField: UITextField {
         layer.borderColor = UIColor.clear.cgColor
         layer.borderWidth = 1.0
         layer.cornerRadius = 12
+        textColor = DesignSystemAsset.Colors.gray100.color
         placeholder = placeholderText
         attributedPlaceholder = NSAttributedString(string: placeholderText, attributes: [NSAttributedString.Key.foregroundColor: DesignSystemAsset.Colors.gray400.color])
         backgroundColor = DesignSystemAsset.Colors.gray700.color
         applyWSFont(.Body04)
     }
     
-    private func bindUI() {
-        
-        rx.controlEvent([.editingDidBegin, .editingDidEnd])
-            .subscribe(with: self) { owner, _ in
-                owner.updateBorder()
-            }.disposed(by: disposeBag)
-        
-        rx.text.orEmpty
-            .subscribe(with: self) { owner, text in
-                owner.updateTextColor(hasText: !text.isEmpty)
-            }
-            .disposed(by: disposeBag)
-    }
     
     private func updateBorder() {
         if isEditing {
@@ -107,13 +94,6 @@ public final class WSTextField: UITextField {
         }
     }
     
-    private func updateTextColor(hasText: Bool) {
-        if hasText {
-            textColor = DesignSystemAsset.Colors.gray100.color
-        } else {
-            textColor = DesignSystemAsset.Colors.gray400.color
-        }
-    }
     
     // WSFont를 적용하는 메소드 추가
     private func applyWSFont(_ wsFont: WSFont) {
@@ -183,5 +163,10 @@ public final class WSTextField: UITextField {
         return bounds.inset(by: textFieldState.padding)
     }
     
-    
+    // boderUpdate Binder 프로퍼티
+    public var borderUpdateBinder: Binder<Bool> {
+        return Binder(self) { textField, isEditing in
+            textField.updateBorder()
+        }
+    }
 }
