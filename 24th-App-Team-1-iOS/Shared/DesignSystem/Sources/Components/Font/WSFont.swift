@@ -22,6 +22,7 @@ public enum WSFont {
     case Body08
     case Body09
     case Body10
+    case Body11
     case Badge
     
     var size: CGFloat {
@@ -51,6 +52,8 @@ public enum WSFont {
         case .Body09:
             12
         case .Body10:
+            10
+        case .Body11:
             10
         case .Badge:
             12
@@ -84,6 +87,8 @@ public enum WSFont {
         case .Body09:
             DesignSystemFontFamily.Pretendard.medium
         case .Body10:
+            DesignSystemFontFamily.Pretendard.semiBold
+        case .Body11:
             DesignSystemFontFamily.Pretendard.medium
         case .Badge:
             DesignSystemFontFamily.Pretendard.semiBold
