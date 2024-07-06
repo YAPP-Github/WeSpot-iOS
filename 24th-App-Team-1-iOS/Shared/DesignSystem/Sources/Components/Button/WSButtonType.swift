@@ -9,29 +9,31 @@ import UIKit
 
 
 public enum WSButtonType {
-    case `default`
-    case supplementaryButton(WSButtonColor)
+    case `default`(CGFloat)
+    case secondaryButton
     case strokeButton
     case disableButton
     
     
     var buttonProperties: WSButtonProperty {
         switch self {
-        case .default:
-            
+        /// Primary Button 생성 Case  입니다
+        case let .default(radius):
             return .init(
                 backgroundColor: .primary,
                 textColor: DesignSystemAsset.Colors.gray900.color,
                 textFont: WSFont.Body03.font(),
-                radius: 12
+                radius: radius
             )
-        case let .supplementaryButton(colorType):
+        /// Secondary Button 생성 Case  입니다
+        case .secondaryButton:
             return .init(
-                backgroundColor: colorType,
-                textColor: colorType == .primary ? DesignSystemAsset.Colors.gray900.color : DesignSystemAsset.Colors.gray100.color,
+                backgroundColor: .secondary,
+                textColor: DesignSystemAsset.Colors.gray100.color,
                 textFont: WSFont.Body03.font(),
                 radius: 10
             )
+        /// Stroke Button이 있는 생성 Case  입니다
         case .strokeButton:
             return .init(
                 backgroundColor: .tertiary,
@@ -41,10 +43,11 @@ public enum WSButtonType {
                 borderColor: DesignSystemAsset.Colors.primary400.color.cgColor,
                 borderWidth: 1
             )
+        /// Disabled Button이 있는 생성 Case  입니다
         case .disableButton:
             return .init(
                 backgroundColor: .secondary,
-                textColor: DesignSystemAsset.Colors.gray300.color.withAlphaComponent(0.8),
+                textColor: DesignSystemAsset.Colors.gray300.color,
                 textFont: WSFont.Body03.font(),
                 radius: 12
             )
@@ -57,10 +60,8 @@ public enum WSButtonType {
             return DesignSystemAsset.Colors.pressedPrimary300.color
         case .strokeButton:
             return DesignSystemAsset.Colors.pressedGray700.color
-        case .disableButton:
+        case .disableButton, .secondaryButton:
             return DesignSystemAsset.Colors.pressedGray500.color
-        default:
-            return UIColor()
         }
     }
     
@@ -75,7 +76,7 @@ public enum WSButtonType {
     
     var pressedTextColor: UIColor {
         switch self {
-        case .strokeButton:
+        case .strokeButton, .disableButton, .secondaryButton:
             return DesignSystemAsset.Colors.gray300.color
         default:
             return self.buttonProperties.textColor ?? UIColor()
