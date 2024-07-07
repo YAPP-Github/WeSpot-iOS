@@ -78,8 +78,4 @@ public final class WSToast: UIView {
         layer.cornerRadius = bounds.height / 2
     }
     
-    override public var intrinsicContentSize: CGSize {
-        return stackView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-    }
-    
 }
