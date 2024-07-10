@@ -8,9 +8,8 @@
 import UIKit
 import Util
 
-import DesignSystem
 import SnapKit
-
+import VoteFeature
 
 class SceneDelegate: UIResponder, UISceneDelegate {
     
@@ -20,7 +19,7 @@ class SceneDelegate: UIResponder, UISceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: scene)
-        //TODO: ViewControle 생성 해서 RootViewController로 지정 해주세요
+        window?.rootViewController = UINavigationController(rootViewController: VoteMainViewController())
         window?.makeKeyAndVisible()
         
     }
