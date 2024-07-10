@@ -23,7 +23,7 @@ public final class WSNetworkService: WSNetworkServiceProtocol {
         return networkSession
     }()
     
-    //TODO: Status Code 값에 따른 Network 오류 처리 코드 추가
+    //MARK: Functions
     public func requset<T: Decodable>(endPoint: URLRequestConvertible) -> Single<T> {
         return Single<T>.create { [weak self] single in
             let task = self?.session.request(endPoint)
@@ -33,7 +33,16 @@ public final class WSNetworkService: WSNetworkServiceProtocol {
                     case let .success(response):
                         single(.success(response))
                     case let .failure(error):
-                        single(.failure(error))
+                        switch response.response?.statusCode {
+                        case 400:
+                            single(.failure(WSNetworkError.badRequest(message: response.request?.url?.absoluteString ?? "")))
+                        case 401:
+                            single(.failure(WSNetworkError.unauthorized))
+                        case 404:
+                            single(.failure(WSNetworkError.notFound))
+                        default:
+                            single(.failure(WSNetworkError.default(message: error.localizedDescription)))
+                        }
                     }
                 }
             return Disposables.create {
