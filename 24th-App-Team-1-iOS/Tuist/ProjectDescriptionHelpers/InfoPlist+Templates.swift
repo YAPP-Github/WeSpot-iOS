@@ -9,7 +9,14 @@ import ProjectDescription
 
 extension InfoPlist {
     
+    public static var `default`: Self = {
+        return .extendingDefault(with: [
+            "BASE_URL": .string("https://24b0b5f1-548f-4c72-aaf9-65f747a2e62b.mock.pstmn.io/api/v1")
+        ])
+    }()
+    
     static func makeInfoPlist() -> Self {
+        
         
         var basePlist: [String: Plist.Value] = [
             "CFBundleDisplayName": .string("wespot"),
@@ -33,7 +40,8 @@ extension InfoPlist {
                 .string("Pretendard-Bold.otf"),
                 .string("Pretendard-Medium.otf"),
                 .string("Pretendard-SemiBold.otf")
-            ])
+            ]),
+            "BASE_URL": .string("https://24b0b5f1-548f-4c72-aaf9-65f747a2e62b.mock.pstmn.io/api/v1")
         ]
         
         return InfoPlist.extendingDefault(with: basePlist)
