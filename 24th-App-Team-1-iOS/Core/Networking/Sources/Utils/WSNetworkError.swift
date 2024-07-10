@@ -9,7 +9,7 @@ import Foundation
 
 
 public enum WSNetworkError: Error, LocalizedError {
-    case `default`(statusCode: Int)
+    case `default`(message: String)
     case badRequest(message: String)
     case unauthorized
     case forbidden

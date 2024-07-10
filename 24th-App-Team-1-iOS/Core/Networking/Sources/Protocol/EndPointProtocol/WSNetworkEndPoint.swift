@@ -10,7 +10,6 @@ import Foundation
 import Alamofire
 
 public protocol WSNetworkEndPoint: URLRequestConvertible {
-    var baseURL: String { get }
     var path: String { get }
     var method: HTTPMethod { get }
     var parameters: WSRequestParameters { get }
@@ -20,7 +19,7 @@ public protocol WSNetworkEndPoint: URLRequestConvertible {
 extension WSNetworkEndPoint {
     
     func asURLRequest() throws -> URLRequest {
-        var url = try baseURL.asURL()
+        var url = try WSNetworkConfigure.baseURL.asURL()
         var urlRequest = try URLRequest(url: url.appendingPathComponent(path), method: method)
         
         switch parameters {
