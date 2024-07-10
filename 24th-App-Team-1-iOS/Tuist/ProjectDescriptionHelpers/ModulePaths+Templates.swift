@@ -46,6 +46,7 @@ extension ModulePaths {
 extension ModulePaths {
     public enum Feature: String, ModulePathProtocol {
         case ProfileFeature
+        case VoteFeature
     }
 }
 
