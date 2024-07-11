@@ -9,12 +9,24 @@ import Foundation
 import os.log
 
 
-//MARK: View 기반 로그 타입
-public enum ViewLogType: String, CustomStringConvertible {
+/// 기능 단위 로그 타입
+public enum Feature: String, CustomStringConvertible {
     public var description: String {
         return "\(self.rawValue.uppercased())"
     }
     case login
+}
+
+/// 네트워크 로그 타입
+public enum Network: String, CustomStringConvertible{
+    public var description: String {
+        return "\(self.rawValue.uppercased())"
+    }
+    
+    /// 에러 확인용 로그
+    case error
+    /// 데이터 출력용 로그
+    case `default`
 }
 
 public struct WSLogger {
