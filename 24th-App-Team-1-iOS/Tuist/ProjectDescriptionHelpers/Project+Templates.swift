@@ -50,7 +50,12 @@ extension Project {
             organizationName: organizationName,
             options: options,
             packages: packages,
-            settings: settings,
+            settings: .settings(
+                configurations: [
+                    .build(.dev, name: name),
+                    .build(.prd, name: name)
+                ]
+            ),
             targets: targets,
             schemes: schemes,
             fileHeaderTemplate: fileHeaderTemplate,
