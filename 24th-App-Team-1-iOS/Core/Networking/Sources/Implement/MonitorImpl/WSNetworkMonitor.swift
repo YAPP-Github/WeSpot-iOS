@@ -8,6 +8,7 @@
 import Foundation
 
 import Alamofire
+import Util
 
 public final class WSNetworkMonitor: EventMonitor {
     
@@ -16,19 +17,19 @@ public final class WSNetworkMonitor: EventMonitor {
 
     //MARK: Functions
     public func requestDidFinish(_ request: Request) {
-        print("⭐️Reqeust WSNetwork LOG⭐️")
-        print("URL : \((request.request?.url?.absoluteString ?? ""))")
-        print("Method : \((request.request?.httpMethod ?? ""))")
-        print("HTTPHeaders \((request.request?.headers) ?? .default):")
-        print("Body: \((request.request?.httpBody?.toPrettyPrintedString ?? ""))")
+        WSLogger.debug(category: Network.default, message: "⭐️Reqeust WSNetwork LOG⭐️")
+        WSLogger.debug(category: Network.default, message: "URL : \((request.request?.url?.absoluteString ?? ""))")
+        WSLogger.debug(category: Network.default, message: "Method : \((request.request?.httpMethod ?? ""))")
+        WSLogger.debug(category: Network.default, message: "HTTPHeaders \((request.request?.headers) ?? .default):")
+        
     }
     
     
     public func request(_ request: DataRequest, didParseResponse response: DataResponse<Data?, AFError>) {
-        print("✅Response WSNetwork LOG✅")
-        print("URL : \((request.request?.url?.absoluteString ?? ""))")
-        print("Results : \((response.result))")
-        print("StatusCode : \(response.response?.statusCode ?? 0)")
-        print("Data : \(response.data?.toPrettyPrintedString ?? "")")
+        WSLogger.debug(category: Network.default, message: "✅Response WSNetwork LOG✅")
+        WSLogger.debug(category: Network.default, message: "URL : \((request.request?.url?.absoluteString ?? ""))")
+        WSLogger.debug(category: Network.default, message: "Results : \((response.result))")
+        WSLogger.debug(category: Network.default, message: "StatusCode : \(response.response?.statusCode ?? 0)")
+        WSLogger.debug(category: Network.default, message: "Data : \(response.data?.toPrettyPrintedString ?? "")")
     }
 }

@@ -12,5 +12,5 @@ import RxSwift
 
 
 public protocol WSNetworkServiceProtocol {
-    func requset<T: Decodable>(endPoint: URLRequestConvertible) -> Single<T>
+    func request<T: Decodable>(endPoint: URLRequestConvertible) -> Single<T>
 }

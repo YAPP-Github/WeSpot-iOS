@@ -24,7 +24,7 @@ public final class WSNetworkService: WSNetworkServiceProtocol {
     }()
     
     //MARK: Functions
-    public func requset<T: Decodable>(endPoint: URLRequestConvertible) -> Single<T> {
+    public func request<T: Decodable>(endPoint: URLRequestConvertible) -> Single<T> {
         return Single<T>.create { [weak self] single in
             let task = self?.session.request(endPoint)
                 .validate(statusCode: 200...299)
