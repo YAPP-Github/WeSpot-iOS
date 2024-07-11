@@ -22,31 +22,13 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
         titleText: "위스팟에 친구 초대하기",
         subText: "다양한 친구들과 더 재밌게 사용해 보세요"
     )
-    private let voteContainerView: UIView = UIView().then {
-        $0.backgroundColor = DesignSystemAsset.Colors.gray700.color
-        $0.clipsToBounds = true
-        $0.layer.cornerRadius = 18
-    }
-    
-    private let voteConfrimButton: WSButton = WSButton(wsButtonType: .default(12)).then {
-        $0.setupButton(text: "투표하기")
-    }
-    
-    private let voteDateLabel: WSLabel = WSLabel(wsFont: .Body06).then {
-        $0.text = Date().toFormatString(with: .MddEEE)
-        $0.textColor = DesignSystemAsset.Colors.gray300.color
-    }
-    
-    private let voteDescriptionLabel: WSLabel = WSLabel(wsFont: .Body01).then {
-        $0.text = "지금 우리 반 투표가 진행 중이에요\n반 친구들에 대해 알려주세요"
-        $0.textColor = DesignSystemAsset.Colors.gray100.color
-    }
-    
-    private let voteImageView: UIImageView = UIImageView().then {
-        $0.contentMode = .scaleAspectFill
-        $0.image = DesignSystemAsset.Images.voteSymbol.image
-    }
-    
+    private let voteContainerView: UIView = UIView()
+    private let voteConfrimButton: WSButton = WSButton(wsButtonType: .default(12))
+    private let voteDateLabel: WSLabel = WSLabel(wsFont: .Body06)
+    private let voteDescriptionLabel: WSLabel = WSLabel(wsFont: .Body01)
+    private let voteImageView: UIImageView = UIImageView()
+    private let voteToggleView: VoteToggleView = VoteToggleView()
+    //TODO: PageViewController 추가
     
     
     //MARK: - LifeCycle
@@ -59,13 +41,20 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
     public override func setupUI() {
         super.setupUI()
         voteContainerView.addSubviews(voteConfrimButton, voteDateLabel, voteImageView, voteDescriptionLabel)
-        view.addSubviews(voteBannerView, voteContainerView)
+        view.addSubviews(voteBannerView, voteContainerView, voteToggleView)
     }
 
     public override func setupAutoLayout() {
         super.setupAutoLayout()
-        voteBannerView.snp.makeConstraints {
+        
+        voteToggleView.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom).offset(20)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(46)
+        }
+        
+        voteBannerView.snp.makeConstraints {
+            $0.top.equalTo(voteToggleView.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(20)
             $0.height.equalTo(80)
         }
@@ -107,12 +96,55 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
         navigationBar
             .setNavigationBarUI(property: .default)
             .setNavigationBarAutoLayout(property: .default)
+        
+        voteContainerView.do {
+            $0.backgroundColor = DesignSystemAsset.Colors.gray700.color
+            $0.clipsToBounds = true
+            $0.layer.cornerRadius = 18
+        }
+        
+        voteConfrimButton.do {
+            $0.setupButton(text: "투표하기")
+        }
+        
+        voteDateLabel.do {
+            $0.text = Date().toFormatString(with: .MddEEE)
+            $0.textColor = DesignSystemAsset.Colors.gray300.color
+        }
+        
+        voteDescriptionLabel.do {
+            $0.text = "지금 우리 반 투표가 진행 중이에요\n반 친구들에 대해 알려주세요"
+            $0.textColor = DesignSystemAsset.Colors.gray100.color
+        }
+        
+        voteImageView.do {
+            $0.contentMode = .scaleAspectFill
+            $0.image = DesignSystemAsset.Images.voteSymbol.image
+        }
 
     }
 
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
-
+        voteToggleView.mainButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTapToggleButton(.main) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        voteToggleView.resultButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTapToggleButton(.result) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.voteTypes == .main ? true : false }
+            .distinctUntilChanged()
+            .bind(to: voteToggleView.rx.isSelected)
+            .disposed(by: disposeBag)
     }
 }
 
@@ -121,7 +153,7 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
 // - App Module에 넣어서 하위 Feature 의존성을 모두 관리 해야 할 듯한데 의존성 라이브러리 잘 몰라서 모르겠음
 public final class WSTabBarViewController: UITabBarController {
     
-    private let voteViewController: VoteMainViewController = VoteMainViewController()
+    private let voteViewController: VoteMainViewController = VoteMainViewController(reactor: VoteMainViewReactor())
     //TODO: ViewController 임시 네이밍 입니다 추후 수정해주세요
     private let noteViewControlelr: UIViewController = UIViewController()
     private let allViewControlelr: UIViewController = UIViewController()
