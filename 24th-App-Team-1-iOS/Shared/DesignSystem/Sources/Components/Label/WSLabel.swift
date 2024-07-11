@@ -30,28 +30,12 @@ public class WSLabel: UILabel {
     func font(_ wsFont: WSFont) {
         self.font = wsFont.font()
         self.numberOfLines = 0
-        self.attributedText = attributedText(with: wsFont)
+        self.attributedText = NSAttributedString().attributedText(
+                    text: self.text ?? "",
+                    font: wsFont.font(),
+                    lineHeight: wsFont.lineHeight,
+                    textAlignment: self.textAlignment
+                )
     }
     
-    /// 주어진 WSFont로 NSAttributedString을 생성
-    /// - Parameters:
-    ///   - wsFont: 사용할 WSFont입니다.  ex) Header01, Body01
-    /// - Returns: 생성된 NSAttributedString입니다.
-    private func attributedText(with wsFont: WSFont) -> NSAttributedString {
-        let paragraphStyle = NSMutableParagraphStyle()
-        let lineHeight = wsFont.size * wsFont.lineHeight
-        paragraphStyle.minimumLineHeight = lineHeight
-        paragraphStyle.maximumLineHeight = lineHeight
-        paragraphStyle.lineHeightMultiple = wsFont.lineHeight
-        paragraphStyle.alignment = self.textAlignment
-        
-        // 텍스트 베이스라인 오프셋 계산
-        let baselineOffset = (lineHeight - wsFont.size) / 2
-        let attributes: [NSAttributedString.Key: Any] = [
-            .paragraphStyle: paragraphStyle, // 문단 스타일 설정
-            .baselineOffset: baselineOffset // 베이스라인 오프셋 설정
-        ]
-        
-        return NSAttributedString(string: self.text ?? "", attributes: attributes)
-    }
 }
