@@ -9,7 +9,7 @@ import Foundation
 
 import ReactorKit
 
-final class ___FILEBASENAMEASIDENTIFIER___: Reactor {
+final class ___FILEBASENAME___: Reactor {
     
     
     struct State {
