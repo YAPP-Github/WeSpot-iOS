@@ -19,7 +19,6 @@ public extension Date {
     }
 }
 
-
 public extension DateFormatter {
     enum Format {
         case m

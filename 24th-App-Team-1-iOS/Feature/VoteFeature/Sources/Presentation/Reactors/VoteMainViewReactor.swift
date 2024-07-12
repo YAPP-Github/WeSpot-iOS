@@ -9,7 +9,6 @@ import Foundation
 
 import ReactorKit
 
-
 public enum VoteTypes {
     case main
     case result

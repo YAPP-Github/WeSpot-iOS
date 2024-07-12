@@ -23,12 +23,10 @@ final class VoteToggleView: UIView {
         }
     }
     
-    
     override func layoutSubviews() {
         selectedLine.frame = CGRect(x: 20, y: frame.size.height - 2, width: (frame.size.width / 2) - 20, height: 2)
     }
 
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -93,7 +91,7 @@ final class VoteToggleView: UIView {
     
     private func updateToggleLayout(_ isSelected: Bool) {
         UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.selectedLine.frame.origin.x = isSelected ? 20 : (self.frame.size.width - self.selectedLine.frame.size.width) - 20
             self.mainButton.configuration?.baseForegroundColor =  isSelected ? DesignSystemAsset.Colors.gray100.color :  DesignSystemAsset.Colors.gray400.color
             self.resultButton.configuration?.baseForegroundColor =  isSelected ? DesignSystemAsset.Colors.gray400.color :  DesignSystemAsset.Colors.gray100.color
