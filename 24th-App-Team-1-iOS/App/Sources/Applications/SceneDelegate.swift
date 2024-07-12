@@ -19,7 +19,10 @@ class SceneDelegate: UIResponder, UISceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: scene)
-        window?.rootViewController = WSTabBarViewController()
+        //TODO: 임시 코드 입니다 DIContainer 추가 후 변경 예정
+        let voteViewReactor = VoteMainViewReactor()
+        let voteViewController = VoteMainViewController(reactor: voteViewReactor)
+        window?.rootViewController = UINavigationController(rootViewController: voteViewController)
         window?.makeKeyAndVisible()
         
     }
