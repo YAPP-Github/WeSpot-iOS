@@ -8,8 +8,9 @@
 import UIKit
 import Util
 
-import DesignSystem
+import LoginFeature
 import SnapKit
+import ReactorKit
 
 
 class SceneDelegate: UIResponder, UISceneDelegate {
@@ -21,6 +22,9 @@ class SceneDelegate: UIResponder, UISceneDelegate {
         
         window = UIWindow(windowScene: scene)
         //TODO: ViewControle 생성 해서 RootViewController로 지정 해주세요
+        let signInViewReactor = SignInViewReactor()
+        let signInViewController = SignInViewController(reactor: signInViewReactor)
+        window?.rootViewController = UINavigationController(rootViewController: signInViewController)
         window?.makeKeyAndVisible()
         
     }
