@@ -17,7 +17,7 @@ import DesignSystem
 
 public final class VoteMainViewController: BaseViewController<VoteMainViewReactor> {
     
-    //MARK: Properties
+    //MARK: - Properties
     private let voteToggleView: VoteToggleView = VoteToggleView()
     private lazy var votePageViewController: VotePageViewController = VotePageViewController(reactor: VotePageViewReactor())
     

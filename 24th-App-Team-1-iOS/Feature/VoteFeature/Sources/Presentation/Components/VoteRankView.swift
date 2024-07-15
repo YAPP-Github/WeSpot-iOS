@@ -12,10 +12,9 @@ import SnapKit
 
 final class VoteRankView: UIView {
     
-    //MARK: Properties
+    //MARK: - Properties
     let rankLabel: WSLabel = WSLabel(wsFont: .Header01, text: "10표")
     let rankImageView: UIImageView = UIImageView()
-    
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,7 +27,7 @@ final class VoteRankView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK: Configure
+    //MARK: - Configure
     private func setupUI() {
         addSubviews(rankLabel, rankImageView)
     }

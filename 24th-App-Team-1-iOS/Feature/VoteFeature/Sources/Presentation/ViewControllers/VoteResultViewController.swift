@@ -21,6 +21,7 @@ import RxDataSources
 
 final class VoteResultViewController: BaseViewController<VoteResultViewReactor> {
     
+    //MARK: - Properties
     private lazy var voteResultCollectionViewLayout: UICollectionViewCompositionalLayout = UICollectionViewCompositionalLayout { [weak self] section, _ in
         return self?.createVoteResultSection()
     }
@@ -33,6 +34,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
     private let backgrounImageView: UIImageView = UIImageView()
     private let resultPageControl: UIPageControl = UIPageControl()
     
+    //MARK: - Configure
     override func setupUI() {
         super.setupUI()
         view.addSubviews(voteResultCollectionView, confirmButton, backgrounImageView, resultPageControl)
@@ -63,7 +65,6 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
             $0.top.equalTo(voteResultCollectionView.snp.bottom).offset(16)
             $0.centerX.equalToSuperview()
         }
-        
     }
     
     override func setupAttributes() {
@@ -108,7 +109,6 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
             .distinctUntilChanged()
             .bind(to: resultPageControl.rx.currentPage)
             .disposed(by: disposeBag)
-        
     }
     
     private func createVoteResultSection() -> NSCollectionLayoutSection {

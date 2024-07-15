@@ -13,11 +13,11 @@ import RxCocoa
 import ReactorKit
 
 final class VotePageViewController: UIPageViewController  {
+    //MARK: - Properties
     typealias Reactor = VotePageViewReactor
     private lazy var voteViewControllers: [UIViewController] = [voteHomeViewController, voteResultViewController]
     private lazy var voteHomeViewController: VoteHomeViewController = VoteHomeViewController(reactor: VoteHomeViewReactor())
     private lazy var voteResultViewController: VoteResultViewController = VoteResultViewController(reactor: VoteResultViewReactor())
-    
     var disposeBag: DisposeBag = DisposeBag()
     
     init(reactor: Reactor) {
@@ -29,12 +29,14 @@ final class VotePageViewController: UIPageViewController  {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupAttributes()
     }
     
+    //MARK: - Configure
     private func setupUI() {
         setViewController(index: 0)
     }
@@ -66,8 +68,6 @@ extension VotePageViewController: ReactorKit.View {
                 owner.setViewController(index: index)
             }.disposed(by: disposeBag)
     }
-    
-    
 }
 
 extension VotePageViewController: UIPageViewControllerDelegate, UIPageViewControllerDataSource  {

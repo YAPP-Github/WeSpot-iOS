@@ -11,7 +11,7 @@ import UIKit
 
 final class VoteResultCollectionViewCell: UICollectionViewCell {
     
-    //MARK: Properties
+    //MARK: - Properties
     private let rankView: VoteRankView = VoteRankView()
     private let descrptionLabel: WSLabel = WSLabel(wsFont: .Body03)
     private let faceImageView: UIImageView = UIImageView()
@@ -34,7 +34,7 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
         addSubviews(rankView, descrptionLabel, faceImageView, nameLabel, introduceLabel, resultButton)
     }
     
-    //MARK: Configure
+    //MARK: - Configure
     private func setupAutoLayout() {
         rankView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(18)
@@ -73,9 +73,7 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
             $0.height.equalTo(33)
             $0.width.equalTo(104)
             $0.centerX.equalToSuperview()
-        }
-        
-        
+        }        
     }
     
     private func setupAttributes() {

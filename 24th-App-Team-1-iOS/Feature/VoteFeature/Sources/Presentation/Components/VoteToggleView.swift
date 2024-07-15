@@ -12,6 +12,7 @@ import Then
 import DesignSystem
 
 final class VoteToggleView: UIView {
+    //MARK: - Properties
     let mainButton: UIButton = UIButton()
     let resultButton: UIButton = UIButton()
     private let selectedLine: UIView = UIView()
@@ -34,6 +35,7 @@ final class VoteToggleView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - Configure
     private func setupUI() {
         addSubviews(mainButton, resultButton, underLine, selectedLine)
     }
