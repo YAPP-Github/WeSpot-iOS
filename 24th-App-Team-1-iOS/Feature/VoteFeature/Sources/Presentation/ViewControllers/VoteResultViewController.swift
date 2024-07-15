@@ -25,7 +25,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         return self?.createVoteResultSection()
     }
     private lazy var voteResultCollectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: voteResultCollectionViewLayout)
-    private let voteResultsCollectionViewDataSources: RxCollectionViewSectionedReloadDataSource<VoteResultSection> = .init { dataSources, collectionView, indexPath, sectionItem in
+    private lazy var voteResultsCollectionViewDataSources: RxCollectionViewSectionedReloadDataSource<VoteResultSection> = .init { dataSources, collectionView, indexPath, sectionItem in
         guard let voteResultsCell = collectionView.dequeueReusableCell(withReuseIdentifier: "VoteResultCollectionViewCell", for: indexPath) as? VoteResultCollectionViewCell else { return UICollectionViewCell() }
         return voteResultsCell
     }
@@ -41,13 +41,11 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
     override func setupAutoLayout() {
         super.setupAutoLayout()
         
-        
         voteResultCollectionView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(32)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(391)
         }
-        
         
         confirmButton.snp.makeConstraints {
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(12)
@@ -56,13 +54,13 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         }
         
         backgrounImageView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview()
+            $0.bottom.equalToSuperview().offset(-98)
         }
         
         resultPageControl.snp.makeConstraints {
             $0.top.equalTo(voteResultCollectionView.snp.bottom).offset(16)
-            $0.height.equalTo(31)
-            $0.width.equalTo(107)
             $0.centerX.equalToSuperview()
         }
         
@@ -89,9 +87,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         
         resultPageControl.do {
             $0.currentPage = 0
-            $0.numberOfPages = 4
-            $0.currentPageIndicatorTintColor = .lightGray
-            $0.pageIndicatorTintColor = .gray
+            $0.numberOfPages = 3
         }
     }
     
@@ -102,11 +98,15 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-    
-        
-        reactor.state.map { $0.resultSection }
+        reactor.pulse(\.$resultSection)
             .asDriver(onErrorJustReturn: [])
             .drive(voteResultCollectionView.rx.items(dataSource: voteResultsCollectionViewDataSources))
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.currentPage }
+            .distinctUntilChanged()
+            .bind(to: resultPageControl.rx.currentPage)
             .disposed(by: disposeBag)
         
     }
@@ -115,15 +115,16 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         
         let voteResultItemSize: NSCollectionLayoutSize = .init(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(391)
+            heightDimension: .absolute(392)
         )
         
         let voteResultItem: NSCollectionLayoutItem = NSCollectionLayoutItem(layoutSize: voteResultItemSize)
         
-        voteResultItem.contentInsets = .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+        voteResultItem.contentInsets = .init(top: 0, leading: 10, bottom: 0, trailing: 10)
+        
         let voteResultGroupSize: NSCollectionLayoutSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(0.8),
-            heightDimension: .absolute(391)
+            heightDimension: .absolute(392)
         )
         
         let voteResultGroup: NSCollectionLayoutGroup = NSCollectionLayoutGroup.horizontal(
@@ -132,9 +133,28 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         )
         
         let voteResultSection: NSCollectionLayoutSection = NSCollectionLayoutSection(group: voteResultGroup)
-        voteResultSection.orthogonalScrollingBehavior = .groupPaging
+        voteResultSection.orthogonalScrollingBehavior = .groupPagingCentered
         voteResultSection.contentInsets = .init(top: 0, leading: 40, bottom: 0, trailing: 40)
 
+        voteResultSection.visibleItemsInvalidationHandler = { [unowned self] visibleItems, offset, env in
+            visibleItems.forEach { item in
+                
+                let position = offset.x / env.container.contentSize.width
+                let roundPosition = Int(round(position))
+            
+                let intersectedRect = item.frame.intersection(CGRect(x: offset.x, y: offset.y, width: env.container.contentSize.width, height: item.frame.height))
+                let percentVisible = intersectedRect.width / item.frame.width
+                
+                let originalHeight: CGFloat = 392
+                let reducedHeight: CGFloat = 334
+                
+                let height = reducedHeight + (originalHeight - reducedHeight) * percentVisible
+            
+                reactor?.action.onNext(.didShowVisibleCell(roundPosition))
+                item.transform = CGAffineTransform(scaleX: 1.0, y: height / originalHeight)
+
+            }
+        }
         return voteResultSection
     }
 }

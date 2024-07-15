@@ -37,7 +37,7 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
     //MARK: Configure
     private func setupAutoLayout() {
         rankView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(20)
+            $0.top.equalToSuperview().offset(18)
             $0.left.equalToSuperview().offset(20)
             $0.width.equalTo(98)
             $0.height.equalTo(36)
@@ -51,26 +51,25 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
         }
         
         faceImageView.snp.makeConstraints {
-            $0.top.equalTo(descrptionLabel.snp.bottom).offset(12)
-            $0.width.equalTo(140)
-            $0.height.equalTo(120)
-            $0.centerX.equalTo(descrptionLabel.snp.centerX)
+            $0.top.equalTo(descrptionLabel.snp.bottom).offset(11)
+            $0.width.height.equalTo(120)
+            $0.centerX.equalToSuperview()
         }
         
         nameLabel.snp.makeConstraints {
-            $0.top.equalTo(faceImageView.snp.bottom).offset(12)
+            $0.top.equalTo(faceImageView.snp.bottom).offset(11)
             $0.height.equalTo(30)
-            $0.centerX.equalTo(faceImageView.snp.centerX)
+            $0.centerX.equalToSuperview()
         }
         
         introduceLabel.snp.makeConstraints {
             $0.top.equalTo(nameLabel.snp.bottom).offset(4)
             $0.height.equalTo(20)
-            $0.centerX.equalTo(nameLabel.snp.centerX)
+            $0.centerX.equalToSuperview()
         }
         
         resultButton.snp.makeConstraints {
-            $0.top.equalTo(introduceLabel.snp.bottom).offset(20)
+            $0.top.equalTo(introduceLabel.snp.bottom).offset(24)
             $0.height.equalTo(33)
             $0.width.equalTo(104)
             $0.centerX.equalToSuperview()
@@ -83,7 +82,7 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
         
         //TODO: 테스트 코드
         
-        backgroundColor = .red
+        backgroundColor = DesignSystemAsset.Colors.white.color.withAlphaComponent(0.15)
         layer.cornerRadius = 20
         clipsToBounds = true
 
@@ -93,10 +92,12 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
         }
         introduceLabel.do {
             $0.text = "안녕! 모르는거 있으면 나한테 다 물어봐"
+            $0.textColor = DesignSystemAsset.Colors.gray300.color
         }
         
         nameLabel.do {
             $0.text = "이지호"
+            $0.textColor = DesignSystemAsset.Colors.primary300.color
         }
         
         rankView.do {
@@ -115,6 +116,7 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
         
         descrptionLabel.do {
             $0.text = "우리 반에서 모르는게생기면물어보고싶은은은은은은은은 친구는?"
+            $0.textColor = DesignSystemAsset.Colors.gray100.color
         }
     }
 }

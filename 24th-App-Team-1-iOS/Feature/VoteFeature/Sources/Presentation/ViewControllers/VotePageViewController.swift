@@ -25,23 +25,24 @@ final class VotePageViewController: UIPageViewController  {
         self.reactor = reactor
     }
     
-    override init(transitionStyle style: UIPageViewController.TransitionStyle, navigationOrientation: UIPageViewController.NavigationOrientation, options: [UIPageViewController.OptionsKey : Any]? = nil) {
-        super.init(transitionStyle: .scroll, navigationOrientation: .horizontal)
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        delegate = self
-        dataSource = self
         setupUI()
+        setupAttributes()
     }
     
     private func setupUI() {
         setViewController(index: 0)
+    }
+    
+    private func setupAttributes() {
+        delegate = self
+        dataSource = self
+        isPagingEnabled = false
     }
     
     private func setViewController(index: Int) {
@@ -59,7 +60,11 @@ final class VotePageViewController: UIPageViewController  {
 extension VotePageViewController: ReactorKit.View {
     func bind(reactor: Reactor) {
         reactor.state
-//            .map { $0.}
+            .map { $0.pageTypes == .main ? 0 : 1 }
+            .distinctUntilChanged()
+            .bind(with: self) { owner, index in
+                owner.setViewController(index: index)
+            }.disposed(by: disposeBag)
     }
     
     
@@ -76,6 +81,7 @@ extension VotePageViewController: UIPageViewControllerDelegate, UIPageViewContro
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         guard let afterIndex = voteViewControllers.firstIndex(of: viewController),
               afterIndex + 1 != voteViewControllers.count else { return nil }
+        reactor?.action.onNext(.updateViewController(afterIndex))
         return voteViewControllers[afterIndex + 1]
     }
 }

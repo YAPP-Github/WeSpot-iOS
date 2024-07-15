@@ -15,6 +15,7 @@ let project = Project.makeProject(
         .feature(
             module: .VoteFeature,
             dependencies: [
+                .core(module: .Util),
                 .shared(module: .ThirdPartyLib),
                 .shared(module: .DesignSystem)
             ]

@@ -6,16 +6,13 @@
 //
 
 import Foundation
+import Util
 
 import ReactorKit
 
-public enum VoteTypes {
-    case main
-    case result
-}
-
 public final class VoteMainViewReactor: Reactor {
     public var initialState: State
+    private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     
     public init() {
         self.initialState = State(
@@ -46,6 +43,7 @@ public final class VoteMainViewReactor: Reactor {
         var newState = state
         switch mutation {
         case let .setVoteTypes(voteTypes):
+            globalService.event.onNext(.toggleStatus(voteTypes))
             newState.voteTypes = voteTypes
         }
         

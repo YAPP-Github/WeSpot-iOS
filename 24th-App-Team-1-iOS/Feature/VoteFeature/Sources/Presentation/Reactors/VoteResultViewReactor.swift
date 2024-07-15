@@ -16,14 +16,17 @@ final class VoteResultViewReactor: Reactor {
     
     struct State {
         @Pulse var resultSection: [VoteResultSection]
+        var currentPage: Int = 0
     }
     
     enum Action {
         case fetchResultItems
+        case didShowVisibleCell(_ index: Int)
     }
     
     enum Mutation {
         case setResultSectionItems([VoteResultItem])
+        case setVisibleCellIndex(Int)
     }
     
     init() {
@@ -37,7 +40,10 @@ final class VoteResultViewReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchResultItems:
-            return .just(.setResultSectionItems([.voteResultsItem, .voteResultsItem, .voteResultsItem]))
+            return .empty()
+        case let .didShowVisibleCell(index):
+            return .just(.setVisibleCellIndex(index))
+            
         }
     }
     
@@ -46,6 +52,8 @@ final class VoteResultViewReactor: Reactor {
         switch mutation {
         case let .setResultSectionItems(items):
             newState.resultSection = [.voteResultInfo(items)]
+        case let .setVisibleCellIndex(currentIndex):
+            newState.currentPage = currentIndex
         }
         return newState
     }

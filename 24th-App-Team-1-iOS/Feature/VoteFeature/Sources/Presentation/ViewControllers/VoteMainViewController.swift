@@ -17,9 +17,9 @@ import DesignSystem
 
 public final class VoteMainViewController: BaseViewController<VoteMainViewReactor> {
     
+    //MARK: Properties
     private let voteToggleView: VoteToggleView = VoteToggleView()
-    //TODO: PageViewController 추가
-    private let votePageViewController: VotePageViewController = VotePageViewController(reactor: VotePageViewReactor())
+    private lazy var votePageViewController: VotePageViewController = VotePageViewController(reactor: VotePageViewReactor())
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -32,7 +32,6 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
         super.setupUI()
         addChild(votePageViewController)
         view.addSubviews(voteToggleView, votePageViewController.view)
-        votePageViewController.didMove(toParent: self)
     }
 
     public override func setupAutoLayout() {
@@ -56,8 +55,6 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
         navigationBar
             .setNavigationBarUI(property: .default)
             .setNavigationBarAutoLayout(property: .default)
-        
-
     }
 
     public override func bind(reactor: Reactor) {
@@ -79,6 +76,7 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
         reactor.state
             .map { $0.voteTypes == .main ? true : false }
             .distinctUntilChanged()
+            .skip(1)
             .bind(to: voteToggleView.rx.isSelected)
             .disposed(by: disposeBag)
     }

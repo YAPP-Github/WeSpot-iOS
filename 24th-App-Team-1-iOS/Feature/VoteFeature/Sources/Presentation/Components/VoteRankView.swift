@@ -13,7 +13,7 @@ import SnapKit
 final class VoteRankView: UIView {
     
     //MARK: Properties
-    let rankLabel: WSLabel = WSLabel(wsFont: .Header01)
+    let rankLabel: WSLabel = WSLabel(wsFont: .Header01, text: "10표")
     let rankImageView: UIImageView = UIImageView()
     
     
@@ -34,15 +34,17 @@ final class VoteRankView: UIView {
     }
     
     private func setupAutoLayout() {
-        rankLabel.snp.makeConstraints {
-            $0.verticalEdges.equalToSuperview().inset(3)
-            $0.right.equalToSuperview().inset(10)
-            
-        }
         
         rankImageView.snp.makeConstraints {
-            $0.verticalEdges.equalToSuperview().inset(3)
-            $0.left.equalToSuperview().inset(10)
+            $0.left.equalToSuperview().inset(12)
+            $0.size.equalTo(30)
+            $0.centerY.equalToSuperview()
+        }
+        
+        rankLabel.snp.makeConstraints {
+            $0.left.equalTo(rankImageView.snp.right).offset(8)
+            $0.height.equalTo(30)
+            $0.centerY.equalToSuperview()
         }
     }
     
