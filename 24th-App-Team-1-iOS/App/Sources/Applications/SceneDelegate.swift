@@ -8,7 +8,9 @@
 import UIKit
 import Util
 
-import VoteFeature
+import LoginFeature
+import SnapKit
+import ReactorKit
 
 class SceneDelegate: UIResponder, UISceneDelegate {
     
@@ -19,9 +21,9 @@ class SceneDelegate: UIResponder, UISceneDelegate {
         
         window = UIWindow(windowScene: scene)
         //TODO: 임시 코드 입니다 DIContainer 추가 후 변경 예정
-        let voteViewReactor = VoteBeginViewReactor()
-        let voteViewController = VoteBeginViewController(reactor: voteViewReactor)
-        window?.rootViewController = UINavigationController(rootViewController: voteViewController)
+        let signInViewReactor = SignInViewReactor()
+        let signInViewController = SignInViewController(reactor: signInViewReactor)
+        window?.rootViewController = UINavigationController(rootViewController: signInViewController)
         window?.makeKeyAndVisible()
         
     }
