@@ -70,7 +70,12 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
         
         navigationBar.do {
             $0.setNavigationBarUI(
-                property: .all(DesignSystemAsset.Images.arrow.image, VoteProcessStr.voteProcessTopTexxt, "1/5")
+                property: .all(
+                    DesignSystemAsset.Images.arrow.image,
+                    VoteProcessStr.voteProcessTopTexxt,
+                    "1/5",
+                    DesignSystemAsset.Colors.gray300.color
+                )
             )
             $0.setNavigationBarAutoLayout(property: .all)
         }

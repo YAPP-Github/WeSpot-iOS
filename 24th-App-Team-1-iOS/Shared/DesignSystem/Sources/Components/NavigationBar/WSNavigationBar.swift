@@ -50,6 +50,8 @@ public final class WSNavigationBar: UIView {
         
         rightBarButton.setTitle(property.items.rightTextItem, for: .normal)
         rightBarButton.setImage(property.items.rightImageItem, for: .normal)
+        rightBarButton.setTitleColor(property.items.rightTextItemColor, for: .normal)
+        rightBarButton.titleLabel?.font = WSFont.Body04.font()
         
         navigationTitleLabel.text = property.items.centerItem
         navigationTitleLabel.textColor = DesignSystemAsset.Colors.gray100.color
