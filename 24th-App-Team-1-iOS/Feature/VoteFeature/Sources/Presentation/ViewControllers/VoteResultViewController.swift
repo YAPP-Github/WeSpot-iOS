@@ -135,7 +135,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         voteResultSection.orthogonalScrollingBehavior = .groupPagingCentered
         voteResultSection.contentInsets = .init(top: 0, leading: 40, bottom: 0, trailing: 40)
 
-        voteResultSection.visibleItemsInvalidationHandler = { [unowned self] visibleItems, offset, env in
+        voteResultSection.visibleItemsInvalidationHandler = { [weak self] visibleItems, offset, env in
             visibleItems.forEach { item in
                 
                 let position = offset.x / env.container.contentSize.width
@@ -149,7 +149,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
                 
                 let height = reducedHeight + (originalHeight - reducedHeight) * percentVisible
             
-                reactor?.action.onNext(.didShowVisibleCell(roundPosition))
+                self?.reactor?.action.onNext(.didShowVisibleCell(roundPosition))
                 item.transform = CGAffineTransform(scaleX: 1.0, y: height / originalHeight)
 
             }
