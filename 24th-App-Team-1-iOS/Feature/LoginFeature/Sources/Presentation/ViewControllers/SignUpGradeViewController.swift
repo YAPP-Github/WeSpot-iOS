@@ -16,19 +16,15 @@ import RxCocoa
 import ReactorKit
 
 public final class SignUpGradeViewController: BaseViewController<SignUpGradeViewReactor> {
-
+    
     //MARK: - Properties
     private let titleLabel = WSLabel(wsFont: .Header01, text: "학년")
     private let subTitleLabel = WSLabel(wsFont: .Body06, text: "회원가입 이후에는 이름을 변경할 수 없어요")
     private let gradeTextField = WSTextField(state: .default)
-    private let nextButton = WSButton(wsButtonType: .default(12)).then {
-        $0.setupButton(text: "다음")
-    }
+    private let nextButton = WSButton(wsButtonType: .default(12))
     private let gradeTextFieldtapGesture = UITapGestureRecognizer()
     private let bottomSheetView = SelectGradeBottomSheetView()
-    private let dimView = UIView().then{
-        $0.backgroundColor = UIColor.black.withAlphaComponent(0.6)
-    }
+    private let dimView = UIView()
     private let dimTapGesture = UITapGestureRecognizer()
     
     //MARK: - LifeCycle
@@ -38,7 +34,7 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
         setupBottomSheet()
         showBottomSheet()
     }
-
+    
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
@@ -87,12 +83,26 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
             .setNavigationBarUI(property: .leftWithCenterItem(DesignSystemAsset.Images.arrow.image, "회원가입"))
             .setNavigationBarAutoLayout(property: .leftWithCenterItem)
         
-        titleLabel.textColor = DesignSystemAsset.Colors.gray100.color
+        titleLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.gray100.color
+        }
         
-        subTitleLabel.textColor = DesignSystemAsset.Colors.gray400.color
+        subTitleLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.gray400.color
+        }
         
-        gradeTextField.text = "현재 학년을 선택해 주세요"
-        gradeTextField.layer.borderColor = DesignSystemAsset.Colors.primary400.color.cgColor
+        gradeTextField.do {
+            $0.text = "현재 학년을 선택해 주세요"
+            $0.layer.borderColor = DesignSystemAsset.Colors.primary400.color.cgColor
+        }
+        
+        nextButton.do {
+           $0.setupButton(text: "다음")
+       }
+        
+        dimView.do {
+            $0.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        }
     }
     
     public override func bind(reactor: Reactor) {

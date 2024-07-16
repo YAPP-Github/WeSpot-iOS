@@ -30,12 +30,8 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
     private let schoolTextFieldTapGesture = UITapGestureRecognizer()
     private let comfirmInfoBottomSheetView = ConfirmInfoBottomSheetView()
     private let policyAgreementBottomSheetView = PolicyAgreementBottomSheetView()
-    private let dimView = UIView().then{
-        $0.backgroundColor = UIColor.black.withAlphaComponent(0.6)
-    }
-    private let nextButton = WSButton(wsButtonType: .default(12)).then {
-        $0.setupButton(text: "다음")
-    }
+    private let dimView = UIView()
+    private let nextButton = WSButton(wsButtonType: .default(12))
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -116,6 +112,14 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         gradeTextField.text = "NO DATA"
         
         schoolTextField.text = "NO DATA"
+        
+        dimView.do{
+            $0.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        }
+        
+        nextButton.do {
+            $0.setupButton(text: "다음")
+        }
     }
     
     public override func bind(reactor: Reactor) {

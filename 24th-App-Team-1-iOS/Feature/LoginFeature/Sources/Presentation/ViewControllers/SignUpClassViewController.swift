@@ -22,9 +22,8 @@ public final class SignUpClassViewController: BaseViewController<SignUpClassView
     private let subTitleLabel = WSLabel(wsFont: .Body06, text: "회원가입 이후에는 이름을 변경할 수 없어요")
     private let classTextField = WSTextField(state: .default, placeholder: "숫자로 입력해 주세요")
     private let warningLabel = WSLabel(wsFont: .Body07, text: "정확한 반을 입력해 주세요")
-    private let nextButton = WSButton(wsButtonType: .default(12)).then {
-        $0.setupButton(text: "다음")
-    }
+    private let nextButton = WSButton(wsButtonType: .default(12))
+    
     //MARK: - LifeCycle
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -76,14 +75,26 @@ public final class SignUpClassViewController: BaseViewController<SignUpClassView
             .setNavigationBarUI(property: .leftWithCenterItem(DesignSystemAsset.Images.arrow.image, "회원가입"))
             .setNavigationBarAutoLayout(property: .leftWithCenterItem)
         
-        titleLabel.textColor = DesignSystemAsset.Colors.gray100.color
+        titleLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.gray100.color
+        }
         
-        subTitleLabel.textColor = DesignSystemAsset.Colors.gray400.color
+        subTitleLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.gray400.color
+        }
         
-        classTextField.keyboardType = .numberPad
-        classTextField.delegate = self
+        classTextField.do {
+            $0.keyboardType = .numberPad
+            $0.delegate = self
+        }
         
-        warningLabel.textColor = DesignSystemAsset.Colors.destructive.color
+        warningLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.destructive.color
+        }
+        
+        nextButton.do {
+            $0.setupButton(text: "다음")
+        }
     }
     
     public override func bind(reactor: Reactor) {

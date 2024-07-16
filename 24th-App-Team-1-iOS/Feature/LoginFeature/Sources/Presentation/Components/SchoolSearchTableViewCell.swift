@@ -12,6 +12,9 @@ import SnapKit
 
 public final class SchoolSearchTableViewCell: UITableViewCell {
     
+    //MARK: - Identifier
+    public static let identifier = "SchoolSearchTableViewCell"
+    
     //MARK: - Properties
     private let schoolCellView = UIView()
     private let schoolImageView = UIImageView()

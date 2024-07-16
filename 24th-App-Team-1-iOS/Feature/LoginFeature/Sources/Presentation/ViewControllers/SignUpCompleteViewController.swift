@@ -19,12 +19,8 @@ public final class SignUpCompleteViewController: BaseViewController<SignUpComple
 
     //MARK: - Properties
     private let imageView = UIImageView()
-    private let inviteStartButton = WSButton(wsButtonType: .default(12)).then {
-        $0.setupButton(text: "친구 초대하고 시작하기")
-    }
-    private let startButton = WSButton(wsButtonType: .strokeButton).then {
-        $0.setupButton(text: "바로 시작하기")
-    }
+    private let inviteStartButton = WSButton(wsButtonType: .default(12))
+    private let startButton = WSButton(wsButtonType: .strokeButton)
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -63,6 +59,14 @@ public final class SignUpCompleteViewController: BaseViewController<SignUpComple
         super.setupAttributes()
         
         view.backgroundColor = DesignSystemAsset.Colors.gray900.color
+        
+        inviteStartButton.do {
+            $0.setupButton(text: "친구 초대하고 시작하기")
+        }
+        
+        startButton.do {
+            $0.setupButton(text: "바로 시작하기")
+        }
     }
     
     public override func bind(reactor: Reactor) {

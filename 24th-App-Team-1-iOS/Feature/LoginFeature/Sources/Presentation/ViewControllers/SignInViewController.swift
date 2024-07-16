@@ -18,23 +18,10 @@ import ReactorKit
 public final class SignInViewController: BaseViewController<SignInViewReactor> {
     
     //MARK: - Properties
-    private let onboardingCarouselView = UIScrollView().then {
-        $0.isPagingEnabled = true
-        $0.showsHorizontalScrollIndicator = false
-        $0.isScrollEnabled = true
-        $0.bounces = false
-    }
-    private let pageControl = UIPageControl().then {
-        $0.numberOfPages = 3
-        $0.currentPage = 0
-    }
-    private let appleLoginButton = UIButton().then {
-        $0.setImage(DesignSystemAsset.Images.appleLoginButton.image, for: .normal)
-    }
-    private let kakaoLoginButton = UIButton().then {
-        $0.setImage(DesignSystemAsset.Images.kakaoLoginButton.image, for: .normal)
-    }
-    
+    private let onboardingCarouselView = UIScrollView()
+    private let pageControl = UIPageControl()
+    private let appleLoginButton = UIButton()
+    private let kakaoLoginButton = UIButton()
     private let onbardingImages: [UIImage] = [.actions,
                                               .checkmark,
                                               .add]
@@ -90,6 +77,25 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         
         view.backgroundColor = DesignSystemAsset.Colors.gray900.color
         
+        onboardingCarouselView.do {
+           $0.isPagingEnabled = true
+           $0.showsHorizontalScrollIndicator = false
+           $0.isScrollEnabled = true
+           $0.bounces = false
+       }
+        
+      pageControl.do {
+           $0.numberOfPages = 3
+           $0.currentPage = 0
+       }
+        
+       appleLoginButton.do {
+           $0.setImage(DesignSystemAsset.Images.appleLoginButton.image, for: .normal)
+       }
+        
+       kakaoLoginButton.do {
+           $0.setImage(DesignSystemAsset.Images.kakaoLoginButton.image, for: .normal)
+       }
     }
     
     public override func bind(reactor: Reactor) {

@@ -23,11 +23,7 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
     private let nameTextField = WSTextField(state: .default, placeholder: "실명을 입력해 주세요")
     private let warningLabel = WSLabel(wsFont: .Body07)
     private let textLengthLabel = WSLabel(wsFont: .Body07)
-    private let nextButton = WSButton(wsButtonType: .default(12)).then {
-        $0.setupButton(text: "다음")
-    }
-    
-    
+    private let nextButton = WSButton(wsButtonType: .default(12))
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -89,6 +85,10 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
         warningLabel.textColor = DesignSystemAsset.Colors.destructive.color
         
         textLengthLabel.textColor = DesignSystemAsset.Colors.gray400.color
+        
+        nextButton.do {
+            $0.setupButton(text: "다음")
+        }
     }
     
     public override func bind(reactor: Reactor) {

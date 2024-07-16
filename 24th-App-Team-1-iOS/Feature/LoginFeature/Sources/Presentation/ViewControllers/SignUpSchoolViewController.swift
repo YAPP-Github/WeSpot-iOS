@@ -25,16 +25,9 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
     private let warningLabel = WSLabel(wsFont: .Body07, text: "20자 이내로 검색해 주세요")
     private let additionalButton = UIButton()
     private let additionalButtonLine = UIView()
-    private let schoolSearchTableView = UITableView().then {
-        $0.register(SchoolSearchTableViewCell.self, forCellReuseIdentifier: "SchoolSearchTableViewCell")
-        $0.backgroundColor = .clear
-        $0.separatorStyle = .none
-        $0.rowHeight = 104
-    }
+    private let schoolSearchTableView = UITableView()
     private let gradientView = GradientView()
-    private let nextButton = WSButton(wsButtonType: .default(12)).then {
-        $0.setupButton(text: "다음")
-    }
+    private let nextButton = WSButton(wsButtonType: .default(12))
     
     //MARK: - LifeCycle
     public override func viewWillAppear(_ animated: Bool) {
@@ -108,17 +101,38 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
             .setNavigationBarUI(property: .leftWithCenterItem(DesignSystemAsset.Images.arrow.image, "회원가입"))
             .setNavigationBarAutoLayout(property: .leftWithCenterItem)
         
-        titleLabel.textColor = DesignSystemAsset.Colors.gray100.color
+        titleLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.gray100.color
+        }
         
-        subTitleLabel.textColor = DesignSystemAsset.Colors.gray400.color
+        subTitleLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.gray400.color
+        }
         
-        warningLabel.textColor = DesignSystemAsset.Colors.destructive.color
+        warningLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.destructive.color
+        }
         
-        additionalButton.setTitle("찾는 학교가 없다면?", for: .normal)
-        additionalButton.setTitleColor(DesignSystemAsset.Colors.gray300.color, for: .normal)
-        additionalButton.titleLabel?.font = WSFont.Body05.font()
+        additionalButton.do {
+            $0.setTitle("찾는 학교가 없다면?", for: .normal)
+            $0.setTitleColor(DesignSystemAsset.Colors.gray300.color, for: .normal)
+            $0.titleLabel?.font = WSFont.Body05.font()
+        }
         
-        additionalButtonLine.backgroundColor = DesignSystemAsset.Colors.gray300.color
+        additionalButtonLine.do {
+            $0.backgroundColor = DesignSystemAsset.Colors.gray300.color
+        }
+        
+        schoolSearchTableView.do {
+            $0.register(SchoolSearchTableViewCell.self, forCellReuseIdentifier: SchoolSearchTableViewCell.identifier)
+            $0.backgroundColor = .clear
+            $0.separatorStyle = .none
+            $0.rowHeight = 104
+        }
+        
+        nextButton.do {
+            $0.setupButton(text: "다음")
+        }
     }
     
     public override func bind(reactor: Reactor) {
@@ -139,7 +153,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         reactor.state
             .map { $0.schoolList }
             .distinctUntilChanged()
-            .bind(to: schoolSearchTableView.rx.items(cellIdentifier: "SchoolSearchTableViewCell", cellType: SchoolSearchTableViewCell.self)) { (index, school, cell) in
+            .bind(to: schoolSearchTableView.rx.items(cellIdentifier: SchoolSearchTableViewCell.identifier, cellType: SchoolSearchTableViewCell.self)) { (index, school, cell) in
                 
                 cell.selectionStyle = .none
                 cell.setupCell(schoolName: "학교이름\(index+1)", address: "주소\(index+1)")

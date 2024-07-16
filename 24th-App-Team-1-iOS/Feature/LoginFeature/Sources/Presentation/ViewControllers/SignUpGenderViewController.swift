@@ -71,9 +71,13 @@ public final class SignUpGenderViewController: BaseViewController<SignUpGenderVi
             .setNavigationBarUI(property: .leftWithCenterItem(DesignSystemAsset.Images.arrow.image, "회원가입"))
             .setNavigationBarAutoLayout(property: .leftWithCenterItem)
         
-        titleLabel.textColor = DesignSystemAsset.Colors.gray100.color
+        titleLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.gray100.color
+        }
         
-        subTitleLabel.textColor = DesignSystemAsset.Colors.gray400.color // 디쟈너 쪽에 물어보기
+        subTitleLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.gray400.color
+        }
     }
     
     public override func bind(reactor: Reactor) {
