@@ -13,26 +13,45 @@ final class VoteProcessViewReactor: Reactor {
     
     
     struct State {
-        
+        @Pulse var questionSection: [VoteProcessSection]
     }
     
     enum Action {
-        
+        case fetchQuestionItems
     }
     
     enum Mutation {
-        
+        case setQuestionItems([VoteProcessItem])
     }
     
-    let initialState: State = State()
+    let initialState: State
+    
+    init() {
+        self.initialState = State(
+            questionSection: [.votePrcessInfo([])]
+        )
+    }
     
     func mutate(action: Action) -> Observable<Mutation> {
-        
-        return .empty()
+        switch action {
+        case .fetchQuestionItems:
+            //TODO: 테스트 코드
+            return .just(.setQuestionItems([
+                .voteQuestionItem,
+                .voteQuestionItem,
+                .voteQuestionItem,
+                .voteQuestionItem,
+                .voteQuestionItem
+            ]))
+        }
     }
     
     func reduce(state: State, mutation: Mutation) -> State {
-        
-        return state
+        var newState = state
+        switch mutation {
+        case let .setQuestionItems(items):
+            newState.questionSection = [.votePrcessInfo(items)]
+        }
+        return newState
     }
 }

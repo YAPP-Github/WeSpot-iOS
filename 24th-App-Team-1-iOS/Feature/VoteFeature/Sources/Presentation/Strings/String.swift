@@ -31,4 +31,5 @@ extension String.VoteResult {
 
 extension String.VoteResult.Identifier {
     static let voteResultCell = "VoteResultCollectionViewCell"
+    static let voteProcessCell = "VoteProcessTableViewCell"
 }

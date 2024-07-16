@@ -14,13 +14,23 @@ import SnapKit
 import RxSwift
 import RxCocoa
 import ReactorKit
+import RxDataSources
 
 fileprivate typealias VoteProcessStr = VoteStrings
+fileprivate typealias VoteProcessId = VoteStrings.Identifier
 final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor> {
 
     //MARK: - Properties
     private let profileImageView: UIImageView = UIImageView()
     private let questionLabel: WSLabel = WSLabel(wsFont: .Header01, text: "김쥬시님은 반에서 어떤 친구인가요?")
+    private let questionTableView: UITableView = UITableView()
+    private let questionDataSources: RxTableViewSectionedReloadDataSource<VoteProcessSection> = .init { dataSources, tableView, indexPath, sectionItem in
+        
+        guard let votePrcessCell = tableView.dequeueReusableCell(withIdentifier: VoteProcessId.voteProcessCell, for: indexPath) as? VoteProcessTableViewCell else { return UITableViewCell() }
+        
+        return votePrcessCell
+    }
+
     
     //MARK: - LifeCycle
     override func viewDidLoad() {
@@ -31,7 +41,7 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
     //MARK: - Configure
     override func setupUI() {
         super.setupUI()
-        view.addSubviews(questionLabel, profileImageView)
+        view.addSubviews(questionLabel, profileImageView, questionTableView)
     }
     
     override func setupAutoLayout() {
@@ -47,6 +57,12 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
             $0.top.equalTo(questionLabel.snp.bottom).offset(39)
             $0.centerX.equalToSuperview()
         }
+        
+        questionTableView.snp.makeConstraints {
+            $0.top.equalTo(profileImageView.snp.bottom).offset(32)
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.height.equalTo(364)
+        }
     }
     
     override func setupAttributes() {
@@ -54,7 +70,7 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
         
         navigationBar.do {
             $0.setNavigationBarUI(
-                property: .all(DesignSystemAsset.Images.arrow.image, "1/5", VoteProcessStr.voteProcessTopTexxt)
+                property: .all(DesignSystemAsset.Images.arrow.image, VoteProcessStr.voteProcessTopTexxt, "1/5")
             )
             $0.setNavigationBarAutoLayout(property: .all)
         }
@@ -66,10 +82,27 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
         profileImageView.do {
             $0.image = DesignSystemAsset.Images.boy.image
         }
+        
+        questionTableView.do {
+            $0.register(VoteProcessTableViewCell.self, forCellReuseIdentifier: VoteProcessId.voteProcessCell)
+            $0.rowHeight = 72
+            $0.backgroundColor = .clear
+            $0.separatorStyle = .none
+        }
     }
     
     override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
+        
+        Observable.just(())
+            .map { Reactor.Action.fetchQuestionItems }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$questionSection)
+            .asDriver(onErrorJustReturn: [])
+            .drive(questionTableView.rx.items(dataSource: questionDataSources))
+            .disposed(by: disposeBag)
         
     }
 }
