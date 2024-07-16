@@ -122,6 +122,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         super.bind(reactor: reactor)
         
         nameTextFieldTapGesture.rx.event
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let signUpNameViewReactor = SignUpNameViewReactor()
                 let signUpNameViewController = SignUpNameViewController(reactor: signUpNameViewReactor)
@@ -130,6 +131,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .disposed(by: disposeBag)
         
         genderTextFieldTapGesture.rx.event
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let signUpGenderViewReactor = SignUpGenderViewReactor()
                 let signUpGenderViewController = SignUpGenderViewController(reactor: signUpGenderViewReactor)
@@ -138,6 +140,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .disposed(by: disposeBag)
         
         classTextFieldTapGesture.rx.event
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let signUpClassViewReactor = SignUpClassViewReactor()
                 let signUpClassViewController = SignUpClassViewController(reactor: signUpClassViewReactor)
@@ -146,6 +149,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .disposed(by: disposeBag)
         
         gradeTextFieldTapGesture.rx.event
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let signUpGradeViewReactor = SignUpGradeViewReactor()
                 let signUpGradeViewController = SignUpGradeViewController(reactor: signUpGradeViewReactor)
@@ -154,6 +158,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .disposed(by: disposeBag)
         
         schoolTextFieldTapGesture.rx.event
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let signUpSchoolViewReactor = SignUpSchoolViewReactor()
                 let signUpSchoolViewController = SignUpSchoolViewController(reactor: signUpSchoolViewReactor)
@@ -162,12 +167,14 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .disposed(by: disposeBag)
         
         comfirmInfoBottomSheetView.editButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.hideComfirmInfoBottomSheet()
             }
             .disposed(by: disposeBag)
         
         comfirmInfoBottomSheetView.confirmButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.hideComfirmInfoBottomSheet()
                 owner.showPolicyAgreementBottomSheet()
@@ -175,6 +182,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .disposed(by: disposeBag)
         
         policyAgreementBottomSheetView.confirmButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let signUpCompleteViewReactor = SignUpCompleteViewReactor()
                 let signUpCompleteViewController = SignUpCompleteViewController(reactor: signUpCompleteViewReactor)
@@ -183,6 +191,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .disposed(by: disposeBag)
         
         nextButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.hideComfirmInfoBottomSheet()
                 owner.showPolicyAgreementBottomSheet()

@@ -96,11 +96,13 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
         
         
         nameTextField.rx.text.orEmpty
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .map { Reactor.Action.inputName($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         nextButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .map { Reactor.Action.nextButtonTap }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -138,6 +140,7 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
             .disposed(by: disposeBag)
         
         nextButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let signUpResultViewReactor = SignUpResultViewReactor()
                 let signUpResultViewController = SignUpResultViewController(reactor: signUpResultViewReactor)

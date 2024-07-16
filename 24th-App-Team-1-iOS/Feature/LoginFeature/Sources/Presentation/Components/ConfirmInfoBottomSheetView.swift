@@ -40,7 +40,6 @@ public final class ConfirmInfoBottomSheetView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
         
-
     //MARK: - Functions
     public func setupUI() {
         
@@ -102,6 +101,14 @@ public final class ConfirmInfoBottomSheetView: UIView {
     
         subInfoLabel.textColor = DesignSystemAsset.Colors.gray100.color
         subInfoLabel.text = "역삼중학교 1학년 6반"
+        
+        editButton.do {
+            $0.setupButton(text: "수정할래요")
+        }
+        
+        confirmButton.do {
+            $0.setupButton(text: "네 좋아요")
+        }
         
         layer.cornerRadius = 25
         layer.masksToBounds = true

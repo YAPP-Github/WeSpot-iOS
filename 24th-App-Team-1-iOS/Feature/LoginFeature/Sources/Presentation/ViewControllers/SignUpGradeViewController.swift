@@ -99,6 +99,7 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
         super.bind(reactor: reactor)
         
         gradeTextFieldtapGesture.rx.event
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.showBottomSheet()
             }
@@ -111,12 +112,14 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
             .disposed(by: disposeBag)
         
         bottomSheetView.firstGradeButton.checkButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.showWSToast(image: .warning, message: "만 14세 미만은 가입이 어려워요")
             }
             .disposed(by: disposeBag)
         
         bottomSheetView.secondGradeButton.checkButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.gradeTextField.text = "2학년"
                 owner.hideBottomSheet()
@@ -124,6 +127,7 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
             .disposed(by: disposeBag)
         
         bottomSheetView.thirdGradeButton.checkButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.gradeTextField.text = "3학년"
                 owner.hideBottomSheet()
@@ -131,6 +135,7 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
             .disposed(by: disposeBag)
         
         nextButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let signUpClassViewReactor = SignUpClassViewReactor()
                 let signUpClassViewController = SignUpClassViewController(reactor: signUpClassViewReactor)

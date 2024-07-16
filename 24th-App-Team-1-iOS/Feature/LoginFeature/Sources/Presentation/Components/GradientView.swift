@@ -12,8 +12,8 @@ import DesignSystem
 final public class GradientView: UIView {
 
     //MARK: - Properties
-    let gradientLayer = CAGradientLayer()
-    let gradientColor: [CGColor] = [
+    private let gradientLayer = CAGradientLayer()
+    private let gradientColor: [CGColor] = [
         UIColor.clear.cgColor,
         DesignSystemAsset.Colors.gray900.color.cgColor
      ]

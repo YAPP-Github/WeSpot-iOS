@@ -45,10 +45,10 @@ public final class SignUpNameViewReactor: Reactor {
             let isWarningHidden = name.count <= 1
             
             return Observable.concat([
-                Observable.just(Mutation.setName(name)),
-                Observable.just(Mutation.setErrorMessage(errorMessage)),
-                Observable.just(Mutation.setButtonEnabled(isButtonEnabled)),
-                Observable.just(Mutation.setWarningHidden(isWarningHidden))
+                .just(Mutation.setName(name)),
+                .just(Mutation.setErrorMessage(errorMessage)),
+                .just(Mutation.setButtonEnabled(isButtonEnabled)),
+                .just(Mutation.setWarningHidden(isWarningHidden))
             ])
             
         case .nextButtonTap:

@@ -11,7 +11,6 @@ import ReactorKit
 
 public final class SignUpSchoolViewReactor: Reactor {
     
-    
     public struct State {
         var schoolName: String = ""
         var schoolList: [String] = []

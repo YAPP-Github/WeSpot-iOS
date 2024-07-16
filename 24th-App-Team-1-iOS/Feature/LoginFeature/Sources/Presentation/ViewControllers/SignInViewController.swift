@@ -96,6 +96,7 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         super.bind(reactor: reactor)
         
         appleLoginButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let signUpSchoolViewReactor = SignUpSchoolViewReactor()
                 let signUpSchoolViewController = SignUpSchoolViewController(reactor: signUpSchoolViewReactor)
@@ -104,6 +105,7 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             .disposed(by: disposeBag)
         
         kakaoLoginButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let signUpSchoolViewReactor = SignUpSchoolViewReactor()
                 let signUpSchoolViewController = SignUpSchoolViewController(reactor: signUpSchoolViewReactor)

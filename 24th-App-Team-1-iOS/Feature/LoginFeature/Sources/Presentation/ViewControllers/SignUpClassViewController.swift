@@ -91,16 +91,18 @@ public final class SignUpClassViewController: BaseViewController<SignUpClassView
      
         classTextField.rx.controlEvent([.editingDidBegin, .editingDidEnd])
             .map { self.classTextField.isEditing }
-            .bind(to: classTextField.borderUpdateBinder )
+            .bind(to: classTextField.borderUpdateBinder)
             .disposed(by: disposeBag)
         
         classTextField.rx.text.orEmpty
-                    .map { Int($0) ?? 0 }
-                    .map { $0 <= 20 }
-                    .bind(to: warningLabel.rx.isHidden)
-                    .disposed(by: disposeBag)
+            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
+            .compactMap { Int($0) }
+            .map { $0 <= 20 }
+            .bind(to: warningLabel.rx.isHidden)
+            .disposed(by: disposeBag)
         
         nextButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let signUpGenderViewReactor = SignUpGenderViewReactor()
                 let signUpGenderViewController = SignUpGenderViewController(reactor: signUpGenderViewReactor)

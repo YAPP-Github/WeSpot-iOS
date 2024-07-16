@@ -40,7 +40,7 @@ public final class GenderCardButton: UIButton {
     private let cardImage = UIImageView()
     private let typeLabel = WSLabel(wsFont: .Header02, textAlignment: .center)
     
-    public var image: UIImage? {
+    private var image: UIImage? {
         return cardImage.image
     }
     public override var isHighlighted: Bool {
@@ -62,8 +62,7 @@ public final class GenderCardButton: UIButton {
     
     //MARK: - Functions
     private func setupUI() {
-        addSubview(cardImage)
-        addSubview(typeLabel)
+        addSubviews(cardImage, typeLabel)
     }
     
     private func setupAutoLayout() {

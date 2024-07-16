@@ -41,12 +41,12 @@ public final class PolicyAgreementBottomSheetView: UIView {
         
 
     //MARK: - Functions
-    public func setupUI() {
+    private func setupUI() {
         
         addSubviews(titleLabel, subView, allAggreementButton, serviceAgreementButton, privacyAgreementButton, marketingAgreementButton, confirmButton)
     }
     
-    public func setupAutoLayout() {
+    private func setupAutoLayout() {
         
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(28)
@@ -84,7 +84,7 @@ public final class PolicyAgreementBottomSheetView: UIView {
         }
     }
     
-    public func setupAttributes() {
+    private func setupAttributes() {
         
         backgroundColor = DesignSystemAsset.Colors.gray600.color
         

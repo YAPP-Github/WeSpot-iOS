@@ -11,7 +11,6 @@ import ReactorKit
 
 public final class SignUpResultViewReactor: Reactor {
     
-    
     public struct State {
         
     }

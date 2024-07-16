@@ -14,7 +14,6 @@ import SnapKit
 
 public final class SelectGradeBottomSheetView: UIView {
 
-    
     //MARK: - Properties
     private let titleLabel = WSLabel(wsFont: .Body01, text: "현재 학년을 선택해주세요")
     private let subTitleLabel = WSLabel(wsFont: .Body06, text: "만 14세 미만 학생은 가입이 어려워요")
@@ -34,15 +33,14 @@ public final class SelectGradeBottomSheetView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-        
 
     //MARK: - Functions
-    public func setupUI() {
+    private func setupUI() {
         
         addSubviews(titleLabel, subTitleLabel, firstGradeButton, secondGradeButton, thirdGradeButton)
     }
     
-    public func setupAutoLayout() {
+    private func setupAutoLayout() {
         
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(28)
@@ -70,7 +68,7 @@ public final class SelectGradeBottomSheetView: UIView {
         }
     }
     
-    public func setupAttributes() {
+    private func setupAttributes() {
         
         backgroundColor = DesignSystemAsset.Colors.gray600.color
         
@@ -82,6 +80,4 @@ public final class SelectGradeBottomSheetView: UIView {
         layer.masksToBounds = true
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
     }
-    
-
 }

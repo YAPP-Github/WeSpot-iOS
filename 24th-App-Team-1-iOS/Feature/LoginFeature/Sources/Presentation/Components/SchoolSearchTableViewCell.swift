@@ -83,7 +83,6 @@ public final class SchoolSearchTableViewCell: UITableViewCell {
         subTitleLabel.textColor = DesignSystemAsset.Colors.gray300.color
     }
     
-    
     public override func layoutSubviews() {
         super.layoutSubviews()
         

@@ -130,7 +130,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
             .disposed(by: disposeBag)
         
         schoolTextField.rx.text.orEmpty
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
             .distinctUntilChanged()
             .map { Reactor.Action.searchSchool($0) }
             .bind(to: reactor.action)
@@ -138,6 +138,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         
         reactor.state
             .map { $0.schoolList }
+            .distinctUntilChanged()
             .bind(to: schoolSearchTableView.rx.items(cellIdentifier: "SchoolSearchTableViewCell", cellType: SchoolSearchTableViewCell.self)) { (index, school, cell) in
                 
                 cell.selectionStyle = .none
@@ -147,16 +148,19 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
             
         reactor.state
             .map { $0.schoolName.isEmpty || (!$0.schoolName.isEmpty && $0.schoolList.count > 0)}
+            .distinctUntilChanged()
             .bind(to: additionalButton.rx.isHidden, additionalButtonLine.rx.isHidden)
             .disposed(by: disposeBag)
         
         reactor.state
             .map { $0.schoolName.count <= 20 }
+            .distinctUntilChanged()
             .bind(to: warningLabel.rx.isHidden)
             .disposed(by: disposeBag)
         
         
         nextButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let signUpGradeViewReactor = SignUpGradeViewReactor()
                 let signUpGradeViewController = SignUpGradeViewController(reactor: signUpGradeViewReactor)
