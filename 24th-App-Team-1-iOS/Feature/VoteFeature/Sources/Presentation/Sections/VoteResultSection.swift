@@ -11,7 +11,6 @@ import Differentiator
 enum VoteResultSection: SectionModelType {
     case voteResultInfo([VoteResultItem])
     
-    
     var items: [VoteResultItem] {
         if case let .voteResultInfo(items) = self {
              return items

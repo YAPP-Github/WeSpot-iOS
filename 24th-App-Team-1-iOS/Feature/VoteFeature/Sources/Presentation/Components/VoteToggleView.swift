@@ -11,6 +11,8 @@ import SnapKit
 import Then
 import DesignSystem
 
+
+fileprivate typealias VoteStr = VoteStrings
 final class VoteToggleView: UIView {
     //MARK: - Properties
     let mainButton: UIButton = UIButton()
@@ -44,7 +46,7 @@ final class VoteToggleView: UIView {
         mainButton.do {
             $0.configuration = .plain()
             $0.configuration?.baseForegroundColor = DesignSystemAsset.Colors.gray100.color
-            $0.configuration?.attributedTitle = AttributedString(NSAttributedString(string: "투표 홈", attributes: [
+            $0.configuration?.attributedTitle = AttributedString(NSAttributedString(string: VoteStr.voteHomeButtonText, attributes: [
                 .font: WSFont.Body03.font(),
             ]))
             $0.configuration?.baseBackgroundColor = .clear
@@ -54,7 +56,7 @@ final class VoteToggleView: UIView {
             $0.configuration = .plain()
             $0.configuration?.baseBackgroundColor = .clear
             $0.configuration?.baseForegroundColor = DesignSystemAsset.Colors.gray400.color
-            $0.configuration?.attributedTitle = AttributedString(NSAttributedString(string: "투표 결과", attributes: [
+            $0.configuration?.attributedTitle = AttributedString(NSAttributedString(string: VoteStr.voteResultButtonText, attributes: [
                 .font: WSFont.Body03.font(),
             ]))
         }

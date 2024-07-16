@@ -66,7 +66,8 @@ extension VotePageViewController: ReactorKit.View {
             .distinctUntilChanged()
             .bind(with: self) { owner, index in
                 owner.setViewController(index: index)
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
     }
 }
 

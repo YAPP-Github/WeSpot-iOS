@@ -8,7 +8,6 @@
 import DesignSystem
 import UIKit
 
-
 final class VoteResultCollectionViewCell: UICollectionViewCell {
     
     //MARK: - Properties
@@ -88,6 +87,7 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
             $0.setupButton(text: "전체 결과 보기")
             $0.setupFont(font: .Body06)
         }
+        
         introduceLabel.do {
             $0.text = "안녕! 모르는거 있으면 나한테 다 물어봐"
             $0.textColor = DesignSystemAsset.Colors.gray300.color

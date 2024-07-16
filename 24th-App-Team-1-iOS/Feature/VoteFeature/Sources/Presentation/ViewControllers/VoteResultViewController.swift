@@ -16,9 +16,8 @@ import RxCocoa
 import ReactorKit
 import RxDataSources
 
-
-
-
+fileprivate typealias VoteStr = VoteStrings
+fileprivate typealias VoteId = VoteStrings.Identifier
 final class VoteResultViewController: BaseViewController<VoteResultViewReactor> {
     
     //MARK: - Properties
@@ -27,7 +26,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
     }
     private lazy var voteResultCollectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: voteResultCollectionViewLayout)
     private lazy var voteResultsCollectionViewDataSources: RxCollectionViewSectionedReloadDataSource<VoteResultSection> = .init { dataSources, collectionView, indexPath, sectionItem in
-        guard let voteResultsCell = collectionView.dequeueReusableCell(withReuseIdentifier: "VoteResultCollectionViewCell", for: indexPath) as? VoteResultCollectionViewCell else { return UICollectionViewCell() }
+        guard let voteResultsCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteId.voteReulstCell , for: indexPath) as? VoteResultCollectionViewCell else { return UICollectionViewCell() }
         return voteResultsCell
     }
     private let confirmButton: WSButton = WSButton(wsButtonType: .default(12))
@@ -71,7 +70,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         super.setupAttributes()
         
         voteResultCollectionView.do {
-            $0.register(VoteResultCollectionViewCell.self, forCellWithReuseIdentifier: "VoteResultCollectionViewCell")
+            $0.register(VoteResultCollectionViewCell.self, forCellWithReuseIdentifier: VoteId.voteReulstCell)
             $0.backgroundColor = .clear
             $0.showsHorizontalScrollIndicator = false
             $0.showsVerticalScrollIndicator = false
@@ -83,7 +82,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         }
         
         confirmButton.do {
-            $0.setupButton(text: "내가 받은 투표 보기")
+            $0.setupButton(text: VoteStrings.voteMyResultButtonText)
         }
         
         resultPageControl.do {

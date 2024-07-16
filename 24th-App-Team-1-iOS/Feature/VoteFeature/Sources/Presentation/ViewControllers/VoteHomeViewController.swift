@@ -15,20 +15,20 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
+fileprivate typealias VoteStr = VoteStrings
 final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
 
     //MARK: - Properties
     private let voteBannerView: WSBanner = WSBanner(
         image: DesignSystemAsset.Images.invite.image,
-        titleText: "위스팟에 친구 초대하기",
-        subText: "다양한 친구들과 더 재밌게 사용해 보세요"
+        titleText: VoteStr.voteBannerMainText,
+        subText: VoteStr.voteBannerSubText
     )
     private let voteContainerView: UIView = UIView()
     private let voteConfirmButton: WSButton = WSButton(wsButtonType: .default(12))
     private let voteDateLabel: WSLabel = WSLabel(wsFont: .Body06, text: Date().toFormatString(with: .MddEEE))
-    private let voteDescriptionLabel: WSLabel = WSLabel(wsFont: .Body01, text: "지금 우리 반 투표가 진행 중이에요\n반 친구들에 대해 알려주세요")
+    private let voteDescriptionLabel: WSLabel = WSLabel(wsFont: .Body01, text: VoteStr.voteDescrptionText)
     private let voteImageView: UIImageView = UIImageView()
-    
     
     //MARK: - LifeCycle
     override func viewDidLoad() {
@@ -94,7 +94,7 @@ final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
         }
         
         voteConfirmButton.do {
-            $0.setupButton(text: "투표하기")
+            $0.setupButton(text: VoteStr.voteText)
         }
         
         voteDateLabel.do {
