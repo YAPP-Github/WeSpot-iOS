@@ -8,6 +8,7 @@ let project = Project
             .app(module: .app, dependencies: [
                 .feature(module: .LoginFeature),
                 .feature(module: .ProfileFeature),
+                .feature(module: .VoteFeature),
                 .shared(module: .DesignSystem)
             ])
         ]

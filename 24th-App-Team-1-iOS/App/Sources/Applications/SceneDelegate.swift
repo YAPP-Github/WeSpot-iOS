@@ -8,6 +8,7 @@
 import UIKit
 import Util
 
+
 import LoginFeature
 import SnapKit
 import ReactorKit
@@ -21,7 +22,7 @@ class SceneDelegate: UIResponder, UISceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: scene)
-        //TODO: ViewControle 생성 해서 RootViewController로 지정 해주세요
+        //TODO: 임시 코드 입니다 DIContainer 추가 후 변경 예정
         let signInViewReactor = SignInViewReactor()
         let signInViewController = SignInViewController(reactor: signInViewReactor)
         window?.rootViewController = UINavigationController(rootViewController: signInViewController)
