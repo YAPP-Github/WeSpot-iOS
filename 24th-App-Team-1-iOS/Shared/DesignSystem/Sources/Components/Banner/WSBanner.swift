@@ -83,7 +83,7 @@ public final class WSBanner: UIView {
         stackView.snp.makeConstraints {
             $0.verticalEdges.equalToSuperview().inset(18)
             $0.leading.equalToSuperview().offset(20)
-            $0.trailing.equalTo(arrowButton.snp.leading).offset(-10)
+            $0.trailing.greaterThanOrEqualTo(arrowButton.snp.leading).offset(-5)
         }
         arrowButton.snp.makeConstraints {
             $0.size.equalTo(40)

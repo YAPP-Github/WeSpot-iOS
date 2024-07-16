@@ -49,8 +49,7 @@ open class BaseViewController<R>: UIViewController, ReactorKit.View where R: Rea
     /// 오토레이아웃 설정을 위한 메서드
     open func setupAutoLayout() {
         navigationBar.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(44)
-            $0.horizontalEdges.equalToSuperview()
+            $0.horizontalEdges.top.equalTo(view.safeAreaLayoutGuide)
             $0.height.equalTo(60)
         }
     }
@@ -58,6 +57,7 @@ open class BaseViewController<R>: UIViewController, ReactorKit.View where R: Rea
     /// 뷰의 속성 설정을 위한 메서드
     open func setupAttributes() {
         navigationController?.navigationBar.isHidden = true
+        view.backgroundColor = DesignSystemAsset.Colors.gray900.color
     }
     
     /// 리엑터와 바인딩을 위한 메서드
