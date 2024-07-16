@@ -26,6 +26,7 @@ let package = Package(
         .package(url: "https://github.com/SnapKit/SnapKit", from: "5.7.1"),
         .package(url: "https://github.com/devxoul/Then", from: "3.0.0"),
         .package(url: "https://github.com/Alamofire/Alamofire", from: "5.9.1"),
-        .package(url: "https://github.com/ReactorKit/ReactorKit", from: "3.2.0")
+        .package(url: "https://github.com/ReactorKit/ReactorKit", from: "3.2.0"),
+        .package(url: "https://github.com/airbnb/lottie-ios", from: "4.5.0")
     ]
 )
