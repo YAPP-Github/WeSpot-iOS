@@ -20,7 +20,8 @@ let project = Project
                 .SPM.snapKit,
                 .SPM.then,
                 .SPM.alamofire,
-                .SPM.swinject
+                .SPM.swinject,
+                .SPM.lottie
             ])
         ]
     )

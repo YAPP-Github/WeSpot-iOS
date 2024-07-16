@@ -45,6 +45,10 @@ public final class WSButton: UIButton {
         return self
     }
     
+    public func setupFont(font: WSFont) {
+        titleLabel?.font = font.font()
+    }
+    
     private func setupHighlighted(_ isHighlighted: Bool) {
         backgroundColor = isHighlighted ? wsButtonType.pressedBackgroundColor : wsButtonType.buttonProperties.backgroundColor.color
         setTitleColor(wsButtonType.pressedTextColor, for: .highlighted)
