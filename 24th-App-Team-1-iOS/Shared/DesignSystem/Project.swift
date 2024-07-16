@@ -15,5 +15,10 @@ let project = Project.makeProject(
             .shared(module: .ThirdPartyLib),
             .core(module: .Extensions)
         ])
+    ],
+    resourceSynthesizers: [
+        .custom(name: "lottie", parser: .json, extensions: ["lottie"]),
+        .assets(),
+        .fonts(),
     ]
 )

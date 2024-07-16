@@ -8,7 +8,6 @@
 import UIKit
 import Util
 
-import SnapKit
 import VoteFeature
 
 class SceneDelegate: UIResponder, UISceneDelegate {
@@ -20,8 +19,8 @@ class SceneDelegate: UIResponder, UISceneDelegate {
         
         window = UIWindow(windowScene: scene)
         //TODO: 임시 코드 입니다 DIContainer 추가 후 변경 예정
-        let voteViewReactor = VoteMainViewReactor()
-        let voteViewController = VoteMainViewController(reactor: voteViewReactor)
+        let voteViewReactor = VoteBeginViewReactor()
+        let voteViewController = VoteBeginViewController(reactor: voteViewReactor)
         window?.rootViewController = UINavigationController(rootViewController: voteViewController)
         window?.makeKeyAndVisible()
         
