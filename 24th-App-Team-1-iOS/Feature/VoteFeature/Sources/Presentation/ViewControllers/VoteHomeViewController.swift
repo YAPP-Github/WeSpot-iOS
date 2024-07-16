@@ -15,19 +15,19 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-fileprivate typealias VoteStr = VoteStrings
+fileprivate typealias VoteHomeStr = VoteStrings
 final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
 
     //MARK: - Properties
     private let voteBannerView: WSBanner = WSBanner(
         image: DesignSystemAsset.Images.invite.image,
-        titleText: VoteStr.voteBannerMainText,
-        subText: VoteStr.voteBannerSubText
+        titleText: VoteHomeStr.voteBannerMainText,
+        subText: VoteHomeStr.voteBannerSubText
     )
     private let voteContainerView: UIView = UIView()
     private let voteConfirmButton: WSButton = WSButton(wsButtonType: .default(12))
     private let voteDateLabel: WSLabel = WSLabel(wsFont: .Body06, text: Date().toFormatString(with: .MddEEE))
-    private let voteDescriptionLabel: WSLabel = WSLabel(wsFont: .Body01, text: VoteStr.voteDescrptionText)
+    private let voteDescriptionLabel: WSLabel = WSLabel(wsFont: .Body01, text: VoteHomeStr.voteDescrptionText)
     private let voteImageView: UIImageView = UIImageView()
     
     //MARK: - LifeCycle
@@ -94,7 +94,7 @@ final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
         }
         
         voteConfirmButton.do {
-            $0.setupButton(text: VoteStr.voteText)
+            $0.setupButton(text: VoteHomeStr.voteText)
         }
         
         voteDateLabel.do {
@@ -113,6 +113,15 @@ final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
     
     override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
+        
+        voteConfirmButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                let voteProcessViewReactor = VoteProcessViewReactor()
+                let voteProcessViewController = VoteProcessViewController(reactor: voteProcessViewReactor)
+                owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
         
     }
 }
