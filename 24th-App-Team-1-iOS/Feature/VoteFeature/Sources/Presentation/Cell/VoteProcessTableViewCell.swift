@@ -58,7 +58,7 @@ final class VoteProcessTableViewCell: UITableViewCell {
     }
     
     private func updateContentLayout(isSelected: Bool) {
-        contentView.backgroundColor = isSelected ? DesignSystemAsset.Colors.primary300.color.withAlphaComponent(0.2) :         DesignSystemAsset.Colors.gray700.color
+        contentView.backgroundColor = isSelected ? DesignSystemAsset.Colors.primary300.color.withAlphaComponent(0.15) :         DesignSystemAsset.Colors.gray700.color
         contentView.layer.borderColor = isSelected ? DesignSystemAsset.Colors.primary300.color.cgColor : UIColor.clear.cgColor
         contentView.layer.borderWidth = 1
     }

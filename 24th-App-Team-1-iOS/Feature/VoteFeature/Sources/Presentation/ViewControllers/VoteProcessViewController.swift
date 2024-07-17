@@ -72,7 +72,7 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
             $0.setNavigationBarUI(
                 property: .all(
                     DesignSystemAsset.Images.arrow.image,
-                    VoteProcessStr.voteProcessTopTexxt,
+                    VoteProcessStr.voteProcessTopText,
                     "1/5",
                     DesignSystemAsset.Colors.gray300.color
                 )
@@ -109,5 +109,42 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
             .drive(questionTableView.rx.items(dataSource: questionDataSources))
             .disposed(by: disposeBag)
         
+        navigationBar
+            .rightBarButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.createAlertController()
+            }
+            .disposed(by: disposeBag)
     }
+}
+
+
+extension VoteProcessViewController {
+    
+    func createAlertController() {
+        let processAlertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let reportAction = UIAlertAction(title: VoteProcessStr.voteReportAlertText, style: .default) { _ in
+            WSAlertBuilder(showViewController: self)
+                .setTitle(title: VoteProcessStr.voteModalTitleText)
+                .setMessage(message: VoteProcessStr.voteModalMessageText)
+                .setConfirm(text: VoteProcessStr.voteModalConfirmText)
+                .setCancel(text: VoteProcessStr.voteModalCancelText)
+                .action(.confirm) { [weak self] in
+                    self?.showWSToast(image: .check, message: VoteProcessStr.voteToastText)
+                }
+                .show()
+        }
+        //TODO: 링크 주어질시 Action 추가하기
+        let choiceAction = UIAlertAction(title: VoteProcessStr.voteChoiceAlertText, style: .default)
+        let cancelAction = UIAlertAction(title: VoteProcessStr.voteCancelAlertText, style: .cancel)
+        
+        processAlertController.addAction(reportAction)
+        processAlertController.addAction(choiceAction)
+        processAlertController.addAction(cancelAction)
+        
+        present(processAlertController, animated: true)
+    }
+    
+    
 }
