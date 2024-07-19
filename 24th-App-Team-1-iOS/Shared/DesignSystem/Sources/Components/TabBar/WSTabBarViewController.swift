@@ -17,11 +17,15 @@ public final class WSTabBarViewController: UITabBarController {
     public let tabBarView = WSTabBar()
     private let disposeBag = DisposeBag()
     
+    // MARK: - Initializer
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .hideTabBar, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .showTabBar, object: nil)
+    }
+    
     // MARK: - Functions
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
-        print(#function, "WSTabBarViewController")
         
         tabBar.isHidden = true
         
@@ -38,30 +42,6 @@ public final class WSTabBarViewController: UITabBarController {
         additionalSafeAreaInsets.bottom = tabBarView.isHidden ? 0 : tabBarView.frame.height
         
         updateTabBarButtonState()
-    }
-    
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        print("✨", #function, "WSTabBarViewController")
-    }
-    
-    public override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        print("✨" ,#function, "WSTabBarViewController")
-    }
-    
-    public override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        print("✨" ,#function, "WSTabBarViewController")
-    }
-    
-    public override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        print("✨" ,#function, "WSTabBarViewController")
     }
     
     // MARK: - Functions
@@ -131,18 +111,11 @@ public final class WSTabBarViewController: UITabBarController {
     
     @objc private func hideTabBar() {
         
-        print(#function)
         setTabBar(hidden: true)
     }
     
     @objc private func showTabBar() {
         
-        print(#function)
         setTabBar(hidden: false)
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self, name: .hideTabBar, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .showTabBar, object: nil)
     }
 }

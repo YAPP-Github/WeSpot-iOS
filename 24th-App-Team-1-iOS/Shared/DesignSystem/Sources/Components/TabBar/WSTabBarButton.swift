@@ -28,7 +28,7 @@ public final class WSTabBarButton: UIButton {
             }
         }
         
-        var unSelectedImage: UIImage {
+        var selectedImage: UIImage {
             switch self {
             case .vote:
                 DesignSystemAsset.Images.icTabbarVoteSelected.image
@@ -39,7 +39,7 @@ public final class WSTabBarButton: UIButton {
             }
         }
         
-        var selectedImage: UIImage {
+        var unSelectedImage: UIImage {
             switch self {
             case .vote:
                 DesignSystemAsset.Images.icTabbarVoteUnseleceted.image
@@ -78,7 +78,6 @@ public final class WSTabBarButton: UIButton {
     
     private func setupAttributes(image: UIImage, text: String) {
         
-        isUserInteractionEnabled = true
         backgroundColor = DesignSystemAsset.Colors.gray800.color
         
         tabImageView.image = image
@@ -101,7 +100,7 @@ public final class WSTabBarButton: UIButton {
     }
     
     public func updateState(isSelected: Bool) {
-        let image = isSelected ? type.unSelectedImage : type.selectedImage
+        let image = isSelected ? type.selectedImage : type.unSelectedImage
         tabImageView.image = image
     }
 }

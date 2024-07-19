@@ -37,9 +37,7 @@ final public class WSTabBar: UIView {
     private func setupUI() {
         
         addSubviews(stackView, topBorder)
-        stackView.addArrangedSubview(voteButton)
-        stackView.addArrangedSubview(messageButton)
-        stackView.addArrangedSubview(allButton)
+        stackView.addArrangedSubviews(voteButton, messageButton, allButton)
     }
     
     private func setupAttributes() {
