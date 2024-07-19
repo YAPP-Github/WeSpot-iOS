@@ -11,35 +11,57 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-public final class WSTabBarViewController: UIViewController {
+public final class WSTabBarViewController: UITabBarController {
     
     // MARK: - Properties
-    private let tabBarView = WSTabBar()
-    private let viewControllers: [UIViewController]
-    private var selectedIndex: Int = 0 {
-        didSet { self.updateView() }
-    }
+    public let tabBarView = WSTabBar()
     private let disposeBag = DisposeBag()
-    
-    // MARK: - Initializer
-    public init(viewControllers: [UIViewController]) {
-        self.viewControllers = viewControllers
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     // MARK: - Functions
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        print(#function, "WSTabBarViewController")
+        
+        tabBar.isHidden = true
+        
         setupUI()
         setupAttributes()
         setupAutoLayout()
         bind()
-        updateView()
+        setupNotificationCenter()
+    }
+    
+    public override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        
+        additionalSafeAreaInsets.bottom = tabBarView.isHidden ? 0 : tabBarView.frame.height
+        
+        updateTabBarButtonState()
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        print("✨", #function, "WSTabBarViewController")
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        print("✨" ,#function, "WSTabBarViewController")
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        print("✨" ,#function, "WSTabBarViewController")
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        print("✨" ,#function, "WSTabBarViewController")
     }
     
     // MARK: - Functions
@@ -67,6 +89,7 @@ public final class WSTabBarViewController: UIViewController {
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.selectedIndex = 0
+                owner.updateTabBarButtonState()
             }
             .disposed(by: disposeBag)
         
@@ -74,6 +97,7 @@ public final class WSTabBarViewController: UIViewController {
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.selectedIndex = 1
+                owner.updateTabBarButtonState()
             }
             .disposed(by: disposeBag)
         
@@ -81,43 +105,44 @@ public final class WSTabBarViewController: UIViewController {
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.selectedIndex = 2
+                owner.updateTabBarButtonState()
             }
             .disposed(by: disposeBag)
+        
     }
     
-    private func updateView() {
-        
-        deleteView()
-        setupView()
-        updateButtonStates()
-    }
-    
-    private func deleteView() {
-        
-        let previousVC = viewControllers[selectedIndex]
-        previousVC.willMove(toParent: nil)
-        previousVC.view.removeFromSuperview()
-        previousVC.removeFromParent()
-    }
-    
-    private func setupView() {
-        
-        let selectedVC = viewControllers[selectedIndex]
-        
-        self.addChild(selectedVC)
-        view.insertSubview(selectedVC.view, belowSubview: tabBarView)
-        selectedVC.view.snp.makeConstraints {
-            $0.top.directionalHorizontalEdges.equalToSuperview()
-            $0.bottom.equalTo(tabBarView.snp.top)
-        }
-        selectedVC.didMove(toParent: self)
-    }
-    
-    private func updateButtonStates() {
+    private func updateTabBarButtonState() {
         
         tabBarView.voteButton.updateState(isSelected: selectedIndex == 0)
         tabBarView.messageButton.updateState(isSelected: selectedIndex == 1)
         tabBarView.allButton.updateState(isSelected: selectedIndex == 2)
     }
     
+    public func setTabBar(hidden: Bool) {
+        tabBarView.isHidden = hidden
+        additionalSafeAreaInsets.bottom = hidden ? 0 : tabBarView.frame.height
+        
+    }
+    
+    private func setupNotificationCenter() {
+        NotificationCenter.default.addObserver(self, selector: #selector(hideTabBar), name: .hideTabBar, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(showTabBar), name: .showTabBar, object: nil)
+    }
+    
+    @objc private func hideTabBar() {
+        
+        print(#function)
+        setTabBar(hidden: true)
+    }
+    
+    @objc private func showTabBar() {
+        
+        print(#function)
+        setTabBar(hidden: false)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .hideTabBar, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .showTabBar, object: nil)
+    }
 }
