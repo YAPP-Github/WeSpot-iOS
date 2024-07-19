@@ -106,6 +106,7 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             .bind(with: self) { owner, _ in
                 let signUpSchoolViewReactor = SignUpSchoolViewReactor()
                 let signUpSchoolViewController = SignUpSchoolViewController(reactor: signUpSchoolViewReactor)
+                signUpSchoolViewController.hidesBottomBarWhenPushed = true
                 owner.navigationController?.pushViewController(signUpSchoolViewController, animated: true)
             }
             .disposed(by: disposeBag)
