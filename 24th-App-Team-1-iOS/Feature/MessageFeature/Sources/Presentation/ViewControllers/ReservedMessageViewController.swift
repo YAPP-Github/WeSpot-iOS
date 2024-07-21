@@ -59,8 +59,6 @@ public final class ReservedMessageViewController: BaseViewController<ReservedMes
     public override func setupAttributes() {
         super.setupAttributes()
         
-        view.backgroundColor = DesignSystemAsset.Colors.gray900.color
-        
         navigationBar.do{
             $0.setNavigationBarUI(property: .leftIcon(DesignSystemAsset.Images.arrow.image))
             $0.setNavigationBarAutoLayout(property: .leftIcon)
