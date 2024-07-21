@@ -7,7 +7,7 @@
 
 import Foundation
 
-public Notification.Name {
-    static let hideTabBar = Notification(name: "hideTabBar")
-    static let showTabBar = Notification(name: "showTabBar")
+public extension Notification.Name {
+    static let hideTabBar = Notification.Name("hideTabBar")
+    static let showTabBar = Notification.Name("showTabBar")
 }

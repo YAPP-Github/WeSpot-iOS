@@ -48,6 +48,7 @@ extension ModulePaths {
         case LoginFeature
         case ProfileFeature
         case VoteFeature
+        case MessageFeature
     }
 }
 
@@ -55,6 +56,7 @@ extension ModulePaths {
     public enum Domain: String, ModulePathProtocol {
         case LoginDomain
         case ProfileDomain
+        case MessageDomain
     }
 }
 
@@ -62,6 +64,7 @@ extension ModulePaths {
     public enum Service: String, ModulePathProtocol {
         case LoginService
         case ProfileService
+        case MessageService
     }
 }
 
