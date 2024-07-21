@@ -61,9 +61,10 @@ public final class ReservedMessageViewController: BaseViewController<ReservedMes
         
         view.backgroundColor = DesignSystemAsset.Colors.gray900.color
         
-        navigationBar
-            .setNavigationBarUI(property: .leftIcon(DesignSystemAsset.Images.arrow.image))
-            .setNavigationBarAutoLayout(property: .leftIcon)
+        navigationBar.do{
+            $0.setNavigationBarUI(property: .leftIcon(DesignSystemAsset.Images.arrow.image))
+            $0.setNavigationBarAutoLayout(property: .leftIcon)
+        }
         
         headerContainerView.backgroundColor = DesignSystemAsset.Colors.gray900.color
         
@@ -92,8 +93,7 @@ public final class ReservedMessageViewController: BaseViewController<ReservedMes
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.state
-            .map { $0.messageSection }
+        reactor.pulse(\.$messageSection)
             .bind(to: reservedMessageTableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         

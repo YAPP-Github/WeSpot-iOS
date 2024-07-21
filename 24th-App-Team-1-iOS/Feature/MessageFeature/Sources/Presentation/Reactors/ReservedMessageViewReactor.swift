@@ -12,7 +12,7 @@ import ReactorKit
 public final class ReservedMessageViewReactor: Reactor {
     
     public struct State {
-        var messageSection: [ReservedMessageSection]
+        @Pulse var messageSection: [ReservedMessageSection]
     }
     
     public enum Action {
@@ -42,9 +42,11 @@ public final class ReservedMessageViewReactor: Reactor {
     }
     
     public func reduce(state: State, mutation: Mutation) -> State {
+        var newState = state
         switch mutation {
         case .setMessages(let messages):
-            return State(messageSection: [.main(messages)])
+            newState.messageSection = [.main(messages)]
         }
+        return newState
     }
 }
