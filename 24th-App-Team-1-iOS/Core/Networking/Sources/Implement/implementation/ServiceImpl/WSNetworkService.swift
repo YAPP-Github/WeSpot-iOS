@@ -23,6 +23,8 @@ public final class WSNetworkService: WSNetworkServiceProtocol {
         return networkSession
     }()
     
+    public init() { }
+    
     //MARK: Functions
     public func request<T: Decodable>(endPoint: URLRequestConvertible) -> Single<T> {
         return Single<T>.create { [weak self] single in

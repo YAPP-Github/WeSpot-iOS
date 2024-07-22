@@ -9,14 +9,16 @@ import Foundation
 
 import Alamofire
 
+public typealias WSNetworkHeader = [String: String]
 public protocol WSNetworkEndPoint: URLRequestConvertible {
     var path: String { get }
     var method: HTTPMethod { get }
     var parameters: WSRequestParameters { get }
+    var headers: WSNetworkHeader { get }
 }
 
 
-extension WSNetworkEndPoint {
+public extension WSNetworkEndPoint {
     
     func asURLRequest() throws -> URLRequest {
         var url = try WSNetworkConfigure.baseURL.asURL()
@@ -30,6 +32,8 @@ extension WSNetworkEndPoint {
         case let .reuqestQueryWithBody(query, body: body):
             urlRequest.url = try setupRequestQuery(url, paramters: query)
             urlRequest.httpBody = try setupRequestBody(body: body)
+        case .none:
+            break
         }
         
         return urlRequest

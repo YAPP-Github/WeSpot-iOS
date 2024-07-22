@@ -19,7 +19,7 @@ enum ReservedMessageSection: SectionModelType {
         }
     }
     
-    init(original: ReservedMessageSection, items: [Item]) {
+    init(original: ReservedMessageSection, items: [ReservedMessageItem]) {
         switch original {
         case .main:
             self = .main(items)
