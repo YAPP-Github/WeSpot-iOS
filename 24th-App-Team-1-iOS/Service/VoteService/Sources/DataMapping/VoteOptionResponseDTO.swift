@@ -41,8 +41,8 @@ extension VoteItemResponseDTO.VoteUserResponseDTO {
 
 
 extension VoteItemResponseDTO {
-    func toDomain() -> VoteItemEntity {
-        return VoteItemEntity(
+    public func toDomain() -> VoteItemEntity {
+        return .init(
             userInfo: userInfo.toDomain(),
             voteInfo: voteInfo.map { $0.toDomain() }
         )
@@ -50,8 +50,8 @@ extension VoteItemResponseDTO {
 }
 
 extension VoteItemResponseDTO.VoteUserResponseDTO {
-    func toDomain() -> VoteUserEntity {
-        return VoteUserEntity(
+    public func toDomain() -> VoteUserEntity {
+        return .init(
             id: id,
             name: name,
             profileInfo: profileInfo.toDomain()
@@ -60,14 +60,17 @@ extension VoteItemResponseDTO.VoteUserResponseDTO {
 }
 
 extension VoteItemResponseDTO.VoteOptionsResponseDTO {
-    func toDomain() -> VoteOptionEntity {
-        return VoteOptionEntity(id: id, content: content)
+    public func toDomain() -> VoteOptionEntity {
+        return .init(
+            id: id,
+            content: content
+        )
     }
 }
 
 extension VoteItemResponseDTO.VoteUserResponseDTO.VoteProfileResponseDTO {
-    func toDomain() -> VoteProfileEntity {
-        return VoteProfileEntity(
+    public func toDomain() -> VoteProfileEntity {
+        return .init(
             backgroundColor: backgroundColor,
             iconUrl: URL(string: iconUrl) ?? URL(fileURLWithPath: "")
         )

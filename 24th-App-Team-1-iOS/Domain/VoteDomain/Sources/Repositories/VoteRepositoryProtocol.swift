@@ -10,5 +10,5 @@ import Foundation
 import RxSwift
 
 public protocol VoteRepositoryProtocol {
-    func fetchVoteOptions() -> Single<[VoteItemEntity]?>
+    func fetchVoteOptions() -> Single<VoteItemEntity?>
 }
