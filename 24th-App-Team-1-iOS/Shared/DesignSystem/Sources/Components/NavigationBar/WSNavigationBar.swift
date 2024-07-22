@@ -13,7 +13,7 @@ import SnapKit
 public final class WSNavigationBar: UIView {
     
     //MARK: Properties
-    private let navigationTitleLabel: WSLabel = WSLabel(wsFont: .Header02)
+    public let navigationTitleLabel: WSLabel = WSLabel(wsFont: .Header02)
     public let leftBarButton: UIButton = UIButton(type: .custom)
     public let rightBarButton: UIButton = UIButton(type: .custom)
     public var navigationProperty: WSNavigationType?

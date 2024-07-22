@@ -74,6 +74,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
             $0.backgroundColor = .clear
             $0.showsHorizontalScrollIndicator = false
             $0.showsVerticalScrollIndicator = false
+            $0.isScrollEnabled = false
         }
         
         backgrounImageView.do {
@@ -119,7 +120,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         
         let voteResultItem: NSCollectionLayoutItem = NSCollectionLayoutItem(layoutSize: voteResultItemSize)
         
-        voteResultItem.contentInsets = .init(top: 0, leading: 10, bottom: 0, trailing: 10)
+        voteResultItem.contentInsets = .init(top: 0, leading: 20, bottom: 0, trailing: 20)
         
         let voteResultGroupSize: NSCollectionLayoutSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(0.8),

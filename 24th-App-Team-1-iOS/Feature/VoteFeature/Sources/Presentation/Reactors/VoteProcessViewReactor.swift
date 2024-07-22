@@ -14,6 +14,8 @@ final class VoteProcessViewReactor: Reactor {
     
     struct State {
         @Pulse var questionSection: [VoteProcessSection]
+        //TODO: 질문지 API 호출시 question Count Increment 하도록 로직 구현
+        var processCount: String
     }
     
     enum Action {
@@ -28,7 +30,8 @@ final class VoteProcessViewReactor: Reactor {
     
     init() {
         self.initialState = State(
-            questionSection: [.votePrcessInfo([])]
+            questionSection: [.votePrcessInfo([])],
+            processCount: "1/5"
         )
     }
     
