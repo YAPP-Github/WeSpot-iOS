@@ -38,6 +38,8 @@ final class VotePageViewReactor: Reactor {
                 switch event {
                 case let .toggleStatus(voteTypes):
                     return .just(.setViewController(voteTypes))
+                case .toogleMessageType(_):
+                    return .empty()
                 }
             }
         return .merge(mutation, setToggleStatus)
