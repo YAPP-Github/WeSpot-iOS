@@ -16,17 +16,18 @@ import RxCocoa
 
 
 public final class VoteRepository: VoteRepositoryProtocol {
+
     private let networkService: WSNetworkServiceProtocol = WSNetworkService()
     
     public init() { }
     
-    public func fetchVoteOptions() -> Single<VoteItemEntity?> {
+    public func fetchVoteOptions() -> Single<VoteResponseEntity?> {
         let endPoint = VoteEndPoint.fetchVoteOptions
         return networkService.request(endPoint: endPoint)
             .asObservable()
             .logErrorIfDetected(category: Network.error)
-            .decodeMap(VoteItemResponseDTO.self)
-            .compactMap { $0.toDomain() }
+            .decodeMap(VoteResponseDTO.self)
+            .map { $0.toDomain() }
             .asSingle()
     }
 }

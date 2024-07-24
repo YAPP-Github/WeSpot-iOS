@@ -8,20 +8,16 @@
 import Foundation
 
 import RxSwift
+import Networking
 
-public extension Observable where Element == Data {
-    func decodeMap<T: Decodable>(_ type: T.Type) -> Observable<T> {
-        flatMap { element -> Observable<T> in
-            .create { observer in
-                let decoder = JSONDecoder()
-                do {
-                    let model = try decoder.decode(T.self, from: element)
-                    observer.onNext(model)
-                } catch {
-                    observer.onError(NSError())
-                }
-                return Disposables.create()
+extension ObservableType where Element == Data {
+    public func decodeMap<T: Decodable>(_ type: T.Type) -> Observable<T> {
+        return map { data in
+            guard let decodedData = try? JSONDecoder().decode(T.self, from: data) else {
+                throw WSNetworkError.default(message: "Decoding Error")
             }
+            return decodedData
         }
     }
 }
+

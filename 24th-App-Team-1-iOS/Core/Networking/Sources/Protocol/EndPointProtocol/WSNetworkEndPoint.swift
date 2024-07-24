@@ -14,14 +14,14 @@ public protocol WSNetworkEndPoint: URLRequestConvertible {
     var path: String { get }
     var method: HTTPMethod { get }
     var parameters: WSRequestParameters { get }
-    var headers: WSNetworkHeader { get }
+    var headers: HTTPHeaders { get }
 }
 
 
 public extension WSNetworkEndPoint {
     
     func asURLRequest() throws -> URLRequest {
-        var url = try WSNetworkConfigure.baseURL.asURL()
+        let url = try WSNetworkConfigure.baseURL.asURL()
         var urlRequest = try URLRequest(url: url.appendingPathComponent(path), method: method)
         
         switch parameters {
@@ -35,7 +35,7 @@ public extension WSNetworkEndPoint {
         case .none:
             break
         }
-        
+        urlRequest.headers = headers
         return urlRequest
     }
     

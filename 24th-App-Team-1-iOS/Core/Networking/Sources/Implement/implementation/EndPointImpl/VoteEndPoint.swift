@@ -73,11 +73,11 @@ public enum VoteEndPoint: WSNetworkEndPoint {
         }
     }
     
-    public var headers: WSNetworkHeader {
+    public var headers: HTTPHeaders {
         return [
             "Content-Type": "application/json",
             //TODO: AccessToken 값 넣기
-            "Authorization": "Bearer"
+            "Authorization": "Bearer testToken"
         ]
     }
     

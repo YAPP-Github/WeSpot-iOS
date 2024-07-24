@@ -7,6 +7,14 @@
 
 import Foundation
 
+public struct VoteResponseEntity {
+    public let response: [VoteItemEntity]
+    
+    public init(response: [VoteItemEntity]) {
+        self.response = response
+    }
+}
+
 /// 투표 응답 엔티티
 public struct VoteItemEntity {
     public let userInfo: VoteUserEntity
@@ -20,11 +28,11 @@ public struct VoteItemEntity {
 
 /// 유저 정보 엔티티
 public struct VoteUserEntity: Identifiable {
-    public let id: String
+    public let id: Int
     public let name: String
     public let profileInfo: VoteProfileEntity
     
-    public init(id: String, name: String, profileInfo: VoteProfileEntity) {
+    public init(id: Int, name: String, profileInfo: VoteProfileEntity) {
         self.id = id
         self.name = name
         self.profileInfo = profileInfo
@@ -44,10 +52,10 @@ public struct VoteProfileEntity {
 
 /// 투표 질문지 엔티티
 public struct VoteOptionEntity: Identifiable {
-    public let id: String
+    public let id: Int
     public let content: String
     
-    public init(id: String, content: String) {
+    public init(id: Int, content: String) {
         self.id = id
         self.content = content
     }

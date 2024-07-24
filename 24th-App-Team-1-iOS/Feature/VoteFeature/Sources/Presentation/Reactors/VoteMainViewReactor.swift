@@ -21,25 +21,35 @@ public final class VoteMainViewReactor: Reactor {
             voteTypes: .main
         )
         self.fetchVoteOptionsUseCase = fetchVoteOptionsUseCase
-        print("FetchVoteOptionUseCase: \(fetchVoteOptionsUseCase)")
     }
     
     public enum Action {
         case didTapToggleButton(VoteTypes)
+        case viewDidLoad
     }
     
     public struct State {
         var voteTypes: VoteTypes
+        @Pulse var voteItemEntity: VoteResponseEntity?
     }
     
     public enum Mutation {
         case setVoteTypes(VoteTypes)
+        case setVoteItems(VoteResponseEntity)
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case let .didTapToggleButton(voteTypes):
             return .just(.setVoteTypes(voteTypes))
+        case .viewDidLoad:
+            return fetchVoteOptionsUseCase
+                .execute()
+                .asObservable()
+                .flatMap { entity -> Observable<VoteMainViewReactor.Mutation> in
+                    guard let originEntity = entity else { return .empty() }
+                    return .just(.setVoteItems(originEntity))
+                }
         }
     }
     
@@ -49,6 +59,8 @@ public final class VoteMainViewReactor: Reactor {
         case let .setVoteTypes(voteTypes):
             globalService.event.onNext(.toggleStatus(voteTypes))
             newState.voteTypes = voteTypes
+        case let .setVoteItems(voteEntity):
+            newState.voteItemEntity = voteEntity
         }
         
         return newState

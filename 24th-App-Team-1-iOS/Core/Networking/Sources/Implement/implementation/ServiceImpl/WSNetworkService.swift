@@ -26,11 +26,11 @@ public final class WSNetworkService: WSNetworkServiceProtocol {
     public init() { }
     
     //MARK: Functions
-    public func request<T: Decodable>(endPoint: URLRequestConvertible) -> Single<T> {
-        return Single<T>.create { [weak self] single in
+    public func request(endPoint: URLRequestConvertible) -> Single<Data> {
+        return Single<Data>.create { [weak self] single in
             let task = self?.session.request(endPoint)
                 .validate(statusCode: 200...299)
-                .responseDecodable(of: T.self) { response in
+                .responseData { response in
                     switch response.result {
                     case let .success(response):
                         single(.success(response))
