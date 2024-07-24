@@ -30,6 +30,7 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
+        print("voteReactor: \(self.reactor)")
         addChild(votePageViewController)
         view.addSubviews(voteToggleView, votePageViewController.view)
     }

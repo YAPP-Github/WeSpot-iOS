@@ -7,17 +7,21 @@
 
 import Foundation
 import Util
+import VoteDomain
 
 import ReactorKit
 
 public final class VoteMainViewReactor: Reactor {
     public var initialState: State
     private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
+    private let fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol
     
-    public init() {
+    public init(fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol) {
         self.initialState = State(
             voteTypes: .main
         )
+        self.fetchVoteOptionsUseCase = fetchVoteOptionsUseCase
+        print("FetchVoteOptionUseCase: \(fetchVoteOptionsUseCase)")
     }
     
     public enum Action {

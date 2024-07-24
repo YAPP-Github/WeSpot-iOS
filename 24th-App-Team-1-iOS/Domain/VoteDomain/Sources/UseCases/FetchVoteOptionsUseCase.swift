@@ -11,11 +11,18 @@ import RxSwift
 import RxCocoa
 
 public protocol FetchVoteOptionsUseCaseProtocol {
-    func execute() -> Single<[VoteItemEntity]?>
+    func execute() -> Single<VoteItemEntity?>
 }
 
 public final class FetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol {
-    public func execute() -> Single<[VoteItemEntity]?> {
-        return .never()
+    
+    private let voteRepository: VoteRepositoryProtocol
+    
+    public init(voteRepository: VoteRepositoryProtocol) {
+        self.voteRepository = voteRepository
+    }
+    
+    public func execute() -> Single<VoteItemEntity?> {
+        return voteRepository.fetchVoteOptions()
     }
 }
