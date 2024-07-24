@@ -12,4 +12,5 @@ public enum WSRequestParameters {
     case requestQuery(_ parameter: Encodable?)
     case requestBody(_ parameter: Encodable?)
     case reuqestQueryWithBody(_ query: Encodable?, body: Encodable?)
+    case none
 }
