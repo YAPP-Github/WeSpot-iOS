@@ -9,7 +9,6 @@ import Foundation
 
 import Alamofire
 
-public typealias WSNetworkHeader = [String: String]
 public protocol WSNetworkEndPoint: URLRequestConvertible {
     var path: String { get }
     var method: HTTPMethod { get }

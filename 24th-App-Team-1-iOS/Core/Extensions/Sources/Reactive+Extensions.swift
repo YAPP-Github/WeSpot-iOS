@@ -6,9 +6,9 @@
 //
 
 import Foundation
+import Networking
 
 import RxSwift
-import Networking
 
 extension ObservableType where Element == Data {
     public func decodeMap<T: Decodable>(_ type: T.Type) -> Observable<T> {
