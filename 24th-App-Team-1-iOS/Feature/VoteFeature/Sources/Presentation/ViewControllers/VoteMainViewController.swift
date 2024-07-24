@@ -59,6 +59,11 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
 
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
+        Observable.just(())
+            .map { Reactor.Action.viewDidLoad }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         voteToggleView.mainButton
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
