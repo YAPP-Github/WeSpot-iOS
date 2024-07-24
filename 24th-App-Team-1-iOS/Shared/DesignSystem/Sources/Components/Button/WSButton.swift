@@ -51,12 +51,16 @@ public final class WSButton: UIButton {
         return self
     }
     
+
     private func setupEnabled(_ isEnabled: Bool) {
         let enabledBackgroundColor = isEnabled ? wsButtonType.buttonProperties.backgroundColor.color : wsButtonType.disabledBackgroundColor
         let enabledTextColor = isEnabled ? wsButtonType.buttonProperties.textColor : wsButtonType.disabledTextColor
         backgroundColor = enabledBackgroundColor
         setTitleColor(enabledTextColor, for: .normal)
         layer.borderColor = isEnabled ? wsButtonType.pressedBorderColor : UIColor.clear.cgColor
+
+    public func setupFont(font: WSFont) {
+        titleLabel?.font = font.font()
     }
     
     private func setupHighlighted(_ isHighlighted: Bool) {

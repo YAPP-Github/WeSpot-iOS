@@ -15,6 +15,9 @@ let project = Project.makeProject(
         .feature(
             module: .VoteFeature,
             dependencies: [
+                .core(module: .Util),
+                .service(module: .VoteService),
+                .domain(module: .VoteDomain),
                 .shared(module: .ThirdPartyLib),
                 .shared(module: .DesignSystem)
             ]

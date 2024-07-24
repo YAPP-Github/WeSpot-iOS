@@ -11,7 +11,10 @@ import SnapKit
 import Then
 import DesignSystem
 
+
+fileprivate typealias VoteStr = VoteStrings
 final class VoteToggleView: UIView {
+    //MARK: - Properties
     let mainButton: UIButton = UIButton()
     let resultButton: UIButton = UIButton()
     private let selectedLine: UIView = UIView()
@@ -23,10 +26,6 @@ final class VoteToggleView: UIView {
         }
     }
     
-    override func layoutSubviews() {
-        selectedLine.frame = CGRect(x: 20, y: frame.size.height - 2, width: (frame.size.width / 2) - 20, height: 2)
-    }
-
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -38,6 +37,7 @@ final class VoteToggleView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - Configure
     private func setupUI() {
         addSubviews(mainButton, resultButton, underLine, selectedLine)
     }
@@ -46,7 +46,7 @@ final class VoteToggleView: UIView {
         mainButton.do {
             $0.configuration = .plain()
             $0.configuration?.baseForegroundColor = DesignSystemAsset.Colors.gray100.color
-            $0.configuration?.attributedTitle = AttributedString(NSAttributedString(string: "투표 홈", attributes: [
+            $0.configuration?.attributedTitle = AttributedString(NSAttributedString(string: VoteStr.voteHomeButtonText, attributes: [
                 .font: WSFont.Body03.font(),
             ]))
             $0.configuration?.baseBackgroundColor = .clear
@@ -56,7 +56,7 @@ final class VoteToggleView: UIView {
             $0.configuration = .plain()
             $0.configuration?.baseBackgroundColor = .clear
             $0.configuration?.baseForegroundColor = DesignSystemAsset.Colors.gray400.color
-            $0.configuration?.attributedTitle = AttributedString(NSAttributedString(string: "투표 결과", attributes: [
+            $0.configuration?.attributedTitle = AttributedString(NSAttributedString(string: VoteStr.voteResultButtonText, attributes: [
                 .font: WSFont.Body03.font(),
             ]))
         }
@@ -87,6 +87,13 @@ final class VoteToggleView: UIView {
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalToSuperview().offset(-1)
         }
+        
+        selectedLine.snp.makeConstraints {
+            $0.left.equalToSuperview().offset(20)
+            $0.height.equalTo(2)
+            $0.width.equalTo(self).multipliedBy(0.5).offset(-20)
+            $0.bottom.equalToSuperview().offset(-2)
+        }
     }
     
     private func updateToggleLayout(_ isSelected: Bool) {
@@ -95,7 +102,6 @@ final class VoteToggleView: UIView {
             self.selectedLine.frame.origin.x = isSelected ? 20 : (self.frame.size.width - self.selectedLine.frame.size.width) - 20
             self.mainButton.configuration?.baseForegroundColor =  isSelected ? DesignSystemAsset.Colors.gray100.color :  DesignSystemAsset.Colors.gray400.color
             self.resultButton.configuration?.baseForegroundColor =  isSelected ? DesignSystemAsset.Colors.gray400.color :  DesignSystemAsset.Colors.gray100.color
-            self.layoutIfNeeded()
         }
     }
 }

@@ -77,7 +77,8 @@ open class BaseViewController<R>: UIViewController, ReactorKit.View where R: Rea
                 default:
                     break
                 }
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
     }
     
 }
