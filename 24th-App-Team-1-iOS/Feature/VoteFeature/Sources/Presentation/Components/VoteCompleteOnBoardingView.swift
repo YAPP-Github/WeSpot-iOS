@@ -47,8 +47,13 @@ final class VoteCompleteOnBoardingView: UIView {
     
     
     private func setupAttributes() {
+        self.do {
+            $0.backgroundColor = DesignSystemAsset.Colors.gray900.color
+        }
+        
         onboardingLottieView.do {
             $0.isStauts = true
+            //TODO: 임시 Animation
             $0.wsAnimation = DesignSystemAnimationAsset.demo.animation
         }
         

@@ -9,27 +9,27 @@ import Foundation
 
 import ReactorKit
 
-final class VoteCompleteViewReactor: Reactor {
+public final class VoteCompleteViewReactor: Reactor {
     
-    let initialState: State
+    public let initialState: State
     
-    struct State {
+    public struct State {
         var isLoading: Bool
     }
     
-    enum Action {
+    public enum Action {
         case viewDidLoad
     }
     
-    enum Mutation {
+    public enum Mutation {
         case setOnboadingView(Bool)
     }
     
-    init() {
+    public init() {
         self.initialState = State(isLoading: false)
     }
     
-    func mutate(action: Action) -> Observable<Mutation> {
+    public func mutate(action: Action) -> Observable<Mutation> {
         
         switch action {
         case .viewDidLoad:
@@ -37,7 +37,7 @@ final class VoteCompleteViewReactor: Reactor {
         }
     }
     
-    func reduce(state: State, mutation: Mutation) -> State {
+    public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
         case let .setOnboadingView(isLoading):

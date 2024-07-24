@@ -24,6 +24,8 @@ extension String.VoteResult {
     static let voteHomeButtonText: String = "투표 홈"
     static let voteResultButtonText: String = "투표 결과"
     static let voteMyResultButtonText: String = "내가 받은 투표 보기"
+    static let voteCompleteText = "우리 반에서 모르는게생기면물어보고싶은은은은은은은은 친구는?"
+    static let voteNoticeText = "친구에게 알려주기"
 }
 
 extension String.VoteResult.Identifier {
