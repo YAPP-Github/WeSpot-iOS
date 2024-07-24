@@ -117,8 +117,8 @@ final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
         voteConfirmButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let voteProcessViewReactor = VoteMainProcessViewReactor()
-                let voteProcessViewController = VoteMainProcessViewController(reactor: voteProcessViewReactor)
+                let voteProcessViewReactor = VoteProcessViewReactor()
+                let voteProcessViewController = VoteProcessViewController(reactor: voteProcessViewReactor)
                 owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
             }
             .disposed(by: disposeBag)

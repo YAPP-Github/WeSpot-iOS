@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Util
 
 import ReactorKit
 
@@ -15,15 +16,18 @@ final class VoteProcessViewReactor: Reactor {
     struct State {
         @Pulse var questionSection: [VoteProcessSection]
         //TODO: 질문지 API 호출시 question Count Increment 하도록 로직 구현
-        var processCount: String
+        var processCount: Int
+        var voteOptionStub: [VoteOptionsStub]
     }
     
     enum Action {
         case fetchQuestionItems
+        case didTappedQuestionItem(Int)
     }
     
     enum Mutation {
         case setQuestionItems([VoteProcessItem])
+        case setVoteOptionsItems([VoteOptionsStub])
     }
     
     let initialState: State
@@ -31,7 +35,8 @@ final class VoteProcessViewReactor: Reactor {
     init() {
         self.initialState = State(
             questionSection: [.votePrcessInfo([])],
-            processCount: "1/5"
+            processCount: 1,
+            voteOptionStub: []
         )
     }
     
@@ -46,6 +51,9 @@ final class VoteProcessViewReactor: Reactor {
                 .voteQuestionItem,
                 .voteQuestionItem
             ]))
+            //TODO: 서버 연동시 추가 작업
+        case let .didTappedQuestionItem(row):
+            return .just(.setVoteOptionsItems([]))
         }
     }
     
@@ -54,6 +62,9 @@ final class VoteProcessViewReactor: Reactor {
         switch mutation {
         case let .setQuestionItems(items):
             newState.questionSection = [.votePrcessInfo(items)]
+            //TODO: VoteOptionsStub 갯수를 NavgationTitle로 지정
+        case .setVoteOptionsItems(_):
+            newState.processCount += 1
         }
         return newState
     }

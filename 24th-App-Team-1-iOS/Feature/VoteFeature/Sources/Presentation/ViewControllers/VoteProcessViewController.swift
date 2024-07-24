@@ -47,7 +47,7 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
     override func setupAutoLayout() {
         super.setupAutoLayout()
         questionLabel.snp.makeConstraints {
-            $0.top.equalToSuperview()
+            $0.top.equalTo(navigationBar.snp.bottom)
             $0.horizontalEdges.equalToSuperview().inset(30)
             $0.height.equalTo(30)
         }
@@ -67,6 +67,18 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
     
     override func setupAttributes() {
         super.setupAttributes()
+        
+        navigationBar.do {
+            $0.setNavigationBarUI(
+                property: .all(
+                    DesignSystemAsset.Images.arrow.image,
+                    VoteProcessStr.voteProcessTopText,
+                    "1/5",
+                    DesignSystemAsset.Colors.gray300.color
+                )
+            )
+            $0.setNavigationBarAutoLayout(property: .all)
+        }
         
         questionLabel.do {
             $0.textColor = DesignSystemAsset.Colors.gray100.color
@@ -88,8 +100,29 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
     override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        navigationBar.rightBarButton
+            .rx.tap
+            .throttle(.microseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.createAlertController()
+            }
+            .disposed(by: disposeBag)
+   
+        reactor.state
+            .map { "\($0.processCount)/5"}
+            .distinctUntilChanged()
+            .bind(to: navigationBar.navigationTitleLabel.rx.text)
+            .disposed(by: disposeBag)
+        
         Observable.just(())
             .map { Reactor.Action.fetchQuestionItems }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        questionTableView.rx
+            .itemSelected
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTappedQuestionItem($0.row) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -97,6 +130,32 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
             .asDriver(onErrorJustReturn: [])
             .drive(questionTableView.rx.items(dataSource: questionDataSources))
             .disposed(by: disposeBag)
+    }
+}
+
+
+extension VoteProcessViewController {
+    private func createAlertController() {
+        let processAlertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let reportAction = UIAlertAction(title: VoteProcessStr.voteReportAlertText, style: .default) { _ in
+            WSAlertBuilder(showViewController: self)
+                .setTitle(title: VoteProcessStr.voteModalTitleText)
+                .setMessage(message: VoteProcessStr.voteModalMessageText)
+                .setConfirm(text: VoteProcessStr.voteModalConfirmText)
+                .setCancel(text: VoteProcessStr.voteModalCancelText)
+                .action(.confirm) { [weak self] in
+                    self?.showWSToast(image: .check, message: VoteProcessStr.voteToastText)
+                }
+                .show()
+        }
+        //TODO: 링크 주어질시 Action 추가하기
+        let choiceAction = UIAlertAction(title: VoteProcessStr.voteChoiceAlertText, style: .default)
+        let cancelAction = UIAlertAction(title: VoteProcessStr.voteCancelAlertText, style: .cancel)
         
+        processAlertController.addAction(reportAction)
+        processAlertController.addAction(choiceAction)
+        processAlertController.addAction(cancelAction)
+        
+        present(processAlertController, animated: true)
     }
 }
