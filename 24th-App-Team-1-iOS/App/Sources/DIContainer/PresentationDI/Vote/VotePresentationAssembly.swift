@@ -14,8 +14,10 @@ import Swinject
 struct VotePresentationAssembly: Assembly {
     func assemble(container: Container) {
         container.register(VoteProcessViewReactor.self) { resolver in
-            let useCase = resolver.resolve(FetchVoteOptionsUseCaseProtocol.self)!
-            return VoteProcessViewReactor(fetchVoteOptionsUseCase: useCase)
+            let fetchVoteOptionsUseCase = resolver.resolve(FetchVoteOptionsUseCaseProtocol.self)!
+            let createVoteUseCase = resolver.resolve(CreateVoteUseCaseProtocol.self)!
+            
+            return VoteProcessViewReactor(fetchVoteOptionsUseCase: fetchVoteOptionsUseCase, createVoteUseCase: createVoteUseCase)
         }
         
         container.register(VoteProcessViewController.self) { resolver in

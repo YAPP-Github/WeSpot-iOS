@@ -27,6 +27,7 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
     private let faceImageView: UIImageView = UIImageView()
     private let questionLabel: WSLabel = WSLabel(wsFont: .Header01)
     private let questionTableView: UITableView = UITableView()
+    private let resultButton: WSButton = WSButton(wsButtonType: .default(12))
     private let processInjector: Injector = DependencyInjector(container: Container())
     private let questionDataSources: RxTableViewSectionedReloadDataSource<VoteProcessSection> = .init { dataSources, tableView, indexPath, sectionItem in
         
@@ -55,7 +56,7 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
     public override func setupUI() {
         super.setupUI()
         profileView.addSubview(faceImageView)
-        view.addSubviews(questionLabel, profileView, questionTableView)
+        view.addSubviews(questionLabel, profileView, questionTableView, resultButton)
     }
     
     public override func setupAutoLayout() {
@@ -80,6 +81,12 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         
         faceImageView.snp.makeConstraints {
             $0.center.equalToSuperview()
+        }
+        
+        resultButton.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.height.equalTo(52)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(12)
         }
     }
     
@@ -118,6 +125,12 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             $0.separatorStyle = .none
             $0.isScrollEnabled = false
         }
+        
+        resultButton.do {
+            $0.setupButton(text: VoteProcessStr.voteResultText)
+            $0.setupFont(font: .Body03)
+            $0.isHidden = true
+        }
     }
     
     public override func bind(reactor: Reactor) {
@@ -131,8 +144,12 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             }
             .disposed(by: disposeBag)
    
-        reactor.state
-            .map { "\($0.processCount)/5"}
+        Observable
+            .zip (
+                reactor.state.map { $0.processCount },
+                reactor.state.compactMap { $0.voteResponseEntity?.response.count }
+            )
+            .map { "\($0.0)/\($0.1)"}
             .distinctUntilChanged()
             .bind(to: navigationBar.navigationTitleLabel.rx.text)
             .disposed(by: disposeBag)

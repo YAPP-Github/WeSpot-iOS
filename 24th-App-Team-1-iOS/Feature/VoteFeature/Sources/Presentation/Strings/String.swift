@@ -35,6 +35,7 @@ extension String.VoteResult {
     static let voteModalTitleText: String = "우리 반 친구가 아닌가요?"
     static let voteModalMessageText: String = "우리 반 친구를 잘못 신고한 것이 확인될 경우\n서비스 이용에 제한이 생길 수 있어요"
     static let voteToastText: String = "제보 접수 완료"
+    static let voteResultText: String = "투표 완료하고 결과 확인하기"
 }
 
 extension String.VoteResult.Identifier {

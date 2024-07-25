@@ -15,6 +15,7 @@ public final class VoteProcessViewReactor: Reactor {
     
     
     private let fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol
+    private let createVoteUseCase: CreateVoteUseCaseProtocol
     
     public struct State {
         var isLoading: Bool
@@ -23,7 +24,7 @@ public final class VoteProcessViewReactor: Reactor {
         var voteItemEntity: VoteItemEntity?
         @Pulse var voteResponseEntity: VoteResponseEntity?
         @Pulse var voteUserEntity: VoteUserEntity?
-        @Pulse var voteOptionsStub: [VoteOptionsStub]
+        @Pulse var voteOptionsStub: [CreateVoteItemReqeuest]
         @Pulse var isShowViewController: Bool
     }
     
@@ -36,7 +37,7 @@ public final class VoteProcessViewReactor: Reactor {
         case setLoading(Bool)
         case setQuestionRowItems([VoteProcessItem])
         case setVoteOptionItems(VoteItemEntity)
-        case addVoteOptionStub(VoteOptionsStub)
+        case addVoteOptionStub(CreateVoteItemReqeuest)
         case setVoteUserItems(VoteUserEntity)
         case setVoteResponseItems(VoteResponseEntity)
         case showNextProcessViewController(Bool)
@@ -44,17 +45,22 @@ public final class VoteProcessViewReactor: Reactor {
     
     public let initialState: State
     
-    public init(fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol, voteOptionStub: [VoteOptionsStub] = []) {
-        self.initialState = State(
-            isLoading: true,
-            questionSection: [.votePrcessInfo([])],
-            processCount: 1,
-            voteUserEntity: nil,
-            voteOptionsStub: voteOptionStub,
-            isShowViewController: false
-        )
-        self.fetchVoteOptionsUseCase = fetchVoteOptionsUseCase
-    }
+    public init(
+        fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol,
+        createVoteUseCase: CreateVoteUseCaseProtocol,
+        voteOptionStub: [CreateVoteItemReqeuest] = []
+    ) {
+            self.initialState = State(
+                isLoading: true,
+                questionSection: [.votePrcessInfo([])],
+                processCount: 1,
+                voteUserEntity: nil,
+                voteOptionsStub: voteOptionStub,
+                isShowViewController: false
+            )
+            self.fetchVoteOptionsUseCase = fetchVoteOptionsUseCase
+            self.createVoteUseCase = createVoteUseCase
+        }
     
     public func mutate(action: Action) -> Observable<Mutation> {
         let index = currentState.processCount - 1
@@ -92,7 +98,7 @@ public final class VoteProcessViewReactor: Reactor {
         case let .didTappedQuestionItem(row):
             guard let request = currentState.voteResponseEntity?.response[row] else { return .empty() }
             
-            let voteOption = VoteOptionsStub(
+            let voteOption = CreateVoteItemReqeuest(
                 userId: request.userInfo.id,
                 voteOptionId: request.voteInfo[row].id
             )
@@ -119,7 +125,7 @@ public final class VoteProcessViewReactor: Reactor {
         case let .addVoteOptionStub(voteOptionStub):
             newState.processCount += 1
             newState.voteOptionsStub.append(voteOptionStub)
-
+            
         case let .setVoteUserItems(voteUserEntity):
             newState.voteUserEntity = voteUserEntity
             
