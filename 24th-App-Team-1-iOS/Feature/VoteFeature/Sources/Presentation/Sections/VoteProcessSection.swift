@@ -7,22 +7,22 @@
 
 import Differentiator
 
-enum VoteProcessSection: SectionModelType {
+public enum VoteProcessSection: SectionModelType {
     case votePrcessInfo([VoteProcessItem])
     
-    var items: [VoteProcessItem] {
+    public var items: [VoteProcessItem] {
         if case let .votePrcessInfo(items) = self {
             return items
         }
         return []
     }
-    init(original: VoteProcessSection, items: [VoteProcessItem]) {
+    public init(original: VoteProcessSection, items: [VoteProcessItem]) {
         self = original
     }
     
 }
 
 
-enum VoteProcessItem {
-    case voteQuestionItem
+public enum VoteProcessItem {
+    case voteQuestionItem(VoteProcessCellReactor)
 }

@@ -7,64 +7,128 @@
 
 import Foundation
 import Util
+import VoteDomain
 
 import ReactorKit
 
-final class VoteProcessViewReactor: Reactor {
+public final class VoteProcessViewReactor: Reactor {
     
     
-    struct State {
+    private let fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol
+    
+    public struct State {
+        var isLoading: Bool
         @Pulse var questionSection: [VoteProcessSection]
-        //TODO: 질문지 API 호출시 question Count Increment 하도록 로직 구현
         var processCount: Int
-        var voteOptionStub: [VoteOptionsStub]
+        var voteItemEntity: VoteItemEntity?
+        @Pulse var voteResponseEntity: VoteResponseEntity?
+        @Pulse var voteUserEntity: VoteUserEntity?
+        @Pulse var voteOptionsStub: [VoteOptionsStub]
+        @Pulse var isShowViewController: Bool
     }
     
-    enum Action {
+    public enum Action {
         case fetchQuestionItems
         case didTappedQuestionItem(Int)
     }
     
-    enum Mutation {
-        case setQuestionItems([VoteProcessItem])
-        case setVoteOptionsItems([VoteOptionsStub])
+    public enum Mutation {
+        case setLoading(Bool)
+        case setQuestionRowItems([VoteProcessItem])
+        case setVoteOptionItems(VoteItemEntity)
+        case addVoteOptionStub(VoteOptionsStub)
+        case setVoteUserItems(VoteUserEntity)
+        case setVoteResponseItems(VoteResponseEntity)
+        case showNextProcessViewController(Bool)
     }
     
-    let initialState: State
+    public let initialState: State
     
-    init() {
+    public init(fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol, voteOptionStub: [VoteOptionsStub] = []) {
         self.initialState = State(
+            isLoading: true,
             questionSection: [.votePrcessInfo([])],
             processCount: 1,
-            voteOptionStub: []
+            voteUserEntity: nil,
+            voteOptionsStub: voteOptionStub,
+            isShowViewController: false
         )
+        self.fetchVoteOptionsUseCase = fetchVoteOptionsUseCase
     }
     
-    func mutate(action: Action) -> Observable<Mutation> {
+    public func mutate(action: Action) -> Observable<Mutation> {
+        let index = currentState.processCount - 1
         switch action {
         case .fetchQuestionItems:
-            //TODO: 테스트 코드
-            return .just(.setQuestionItems([
-                .voteQuestionItem,
-                .voteQuestionItem,
-                .voteQuestionItem,
-                .voteQuestionItem,
-                .voteQuestionItem
-            ]))
-            //TODO: 서버 연동시 추가 작업
+            return fetchVoteOptionsUseCase
+                .execute()
+                .asObservable()
+                .withUnretained(self)
+                .flatMap { owner, entity -> Observable<Mutation> in
+                    guard let originEntity = entity else { return .empty() }
+                    var voteSectionItems: [VoteProcessItem] = []
+                    let response = originEntity.response[index]
+                    response.voteInfo.forEach {
+                        voteSectionItems.append(
+                            .voteQuestionItem(
+                                VoteProcessCellReactor(
+                                    id: $0.id,
+                                    content: $0.content
+                                )
+                            )
+                        )
+                    }
+                    
+                    return .concat(
+                        .just(.setLoading(true)),
+                        .just(.setVoteUserItems(response.userInfo)),
+                        .just(.setQuestionRowItems(voteSectionItems)),
+                        .just(.setVoteOptionItems(response)),
+                        .just(.setVoteResponseItems(originEntity)),
+                        .just(.setLoading(false))
+                    )
+                }
+            
         case let .didTappedQuestionItem(row):
-            return .just(.setVoteOptionsItems([]))
+            guard let request = currentState.voteResponseEntity?.response[row] else { return .empty() }
+            
+            let voteOption = VoteOptionsStub(
+                userId: request.userInfo.id,
+                voteOptionId: request.voteInfo[row].id
+            )
+            
+            return .concat(
+                .just(.addVoteOptionStub(voteOption)),
+                .just(.showNextProcessViewController(true))
+            )
         }
     }
     
-    func reduce(state: State, mutation: Mutation) -> State {
+    public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case let .setQuestionItems(items):
+        case let .setVoteResponseItems(voteResponseEntity):
+            newState.voteResponseEntity = voteResponseEntity
+            
+        case let .setQuestionRowItems(items):
             newState.questionSection = [.votePrcessInfo(items)]
-            //TODO: VoteOptionsStub 갯수를 NavgationTitle로 지정
-        case .setVoteOptionsItems(_):
+            
+        case let .setVoteOptionItems(voteItemEntity):
+            newState.voteItemEntity = voteItemEntity
+            
+        case let .addVoteOptionStub(voteOptionStub):
             newState.processCount += 1
+            newState.voteOptionsStub.append(voteOptionStub)
+
+        case let .setVoteUserItems(voteUserEntity):
+            newState.voteUserEntity = voteUserEntity
+            
+        case let .setLoading(isLoading):
+            newState.isLoading = isLoading
+            
+        case let .showNextProcessViewController(isShowViewController):
+            newState.isShowViewController = isShowViewController
+            
         }
         return newState
     }

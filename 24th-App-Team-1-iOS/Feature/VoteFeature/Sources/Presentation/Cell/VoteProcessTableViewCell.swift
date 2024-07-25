@@ -8,10 +8,14 @@
 import DesignSystem
 import UIKit
 
+import ReactorKit
+
 final class VoteProcessTableViewCell: UITableViewCell {
     
     //MARK: - Property
     private let questionInfoLabel: WSLabel = WSLabel(wsFont: .Body04)
+    typealias Reactor = VoteProcessCellReactor
+    var disposeBag: DisposeBag = DisposeBag()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -65,5 +69,16 @@ final class VoteProcessTableViewCell: UITableViewCell {
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         updateContentLayout(isSelected: selected)
+    }
+}
+
+
+extension VoteProcessTableViewCell: ReactorKit.View {
+    func bind(reactor: VoteProcessCellReactor) {
+        reactor.state
+            .map { $0.content }
+            .distinctUntilChanged()
+            .bind(to: questionInfoLabel.rx.text)
+            .disposed(by: disposeBag)
     }
 }

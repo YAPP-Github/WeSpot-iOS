@@ -6,11 +6,13 @@
 //
 
 import DesignSystem
+import Extensions
 import UIKit
 import Util
 
 import Then
 import SnapKit
+import Swinject
 import RxSwift
 import RxCocoa
 import ReactorKit
@@ -18,33 +20,45 @@ import RxDataSources
 
 fileprivate typealias VoteProcessStr = VoteStrings
 fileprivate typealias VoteProcessId = VoteStrings.Identifier
-final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor> {
+public final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor> {
 
     //MARK: - Properties
-    private let profileImageView: UIImageView = UIImageView()
-    private let questionLabel: WSLabel = WSLabel(wsFont: .Header01, text: "김쥬시님은 반에서 어떤 친구인가요?")
+    private let profileView: UIView = UIView()
+    private let faceImageView: UIImageView = UIImageView()
+    private let questionLabel: WSLabel = WSLabel(wsFont: .Header01)
     private let questionTableView: UITableView = UITableView()
+    private let processInjector: Injector = DependencyInjector(container: Container())
     private let questionDataSources: RxTableViewSectionedReloadDataSource<VoteProcessSection> = .init { dataSources, tableView, indexPath, sectionItem in
         
-        guard let votePrcessCell = tableView.dequeueReusableCell(withIdentifier: VoteProcessId.voteProcessCell, for: indexPath) as? VoteProcessTableViewCell else { return UITableViewCell() }
-        votePrcessCell.selectionStyle = .none
-        return votePrcessCell
+        switch sectionItem {
+        case let .voteQuestionItem(cellReactor):
+            guard let voteProcessCell = tableView.dequeueReusableCell(withIdentifier: VoteProcessId.voteProcessCell, for: indexPath) as? VoteProcessTableViewCell else { return UITableViewCell() }
+            voteProcessCell.selectionStyle = .none
+            voteProcessCell.reactor = cellReactor
+            return voteProcessCell
+        }
     }
 
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        profileView.layer.cornerRadius = profileView.frame.height / 2
+    }
     
     //MARK: - LifeCycle
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         
     }
 
     //MARK: - Configure
-    override func setupUI() {
+    public override func setupUI() {
         super.setupUI()
-        view.addSubviews(questionLabel, profileImageView, questionTableView)
+        profileView.addSubview(faceImageView)
+        view.addSubviews(questionLabel, profileView, questionTableView)
     }
     
-    override func setupAutoLayout() {
+    public override func setupAutoLayout() {
         super.setupAutoLayout()
         questionLabel.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom)
@@ -52,20 +66,24 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
             $0.height.equalTo(30)
         }
         
-        profileImageView.snp.makeConstraints {
+        profileView.snp.makeConstraints {
             $0.size.equalTo(120)
             $0.top.equalTo(questionLabel.snp.bottom).offset(39)
             $0.centerX.equalToSuperview()
         }
         
         questionTableView.snp.makeConstraints {
-            $0.top.equalTo(profileImageView.snp.bottom).offset(32)
+            $0.top.equalTo(profileView.snp.bottom).offset(32)
             $0.horizontalEdges.equalToSuperview().inset(20)
             $0.height.equalTo(364)
         }
+        
+        faceImageView.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
     }
     
-    override func setupAttributes() {
+    public override func setupAttributes() {
         super.setupAttributes()
         
         navigationBar.do {
@@ -84,8 +102,13 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
             $0.textColor = DesignSystemAsset.Colors.gray100.color
         }
         
-        profileImageView.do {
-            $0.image = DesignSystemAsset.Images.boy.image
+        profileView.do {
+            $0.clipsToBounds = true
+            $0.backgroundColor = DesignSystemAsset.Colors.primary100.color
+        }
+        
+        faceImageView.do {
+            $0.image = DesignSystemAsset.Images.icCommonProfile427323024.image
         }
         
         questionTableView.do {
@@ -97,7 +120,7 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
         }
     }
     
-    override func bind(reactor: Reactor) {
+    public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
         navigationBar.rightBarButton
@@ -126,10 +149,41 @@ final class VoteProcessViewController: BaseViewController<VoteProcessViewReactor
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        reactor.state
+            .map { $0.isShowViewController }
+            .distinctUntilChanged()
+            .bind(with: self) { [self] owner, _ in
+                //TODO: 화면 전환 코드, 및 데이터 전달 코드 추가
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isLoading }
+            .distinctUntilChanged()
+            .bind(to: profileView.rx.isHidden)
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$questionSection)
             .asDriver(onErrorJustReturn: [])
             .drive(questionTableView.rx.items(dataSource: questionDataSources))
             .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.voteUserEntity }
+            .map { "\($0.name)님은 반에서 어떤 친구인가요?" }
+            .distinctUntilChanged()
+            .bind(to: questionLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.voteUserEntity?.profileInfo }
+            .map { UIColor(hex: $0.backgroundColor) }
+            .distinctUntilChanged()
+            .bind(to: profileView.rx.backgroundColor)
+            .disposed(by: disposeBag)
+        
+        
+        
     }
 }
 
