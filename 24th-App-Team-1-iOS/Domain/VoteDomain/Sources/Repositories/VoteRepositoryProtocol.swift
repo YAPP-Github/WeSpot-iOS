@@ -11,4 +11,5 @@ import RxSwift
 
 public protocol VoteRepositoryProtocol {
     func fetchVoteOptions() -> Single<VoteResponseEntity?>
+    func uploadFinalVoteResults(body: [CreateVoteItemReqeuest]) -> Single<CreateVoteEntity?>
 }
