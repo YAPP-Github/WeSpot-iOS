@@ -26,11 +26,13 @@ public final class VoteProcessViewReactor: Reactor {
         @Pulse var voteUserEntity: VoteUserEntity?
         @Pulse var voteOptionsStub: [CreateVoteItemReqeuest]
         @Pulse var isShowViewController: Bool
+        var createVoteEntity: CreateVoteEntity?
     }
     
     public enum Action {
         case fetchQuestionItems
         case didTappedQuestionItem(Int)
+        case didTappedResultButton
     }
     
     public enum Mutation {
@@ -41,6 +43,7 @@ public final class VoteProcessViewReactor: Reactor {
         case setVoteUserItems(VoteUserEntity)
         case setVoteResponseItems(VoteResponseEntity)
         case showNextProcessViewController(Bool)
+        case setCreateVoteItems(CreateVoteEntity)
     }
     
     public let initialState: State
@@ -54,7 +57,6 @@ public final class VoteProcessViewReactor: Reactor {
                 isLoading: true,
                 questionSection: [.votePrcessInfo([])],
                 processCount: 1,
-                voteUserEntity: nil,
                 voteOptionsStub: voteOptionStub,
                 isShowViewController: false
             )
@@ -107,6 +109,25 @@ public final class VoteProcessViewReactor: Reactor {
                 .just(.addVoteOptionStub(voteOption)),
                 .just(.showNextProcessViewController(true))
             )
+            
+        case .didTappedResultButton:
+            
+            //TODO: 더미 데이터임 -> Swinject로 화면 전환 코드 변경시 삭제
+            let createItem: [CreateVoteItemReqeuest] = [
+                .init(userId: 1, voteOptionId: 1),
+                .init(userId: 2, voteOptionId: 2),
+                .init(userId: 3, voteOptionId: 3),
+                .init(userId: 4, voteOptionId: 4),
+                .init(userId: 5, voteOptionId: 5)
+            ]
+            
+            return createVoteUseCase
+                .execute(body: createItem)
+                .asObservable()
+                .flatMap { entity -> Observable<Mutation> in
+                    guard let originalEntity = entity else { return .empty() }
+                    return .just(.setCreateVoteItems(originalEntity))
+                }
         }
     }
     
@@ -135,6 +156,8 @@ public final class VoteProcessViewReactor: Reactor {
         case let .showNextProcessViewController(isShowViewController):
             newState.isShowViewController = isShowViewController
             
+        case let .setCreateVoteItems(createVoteEntity):
+            newState.createVoteEntity = createVoteEntity
         }
         return newState
     }

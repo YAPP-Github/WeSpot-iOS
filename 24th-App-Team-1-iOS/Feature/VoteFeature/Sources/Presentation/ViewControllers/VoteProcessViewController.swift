@@ -129,7 +129,6 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         resultButton.do {
             $0.setupButton(text: VoteProcessStr.voteResultText)
             $0.setupFont(font: .Body03)
-            $0.isHidden = true
         }
     }
     
@@ -143,6 +142,21 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
                 owner.createAlertController()
             }
             .disposed(by: disposeBag)
+        
+        questionTableView.rx
+            .itemSelected
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTappedQuestionItem($0.row) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        resultButton.rx
+            .tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTappedResultButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
    
         Observable
             .zip (
@@ -156,13 +170,6 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         
         Observable.just(())
             .map { Reactor.Action.fetchQuestionItems }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        questionTableView.rx
-            .itemSelected
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .map { Reactor.Action.didTappedQuestionItem($0.row) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
