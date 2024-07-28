@@ -7,6 +7,8 @@
 
 import UIKit
 import Util
+import VoteDomain
+import VoteService
 
 import RxSwift
 import RxCocoa
@@ -17,7 +19,8 @@ final class VotePageViewController: UIPageViewController  {
     typealias Reactor = VotePageViewReactor
     private lazy var voteViewControllers: [UIViewController] = [voteHomeViewController, voteResultViewController]
     private lazy var voteHomeViewController: VoteHomeViewController = VoteHomeViewController(reactor: VoteHomeViewReactor())
-    private lazy var voteResultViewController: VoteResultViewController = VoteResultViewController(reactor: VoteResultViewReactor())
+    //TODO: Swinject 코드로 변경
+    private lazy var voteResultViewController: VoteResultViewController = VoteResultViewController(reactor: VoteResultViewReactor(fetchWinnerVoteOptionsUseCase: FetchWinnerVoteOptionsUseCase(voteRepository: VoteRepository())))
     var disposeBag: DisposeBag = DisposeBag()
     
     init(reactor: Reactor) {

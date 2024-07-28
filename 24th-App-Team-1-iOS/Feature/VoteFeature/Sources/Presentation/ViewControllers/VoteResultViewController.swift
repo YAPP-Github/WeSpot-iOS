@@ -94,7 +94,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
     override func bind(reactor: VoteResultViewReactor) {
         super.bind(reactor: reactor)
         Observable.just(())
-            .map { Reactor.Action.fetchResultItems }
+            .map { Reactor.Action.fetchWinnerResultItems }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         

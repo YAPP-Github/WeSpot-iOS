@@ -58,6 +58,7 @@ public final class WSButton: UIButton {
         backgroundColor = enabledBackgroundColor
         setTitleColor(enabledTextColor, for: .normal)
         layer.borderColor = isEnabled ? wsButtonType.pressedBorderColor : UIColor.clear.cgColor
+    }
 
     public func setupFont(font: WSFont) {
         titleLabel?.font = font.font()
@@ -68,4 +69,5 @@ public final class WSButton: UIButton {
         setTitleColor(wsButtonType.pressedTextColor, for: .highlighted)
         layer.borderColor = wsButtonType.pressedBorderColor
     }
+        
 }

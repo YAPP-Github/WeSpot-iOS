@@ -30,4 +30,17 @@ public final class VoteRepository: VoteRepositoryProtocol {
             .map { $0.toDomain() }
             .asSingle()
     }
+    
+    public func fetchWinnerVoteOptions(query: VoteWinnerRequestQuery) -> Single<VoteWinnerResponseEntity?> {
+        let query = VoteWinnerRequestDTO(date: query.date)
+        let endPoint = VoteEndPoint.fetchWinnerVotes(query)
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .logErrorIfDetected(category: Network.error)
+            .decodeMap(VoteWinnerResponseDTO.self)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
+
 }
