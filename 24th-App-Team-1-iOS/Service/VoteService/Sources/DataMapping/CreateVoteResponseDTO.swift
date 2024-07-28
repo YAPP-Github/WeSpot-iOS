@@ -10,11 +10,11 @@ import Foundation
 import VoteDomain
 
 public struct CreateVoteResponseDTO: Decodable {
-    public let voteId: Int    
+    public let id: Int
 }
 
 extension CreateVoteResponseDTO {
     public func toDomain() -> CreateVoteEntity {
-        return .init(voteId: voteId)
+        return .init(voteId: id)
     }
 }

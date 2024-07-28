@@ -15,7 +15,7 @@ public struct CreateVoteReqeuest {
     }
 }
 
-public struct CreateVoteItemReqeuest {
+public struct CreateVoteItemReqeuest: Equatable {
     public let userId: Int
     public let voteOptionId: Int
     

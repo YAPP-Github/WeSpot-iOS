@@ -16,7 +16,7 @@ import RxCocoa
 import ReactorKit
 
 fileprivate typealias VoteHomeStr = VoteStrings
-final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
+public final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
 
     //MARK: - Properties
     private let voteBannerView: WSBanner = WSBanner(
@@ -31,20 +31,20 @@ final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
     private let voteImageView: UIImageView = UIImageView()
     
     //MARK: - LifeCycle
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         
     }
 
     //MARK: - Configure
-    override func setupUI() {
+    public override func setupUI() {
         super.setupUI()
         voteContainerView.addSubviews(voteConfirmButton, voteDateLabel, voteImageView, voteDescriptionLabel)
         
         view.addSubviews(voteBannerView, voteContainerView)
     }
     
-    override func setupAutoLayout() {
+    public override func setupAutoLayout() {
         super.setupAutoLayout()
         
         voteBannerView.snp.makeConstraints {
@@ -85,7 +85,7 @@ final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
         
     }
     
-    override func setupAttributes() {
+    public override func setupAttributes() {
         super.setupAttributes()
         voteContainerView.do {
             $0.backgroundColor = DesignSystemAsset.Colors.gray700.color
@@ -111,15 +111,14 @@ final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
         }
     }
     
-    override func bind(reactor: Reactor) {
+    public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
-        voteConfirmButton.rx.tap
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                //TODO: Injector로 리펙토링
-            }
+        voteConfirmButton
+            .rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTappedVoteButton }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
     }
 }

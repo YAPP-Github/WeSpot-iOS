@@ -129,11 +129,17 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         resultButton.do {
             $0.setupButton(text: VoteProcessStr.voteResultText)
             $0.setupFont(font: .Body03)
+            $0.isHidden = true
         }
     }
     
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
+        
+        Observable.just(())
+            .map { Reactor.Action.viewDidLoad }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
         
         navigationBar.rightBarButton
             .rx.tap
@@ -163,21 +169,40 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
                 reactor.state.map { $0.processCount },
                 reactor.state.compactMap { $0.voteResponseEntity?.response.count }
             )
+            .observe(on: MainScheduler.asyncInstance)
             .map { "\($0.0)/\($0.1)"}
             .distinctUntilChanged()
             .bind(to: navigationBar.navigationTitleLabel.rx.text)
             .disposed(by: disposeBag)
         
-        Observable.just(())
-            .map { Reactor.Action.fetchQuestionItems }
-            .bind(to: reactor.action)
+        reactor.state
+            .map { $0.processCount != 5 }
+            .observe(on: MainScheduler.asyncInstance)
+            .distinctUntilChanged()
+            .bind(to: resultButton.rx.isHidden)
             .disposed(by: disposeBag)
         
+        Observable
+            .combineLatest(
+                reactor.pulse(\.$voteResponseEntity),
+                reactor.pulse(\.$voteOptionsStub),
+                reactor.pulse (\.$processCount )
+            )
+            .filter { $0.1.count == $0.2 && $0.0?.response.count != $0.2 }
+            .compactMap { ($0.0, $0.1, $0.2 + 1) }
+            .bind(with: self) { owner, response in
+                guard let entity = response.0 else { return }
+                let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self, arguments: entity, response.1, response.2)
+                owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        
         reactor.state
-            .map { $0.isShowViewController }
+            .compactMap { $0.createVoteEntity }
             .distinctUntilChanged()
-            .bind(with: self) { [self] owner, _ in
-                //TODO: 화면 전환 코드, 및 데이터 전달 코드 추가
+            .bind(with: self) { owner, response in
+                owner.navigationController?.popToRootViewController(animated: true)
             }
             .disposed(by: disposeBag)
         
@@ -205,9 +230,6 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             .distinctUntilChanged()
             .bind(to: profileView.rx.backgroundColor)
             .disposed(by: disposeBag)
-        
-        
-        
     }
 }
 

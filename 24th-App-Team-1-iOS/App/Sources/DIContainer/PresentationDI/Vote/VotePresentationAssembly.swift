@@ -11,17 +11,18 @@ import VoteDomain
 
 import Swinject
 
+
 struct VotePresentationAssembly: Assembly {
     func assemble(container: Container) {
-        container.register(VoteProcessViewReactor.self) { resolver in
-            let fetchVoteOptionsUseCase = resolver.resolve(FetchVoteOptionsUseCaseProtocol.self)!
+        container.register(VoteProcessViewReactor.self) { (resolver, voteResponseEntity: VoteResponseEntity, voteOptionStub: [CreateVoteItemReqeuest], processCount: Int) in
             let createVoteUseCase = resolver.resolve(CreateVoteUseCaseProtocol.self)!
             
-            return VoteProcessViewReactor(fetchVoteOptionsUseCase: fetchVoteOptionsUseCase, createVoteUseCase: createVoteUseCase)
+            return VoteProcessViewReactor(createVoteUseCase: createVoteUseCase, voteResponseEntity: voteResponseEntity, voteOptionStub: voteOptionStub, processCount: processCount)
         }
         
-        container.register(VoteProcessViewController.self) { resolver in
-            let reactor = resolver.resolve(VoteProcessViewReactor.self)!
+        container.register(VoteProcessViewController.self) { (resolver, voteResponseEntity: VoteResponseEntity, voteOptionStub: [CreateVoteItemReqeuest], processCount: Int) in
+            let reactor = resolver.resolve(VoteProcessViewReactor.self, arguments: voteResponseEntity, voteOptionStub, processCount)!
+            
             return VoteProcessViewController(reactor: reactor)
         }
     }

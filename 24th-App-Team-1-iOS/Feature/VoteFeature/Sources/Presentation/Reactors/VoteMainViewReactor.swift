@@ -17,7 +17,8 @@ public final class VoteMainViewReactor: Reactor {
     
     public init() {
         self.initialState = State(
-            voteTypes: .main
+            voteTypes: .main,
+            voteResponseStub: []
         )
     }
     
@@ -27,10 +28,26 @@ public final class VoteMainViewReactor: Reactor {
     
     public struct State {
         var voteTypes: VoteTypes
+        @Pulse var voteResponseEntity: VoteResponseEntity?
+        @Pulse var voteResponseStub: [CreateVoteItemReqeuest]
     }
     
     public enum Mutation {
         case setVoteTypes(VoteTypes)
+        case setVoteResponseItems(VoteResponseEntity)
+    }
+    
+    public func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
+        let fetchVoteResponse = globalService.event
+            .flatMap { event -> Observable<Mutation> in
+                switch event {
+                case let .didFetchVoteReponseItems(response):
+                    return .just(.setVoteResponseItems(response))
+                default:
+                    return .empty()
+                }
+            }
+        return .merge(mutation, fetchVoteResponse)
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
@@ -46,6 +63,9 @@ public final class VoteMainViewReactor: Reactor {
         case let .setVoteTypes(voteTypes):
             globalService.event.onNext(.toggleStatus(voteTypes))
             newState.voteTypes = voteTypes
+            
+        case let .setVoteResponseItems(voteResponseEntity):
+            newState.voteResponseEntity = voteResponseEntity
         }
         
         return newState

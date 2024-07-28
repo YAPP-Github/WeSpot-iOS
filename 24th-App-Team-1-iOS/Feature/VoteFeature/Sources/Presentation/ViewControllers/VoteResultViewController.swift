@@ -18,7 +18,7 @@ import RxDataSources
 
 fileprivate typealias VoteResultStr = VoteStrings
 fileprivate typealias VoteResultId = VoteStrings.Identifier
-final class VoteResultViewController: BaseViewController<VoteResultViewReactor> {
+public final class VoteResultViewController: BaseViewController<VoteResultViewReactor> {
     
     //MARK: - Properties
     private lazy var voteResultCollectionViewLayout: UICollectionViewCompositionalLayout = UICollectionViewCompositionalLayout { [weak self] section, _ in
@@ -34,12 +34,12 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
     private let resultPageControl: UIPageControl = UIPageControl()
     
     //MARK: - Configure
-    override func setupUI() {
+    public override func setupUI() {
         super.setupUI()
         view.addSubviews(voteResultCollectionView, confirmButton, backgrounImageView, resultPageControl)
     }
     
-    override func setupAutoLayout() {
+    public override func setupAutoLayout() {
         super.setupAutoLayout()
         
         voteResultCollectionView.snp.makeConstraints {
@@ -66,7 +66,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         }
     }
     
-    override func setupAttributes() {
+    public override func setupAttributes() {
         super.setupAttributes()
         
         voteResultCollectionView.do {
@@ -92,7 +92,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         }
     }
     
-    override func bind(reactor: VoteResultViewReactor) {
+    public override func bind(reactor: VoteResultViewReactor) {
         super.bind(reactor: reactor)
         Observable.just(())
             .map { Reactor.Action.fetchResultItems }

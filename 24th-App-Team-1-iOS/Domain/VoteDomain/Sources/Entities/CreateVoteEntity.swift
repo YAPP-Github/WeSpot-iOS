@@ -8,7 +8,7 @@
 import Foundation
 
 
-public struct CreateVoteEntity {
+public struct CreateVoteEntity: Equatable {
     public let voteId: Int
     
     public init(voteId: Int) {
