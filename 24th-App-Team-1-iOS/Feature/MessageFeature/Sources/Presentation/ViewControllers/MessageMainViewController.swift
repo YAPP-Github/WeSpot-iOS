@@ -44,6 +44,7 @@ public final class MessageMainViewController: BaseViewController<MessageMainView
         }
         
         messagePageViewController.view.snp.makeConstraints {
+            $0.top.equalTo(messageToggleView.snp.bottom)
             $0.horizontalEdges.bottom.equalToSuperview()
         }
     }
