@@ -8,15 +8,20 @@
 import DesignSystem
 import UIKit
 
+import ReactorKit
+import RxCocoa
+
 final class VoteResultCollectionViewCell: UICollectionViewCell {
     
     //MARK: - Properties
+    typealias Reactor = VoteResultCellReactor
     private let rankView: VoteRankView = VoteRankView()
     private let descrptionLabel: WSLabel = WSLabel(wsFont: .Body03)
     private let faceImageView: UIImageView = UIImageView()
     private let nameLabel: WSLabel = WSLabel(wsFont: .Header01)
     private let introduceLabel: WSLabel = WSLabel(wsFont: .Body07)
     private let resultButton: WSButton = WSButton(wsButtonType: .secondaryButton)
+    var disposeBag: DisposeBag = DisposeBag()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -116,5 +121,37 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
             $0.text = "우리 반에서 모르는게생기면물어보고싶은은은은은은은은 친구는?"
             $0.textColor = DesignSystemAsset.Colors.gray100.color
         }
+    }
+}
+
+extension VoteResultCollectionViewCell: ReactorKit.View {
+    
+    func bind(reactor: Reactor) {
+        reactor.state
+            .map { $0.content }
+            .distinctUntilChanged()
+            .bind(to: descrptionLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { "\($0.voteCount)표" }
+            .distinctUntilChanged()
+            .bind(to: rankView.rankLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.winnerUser }
+            .map { $0.name }
+            .distinctUntilChanged()
+            .bind(to: nameLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.winnerUser }
+            .map { $0.introduction }
+            .distinctUntilChanged()
+            .bind(to: introduceLabel.rx.text)
+            .disposed(by: disposeBag)
+        
     }
 }

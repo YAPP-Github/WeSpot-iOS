@@ -18,11 +18,11 @@ public final class VoteResultCellReactor: Reactor {
     
     public struct State {
         public let content: String
-        public let winnerUser: VoteWinnerUserEntity
+        public let winnerUser: VoteWinnerUserEntity?
         public let voteCount: Int
     }
     
-    init(content: String, winnerUser: VoteWinnerUserEntity, voteCount: Int) {
+    init(content: String, winnerUser: VoteWinnerUserEntity?, voteCount: Int) {
         self.initialState = State(
             content: content,
             winnerUser: winnerUser,

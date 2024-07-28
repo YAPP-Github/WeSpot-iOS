@@ -39,9 +39,7 @@ final class VoteResultViewReactor: Reactor {
     
     init(fetchWinnerVoteOptionsUseCase: FetchWinnerVoteOptionsUseCaseProtocol) {
         self.initialState = State(
-            resultSection: [
-                .voteResultInfo([.voteResultsItem, .voteResultsItem, .voteResultsItem])
-            ]
+            resultSection: [.voteResultInfo([])]
         )
         self.fetchWinnerVoteOptionsUseCase = fetchWinnerVoteOptionsUseCase
     }
@@ -54,13 +52,26 @@ final class VoteResultViewReactor: Reactor {
                 .execute(query: query)
                 .asObservable()
                 .flatMap { entity -> Observable<Mutation> in
-                    let winnerSectionItem: [VoteResultItem] = []
+                    var winnerSectionItem: [VoteResultItem] = []
                     
-                    guard let response = entity else { return .empty() }
+                    guard let originalEntity = entity else { return .empty() }
+                    
+                    originalEntity.response.forEach {
+                        winnerSectionItem.append(
+                            .voteResultsItem(
+                                VoteResultCellReactor(
+                                    content: $0.options.content,
+                                    winnerUser: $0.results.first?.user ?? nil,
+                                    voteCount: $0.results.first?.voteCount ?? 0
+                                )
+                            )
+                        )
+                    }
                     
                     return .concat(
                         .just(.setLoading(true)),
-                        .just(.setWinnerItems(response)),
+                        .just(.setWinnerItems(originalEntity)),
+                        .just(.setResultSectionItems(winnerSectionItem)),
                         .just(.setLoading(false))
                     )
                     
@@ -82,7 +93,6 @@ final class VoteResultViewReactor: Reactor {
             
         case let .setWinnerItems(winnerResponseEntity):
             newState.winnerResponseEntity = winnerResponseEntity
-            print("fetch winner response: \(winnerResponseEntity)")
             
         case let .setVisibleCellIndex(currentIndex):
             newState.currentPage = currentIndex
