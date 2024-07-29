@@ -23,6 +23,6 @@ public enum VoteResultSection: SectionModelType {
     }
 }
 
-enum VoteResultItem {
+public enum VoteResultItem {
     case voteResultsItem(VoteResultCellReactor)
 }

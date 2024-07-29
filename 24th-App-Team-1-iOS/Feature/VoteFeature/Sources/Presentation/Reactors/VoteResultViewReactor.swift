@@ -24,19 +24,19 @@ public final class VoteResultViewReactor: Reactor {
         var isLoading: Bool = false
     }
     
-    enum Action {
+    public enum Action {
         case fetchWinnerResultItems
         case didShowVisibleCell(_ index: Int)
     }
     
-    enum Mutation {
+    public enum Mutation {
         case setLoading(Bool)
         case setResultSectionItems([VoteResultItem])
         case setWinnerItems(VoteWinnerResponseEntity)
         case setVisibleCellIndex(Int)
     }
     
-    init(fetchWinnerVoteOptionsUseCase: FetchWinnerVoteOptionsUseCaseProtocol) {
+    public init(fetchWinnerVoteOptionsUseCase: FetchWinnerVoteOptionsUseCaseProtocol) {
         self.initialState = State(
             resultSection: [.voteResultInfo([])]
         )
