@@ -13,7 +13,8 @@ let project = Project.makeProject(
     module: .core(.Util),
     targets: [
         .core(module: .Util, dependencies: [
-            .shared(module: .ThirdPartyLib)
+            .shared(module: .ThirdPartyLib),
+            .shared(module: .DesignSystem)
         ])
     ]
 )

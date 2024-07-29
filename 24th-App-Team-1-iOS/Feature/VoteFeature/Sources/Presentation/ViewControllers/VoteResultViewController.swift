@@ -16,9 +16,9 @@ import RxCocoa
 import ReactorKit
 import RxDataSources
 
-fileprivate typealias VoteStr = VoteStrings
-fileprivate typealias VoteId = VoteStrings.Identifier
-final class VoteResultViewController: BaseViewController<VoteResultViewReactor> {
+fileprivate typealias VoteResultStr = VoteStrings
+fileprivate typealias VoteResultId = VoteStrings.Identifier
+public final class VoteResultViewController: BaseViewController<VoteResultViewReactor> {
     
     //MARK: - Properties
     private lazy var voteResultCollectionViewLayout: UICollectionViewCompositionalLayout = UICollectionViewCompositionalLayout { [weak self] section, _ in
@@ -38,12 +38,12 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
     private let resultPageControl: UIPageControl = UIPageControl()
     
     //MARK: - Configure
-    override func setupUI() {
+    public override func setupUI() {
         super.setupUI()
         view.addSubviews(voteResultCollectionView, confirmButton, backgrounImageView, resultPageControl)
     }
     
-    override func setupAutoLayout() {
+    public override func setupAutoLayout() {
         super.setupAutoLayout()
         
         voteResultCollectionView.snp.makeConstraints {
@@ -70,14 +70,15 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         }
     }
     
-    override func setupAttributes() {
+    public override func setupAttributes() {
         super.setupAttributes()
         
         voteResultCollectionView.do {
-            $0.register(VoteResultCollectionViewCell.self, forCellWithReuseIdentifier: VoteId.voteReulstCell)
+            $0.register(VoteResultCollectionViewCell.self, forCellWithReuseIdentifier: VoteResultId.voteResultCell)
             $0.backgroundColor = .clear
             $0.showsHorizontalScrollIndicator = false
             $0.showsVerticalScrollIndicator = false
+            $0.isScrollEnabled = false
         }
         
         backgrounImageView.do {
@@ -86,7 +87,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         }
         
         confirmButton.do {
-            $0.setupButton(text: VoteStrings.voteMyResultButtonText)
+            $0.setupButton(text: VoteResultStr.voteMyResultButtonText)
             $0.isHidden = true
         }
         
@@ -96,7 +97,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         }
     }
     
-    override func bind(reactor: VoteResultViewReactor) {
+    public override func bind(reactor: VoteResultViewReactor) {
         super.bind(reactor: reactor)
         
         Observable.just(())
@@ -144,7 +145,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         
         let voteResultItem: NSCollectionLayoutItem = NSCollectionLayoutItem(layoutSize: voteResultItemSize)
         
-        voteResultItem.contentInsets = .init(top: 0, leading: 10, bottom: 0, trailing: 10)
+        voteResultItem.contentInsets = .init(top: 0, leading: 20, bottom: 0, trailing: 20)
         
         let voteResultGroupSize: NSCollectionLayoutSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(0.8),

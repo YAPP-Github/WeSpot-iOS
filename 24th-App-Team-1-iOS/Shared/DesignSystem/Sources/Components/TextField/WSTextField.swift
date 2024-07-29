@@ -100,25 +100,8 @@ public final class WSTextField: UITextField {
         self.font = wsFont.font()
         
         if let text = self.text, !text.isEmpty {
-            let attributedString = NSAttributedString(string: text, attributes: wsFontAttributes(wsFont))
-            attributedText = attributedString
+            self.attributedText = NSAttributedString.attributedText(text: text, font: wsFont.font(), lineHeight: wsFont.lineHeight, textAlignment: self.textAlignment)
         }
-    }
-    
-    private func wsFontAttributes(_ wsFont: WSFont) -> [NSAttributedString.Key: Any] {
-        let paragraphStyle = NSMutableParagraphStyle()
-        let lineHeight = wsFont.size * wsFont.lineHeight
-        paragraphStyle.minimumLineHeight = lineHeight
-        paragraphStyle.maximumLineHeight = lineHeight
-        paragraphStyle.lineHeightMultiple = wsFont.lineHeight
-        paragraphStyle.alignment = self.textAlignment
-        
-        let baselineOffset = (lineHeight - wsFont.size) / 2
-        return [
-            .font: wsFont.font(),
-            .paragraphStyle: paragraphStyle,
-            .baselineOffset: baselineOffset
-        ]
     }
     
     // title Label 레이아웃 설정

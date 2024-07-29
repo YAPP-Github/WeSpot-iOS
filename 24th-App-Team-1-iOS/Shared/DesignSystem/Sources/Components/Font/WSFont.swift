@@ -97,7 +97,7 @@ public enum WSFont {
     
     
     var lineHeight: CGFloat {
-        return 1.5
+        return 1.26
     }
     
     var letterSpacing: CGFloat {

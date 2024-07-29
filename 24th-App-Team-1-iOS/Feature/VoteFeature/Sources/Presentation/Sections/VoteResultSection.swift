@@ -8,17 +8,17 @@
 import Differentiator
 
 
-enum VoteResultSection: SectionModelType {
+public enum VoteResultSection: SectionModelType {
     case voteResultInfo([VoteResultItem])
     
-    var items: [VoteResultItem] {
+    public var items: [VoteResultItem] {
         if case let .voteResultInfo(items) = self {
              return items
          }
          return []
     }
     
-    init(original: VoteResultSection, items: [VoteResultItem]) {
+    public init(original: VoteResultSection, items: [VoteResultItem]) {
         self = original
     }
 }

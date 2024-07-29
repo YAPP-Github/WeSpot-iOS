@@ -12,13 +12,12 @@ import Extensions
 
 import ReactorKit
 
-final class VoteResultViewReactor: Reactor {
+public final class VoteResultViewReactor: Reactor {
     
-    
-    var initialState: State
     private let fetchWinnerVoteOptionsUseCase: FetchWinnerVoteOptionsUseCaseProtocol
+    public var initialState: State
     
-    struct State {
+    public struct State {
         @Pulse var resultSection: [VoteResultSection]
         @Pulse var winnerResponseEntity: VoteWinnerResponseEntity?
         var currentPage: Int = 0
@@ -44,7 +43,7 @@ final class VoteResultViewReactor: Reactor {
         self.fetchWinnerVoteOptionsUseCase = fetchWinnerVoteOptionsUseCase
     }
     
-    func mutate(action: Action) -> Observable<Mutation> {
+    public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchWinnerResultItems:
             let query = VoteWinnerRequestQuery(date: Date().toFormatString(with: .dashYyyyMMdd))
@@ -81,7 +80,7 @@ final class VoteResultViewReactor: Reactor {
         }
     }
     
-    func reduce(state: State, mutation: Mutation) -> State {
+    public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
         case let .setLoading(isLoading):

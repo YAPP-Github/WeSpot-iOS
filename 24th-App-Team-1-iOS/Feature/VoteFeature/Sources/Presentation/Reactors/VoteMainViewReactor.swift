@@ -14,42 +14,46 @@ import ReactorKit
 public final class VoteMainViewReactor: Reactor {
     public var initialState: State
     private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
-    private let fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol
     
-    public init(fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol) {
+    public init() {
         self.initialState = State(
-            voteTypes: .main
+            voteTypes: .main,
+            voteResponseStub: []
         )
-        self.fetchVoteOptionsUseCase = fetchVoteOptionsUseCase
     }
     
     public enum Action {
         case didTapToggleButton(VoteTypes)
-        case viewDidLoad
     }
     
     public struct State {
         var voteTypes: VoteTypes
-        @Pulse var voteItemEntity: VoteResponseEntity?
+        @Pulse var voteResponseEntity: VoteResponseEntity?
+        @Pulse var voteResponseStub: [CreateVoteItemReqeuest]
     }
     
     public enum Mutation {
         case setVoteTypes(VoteTypes)
-        case setVoteItems(VoteResponseEntity)
+        case setVoteResponseItems(VoteResponseEntity)
+    }
+    
+    public func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
+        let fetchVoteResponse = globalService.event
+            .flatMap { event -> Observable<Mutation> in
+                switch event {
+                case let .didFetchVoteReponseItems(response):
+                    return .just(.setVoteResponseItems(response))
+                default:
+                    return .empty()
+                }
+            }
+        return .merge(mutation, fetchVoteResponse)
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case let .didTapToggleButton(voteTypes):
             return .just(.setVoteTypes(voteTypes))
-        case .viewDidLoad:
-            return fetchVoteOptionsUseCase
-                .execute()
-                .asObservable()
-                .flatMap { entity -> Observable<VoteMainViewReactor.Mutation> in
-                    guard let originEntity = entity else { return .empty() }
-                    return .just(.setVoteItems(originEntity))
-                }
         }
     }
     
@@ -59,8 +63,9 @@ public final class VoteMainViewReactor: Reactor {
         case let .setVoteTypes(voteTypes):
             globalService.event.onNext(.toggleStatus(voteTypes))
             newState.voteTypes = voteTypes
-        case let .setVoteItems(voteEntity):
-            newState.voteItemEntity = voteEntity
+            
+        case let .setVoteResponseItems(voteResponseEntity):
+            newState.voteResponseEntity = voteResponseEntity
         }
         
         return newState

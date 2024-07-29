@@ -13,7 +13,8 @@ let project = Project
         module: .core(.Networking),
         targets: [
             .core(module: .Networking, dependencies: [
-                .shared(module: .ThirdPartyLib)
+                .shared(module: .ThirdPartyLib),
+                .core(module: .Util)
             ])
         ]
     )
