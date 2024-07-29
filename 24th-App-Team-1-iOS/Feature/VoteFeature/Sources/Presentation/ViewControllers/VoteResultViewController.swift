@@ -87,16 +87,19 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         
         confirmButton.do {
             $0.setupButton(text: VoteStrings.voteMyResultButtonText)
+            $0.isHidden = true
         }
         
         resultPageControl.do {
             $0.currentPage = 0
             $0.numberOfPages = 3
+            $0.isHidden = true
         }
     }
     
     override func bind(reactor: VoteResultViewReactor) {
         super.bind(reactor: reactor)
+        
         Observable.just(())
             .map { Reactor.Action.fetchWinnerResultItems }
             .bind(to: reactor.action)
@@ -108,9 +111,27 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
             .disposed(by: disposeBag)
         
         reactor.state
+            .compactMap { $0.winnerResponseEntity }
+            .map { $0.response.count }
+            .bind(to: resultPageControl.rx.numberOfPages)
+            .disposed(by: disposeBag)
+        
+        reactor.state
             .map { $0.currentPage }
             .distinctUntilChanged()
             .bind(to: resultPageControl.rx.currentPage)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isLoading }
+            .distinctUntilChanged()
+            .bind(to: confirmButton.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isLoading }
+            .distinctUntilChanged()
+            .bind(to: resultPageControl.rx.isHidden)
             .disposed(by: disposeBag)
     }
     

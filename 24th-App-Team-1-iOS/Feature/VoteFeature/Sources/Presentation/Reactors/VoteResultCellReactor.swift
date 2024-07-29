@@ -22,7 +22,11 @@ public final class VoteResultCellReactor: Reactor {
         public let voteCount: Int
     }
     
-    init(content: String, winnerUser: VoteWinnerUserEntity?, voteCount: Int) {
+    init(
+        content: String,
+        winnerUser: VoteWinnerUserEntity?,
+        voteCount: Int
+    ) {
         self.initialState = State(
             content: content,
             winnerUser: winnerUser,

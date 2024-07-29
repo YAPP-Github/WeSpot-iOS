@@ -55,7 +55,6 @@ final class VoteResultViewReactor: Reactor {
                     var winnerSectionItem: [VoteResultItem] = []
                     
                     guard let originalEntity = entity else { return .empty() }
-                    
                     originalEntity.response.forEach {
                         winnerSectionItem.append(
                             .voteResultsItem(
@@ -70,8 +69,8 @@ final class VoteResultViewReactor: Reactor {
                     
                     return .concat(
                         .just(.setLoading(true)),
-                        .just(.setWinnerItems(originalEntity)),
                         .just(.setResultSectionItems(winnerSectionItem)),
+                        .just(.setWinnerItems(originalEntity)),
                         .just(.setLoading(false))
                     )
                     
