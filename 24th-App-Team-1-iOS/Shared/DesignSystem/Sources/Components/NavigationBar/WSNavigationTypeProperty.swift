@@ -17,6 +17,8 @@ public struct WSNavigationTypeProperty: Equatable {
     var rightImageItem: UIImage?
     /// rightBarButtonItem  Text UI를 구성하기 위한 프로퍼티 입니다.
     var rightTextItem: String?
+    /// rightBarButtonItem Text Color를 구성하기 위한 프로퍼티 입니다.
+    var rightTextItemColor: UIColor?
 }
 
 
@@ -27,8 +29,8 @@ public enum WSNavigationType: Equatable {
     case leftIcon(UIImage)
     case leftWithCenterItem(UIImage, String)
     case rightIcon(String? = "")
-    case leftWithRightItem(UIImage, String)
-    case all(UIImage, String?, String?)
+    case leftWithRightItem(UIImage, String, UIColor)
+    case all(UIImage, String?, String?, UIColor)
     
     var items: WSNavigationTypeProperty {
         switch self {
@@ -50,16 +52,19 @@ public enum WSNavigationType: Equatable {
             return .init(
                 rightTextItem: rightTextItem
             )
-        case let .leftWithRightItem(leftItem, rightTextItem):
+        case let .leftWithRightItem(leftItem, rightTextItem, rightTextItemColor):
             return .init(
                 leftItem: leftItem,
-                rightTextItem: rightTextItem
+                rightTextItem: rightTextItem,
+                rightTextItemColor: rightTextItemColor
+                
             )
-        case let .all(leftItem, rightTextItem, centerItem):
+        case let .all(leftItem, rightTextItem, centerItem, rightTextItemColor):
             return .init(
                 leftItem: leftItem,
                 centerItem: centerItem,
-                rightTextItem: rightTextItem
+                rightTextItem: rightTextItem,
+                rightTextItemColor: rightTextItemColor
             )
         }
     }

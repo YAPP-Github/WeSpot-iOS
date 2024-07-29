@@ -15,11 +15,12 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
+fileprivate typealias VoteBeginStr = VoteStrings
 public final class VoteBeginViewController: BaseViewController<VoteBeginViewReactor> {
 
     //MARK: - Properties
-    private let beginInfoLabel: WSLabel = WSLabel(wsFont: .Header01, text: "투표할 수 있는\n1학년 6반 친구들이 부족해요")
-    private let beginButton: WSButton = WSButton(wsButtonType: .default(12))
+    private let beginInfoLabel: WSLabel = WSLabel(wsFont: .Header01, text: VoteBeginStr.voteBeginInfoText)
+    private let inviteButton: WSButton = WSButton(wsButtonType: .default(12))
     private let beginlottieView: WSLottieView = WSLottieView()
     
     //MARK: - LifeCycle
@@ -30,7 +31,7 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
-        view.addSubviews(beginInfoLabel, beginlottieView, beginButton)
+        view.addSubviews(beginInfoLabel, beginlottieView, inviteButton)
     }
     
     public override func setupAutoLayout() {
@@ -47,7 +48,7 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
             $0.height.equalTo(450)
         }
         
-        beginButton.snp.makeConstraints {
+        inviteButton.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(20)
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(12)
             $0.height.equalTo(52)
@@ -71,8 +72,8 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
             $0.setNavigationBarAutoLayout(property: .leftIcon)
         }
         
-        beginButton.do {
-            $0.setupButton(text: "친구 초대하기")
+        inviteButton.do {
+            $0.setupButton(text: VoteBeginStr.voteInviteButtonText)
         }
     }
     

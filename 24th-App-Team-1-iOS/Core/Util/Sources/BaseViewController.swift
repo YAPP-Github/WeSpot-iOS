@@ -63,7 +63,6 @@ open class BaseViewController<R>: UIViewController, ReactorKit.View where R: Rea
     /// 리엑터와 바인딩을 위한 메서드
     open func bind(reactor: R) {
         navigationBar.rx.leftBarButtonItem
-            .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, type in
                 switch type {
                 case .leftIcon:

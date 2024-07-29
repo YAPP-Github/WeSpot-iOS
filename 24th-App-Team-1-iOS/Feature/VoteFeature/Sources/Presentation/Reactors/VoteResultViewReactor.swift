@@ -9,27 +9,27 @@ import Foundation
 
 import ReactorKit
 
-final class VoteResultViewReactor: Reactor {
+public final class VoteResultViewReactor: Reactor {
     
     
-    var initialState: State
+    public var initialState: State
     
-    struct State {
+    public struct State {
         @Pulse var resultSection: [VoteResultSection]
         var currentPage: Int = 0
     }
     
-    enum Action {
+    public enum Action {
         case fetchResultItems
         case didShowVisibleCell(_ index: Int)
     }
     
-    enum Mutation {
+    public enum Mutation {
         case setResultSectionItems([VoteResultItem])
         case setVisibleCellIndex(Int)
     }
     
-    init() {
+    public  init() {
         self.initialState = State(
             resultSection: [
                 .voteResultInfo([.voteResultsItem, .voteResultsItem, .voteResultsItem])
@@ -37,7 +37,7 @@ final class VoteResultViewReactor: Reactor {
         )
     }
     
-    func mutate(action: Action) -> Observable<Mutation> {
+    public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchResultItems:
             return .empty()
@@ -47,7 +47,7 @@ final class VoteResultViewReactor: Reactor {
         }
     }
     
-    func reduce(state: State, mutation: Mutation) -> State {
+    public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
         case let .setResultSectionItems(items):

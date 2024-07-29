@@ -6,33 +6,54 @@
 //
 
 import Foundation
+import Util
+import VoteDomain
 
 import ReactorKit
 
-final class VoteHomeViewReactor: Reactor {
+public final class VoteHomeViewReactor: Reactor {
     
+    private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
+    private let fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol
+    public let initialState: State
     
-    struct State {
+    public struct State {
+
+    }
+    
+    public enum Action {
+        case didTappedVoteButton
+    }
+    
+    public enum Mutation {
         
     }
     
-    enum Action {
-        
+    public init(fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol) {
+        self.fetchVoteOptionsUseCase = fetchVoteOptionsUseCase
+        self.initialState = State()
     }
     
-    enum Mutation {
+    public func mutate(action: Action) -> Observable<Mutation> {
         
+        switch action {
+        case .didTappedVoteButton:
+            return fetchVoteOptionsUseCase
+                .execute()
+                .asObservable()
+                .withUnretained(self)
+                .flatMap { onwer, entity -> Observable<Mutation> in
+                    guard let response = entity else { return .empty() }
+                    onwer.globalService.event.onNext(.didFetchVoteReponseItems(response))
+                    
+                    return .empty()
+                }
+        }
     }
     
-    let initialState: State = State()
-    
-    func mutate(action: Action) -> Observable<Mutation> {
-        
-        return .empty()
-    }
-    
-    func reduce(state: State, mutation: Mutation) -> State {
-        
-        return state
+    public func reduce(state: State, mutation: Mutation) -> State {
+        var newState = state
+                
+        return newState
     }
 }
