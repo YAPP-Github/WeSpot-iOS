@@ -24,5 +24,5 @@ public enum VoteResultSection: SectionModelType {
 }
 
 public enum VoteResultItem {
-    case voteResultsItem
+    case voteResultsItem(VoteResultCellReactor)
 }
