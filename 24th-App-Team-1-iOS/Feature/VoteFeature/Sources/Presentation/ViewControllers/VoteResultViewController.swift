@@ -92,7 +92,6 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         
         resultPageControl.do {
             $0.currentPage = 0
-            $0.numberOfPages = 3
             $0.isHidden = true
         }
     }
@@ -113,6 +112,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         reactor.state
             .compactMap { $0.winnerResponseEntity }
             .map { $0.response.count }
+            .distinctUntilChanged()
             .bind(to: resultPageControl.rx.numberOfPages)
             .disposed(by: disposeBag)
         
@@ -163,7 +163,7 @@ final class VoteResultViewController: BaseViewController<VoteResultViewReactor> 
         voteResultSection.visibleItemsInvalidationHandler = { [weak self] visibleItems, offset, env in
             visibleItems.forEach { item in
                 
-                let position = offset.x / env.container.contentSize.width
+                let position = offset.x / (env.container.contentSize.width * 0.8)
                 let roundPosition = Int(round(position))
             
                 let intersectedRect = item.frame.intersection(CGRect(x: offset.x, y: offset.y, width: env.container.contentSize.width, height: item.frame.height))
