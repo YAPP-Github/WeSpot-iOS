@@ -100,7 +100,7 @@ public final class WSTextField: UITextField {
         self.font = wsFont.font()
         
         if let text = self.text, !text.isEmpty {
-            self.attributedText = NSAttributedString.attributedText(text: text, font: wsFont.font(), lineHeight: wsFont.lineHeight, textAlignment: self.textAlignment)
+            self.attributedText = NSAttributedString().attributedText(text: text, font: wsFont.font(), lineHeight: wsFont.lineHeight, textAlignment: self.textAlignment)
         }
     }
     

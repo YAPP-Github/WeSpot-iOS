@@ -26,8 +26,12 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
     }
     private lazy var voteResultCollectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: voteResultCollectionViewLayout)
     private lazy var voteResultsCollectionViewDataSources: RxCollectionViewSectionedReloadDataSource<VoteResultSection> = .init { dataSources, collectionView, indexPath, sectionItem in
-        guard let voteResultsCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteResultId.voteResultCell , for: indexPath) as? VoteResultCollectionViewCell else { return UICollectionViewCell() }
-        return voteResultsCell
+        switch sectionItem {
+        case let .voteResultsItem(cellReactor):
+            guard let voteResultsCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteResultId.voteResultCell , for: indexPath) as? VoteResultCollectionViewCell else { return UICollectionViewCell() }
+            voteResultsCell.reactor = cellReactor
+            return voteResultsCell
+        }
     }
     private let confirmButton: WSButton = WSButton(wsButtonType: .default(12))
     private let backgrounImageView: UIImageView = UIImageView()
@@ -84,18 +88,20 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
         
         confirmButton.do {
             $0.setupButton(text: VoteResultStr.voteMyResultButtonText)
+            $0.isHidden = true
         }
         
         resultPageControl.do {
             $0.currentPage = 0
-            $0.numberOfPages = 3
+            $0.isHidden = true
         }
     }
     
     public override func bind(reactor: VoteResultViewReactor) {
         super.bind(reactor: reactor)
+        
         Observable.just(())
-            .map { Reactor.Action.fetchResultItems }
+            .map { Reactor.Action.fetchWinnerResultItems }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -105,9 +111,28 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
             .disposed(by: disposeBag)
         
         reactor.state
+            .compactMap { $0.winnerResponseEntity }
+            .map { $0.response.count }
+            .distinctUntilChanged()
+            .bind(to: resultPageControl.rx.numberOfPages)
+            .disposed(by: disposeBag)
+        
+        reactor.state
             .map { $0.currentPage }
             .distinctUntilChanged()
             .bind(to: resultPageControl.rx.currentPage)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isLoading }
+            .distinctUntilChanged()
+            .bind(to: confirmButton.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isLoading }
+            .distinctUntilChanged()
+            .bind(to: resultPageControl.rx.isHidden)
             .disposed(by: disposeBag)
     }
     
@@ -139,7 +164,7 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
         voteResultSection.visibleItemsInvalidationHandler = { [weak self] visibleItems, offset, env in
             visibleItems.forEach { item in
                 
-                let position = offset.x / env.container.contentSize.width
+                let position = offset.x / (env.container.contentSize.width * 0.8)
                 let roundPosition = Int(round(position))
             
                 let intersectedRect = item.frame.intersection(CGRect(x: offset.x, y: offset.y, width: env.container.contentSize.width, height: item.frame.height))

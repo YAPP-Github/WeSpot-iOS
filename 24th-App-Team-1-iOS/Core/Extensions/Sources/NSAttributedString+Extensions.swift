@@ -26,7 +26,7 @@ public extension NSAttributedString {
         paragraphStyle.lineHeightMultiple = lineHeight
         paragraphStyle.alignment = textAlignment
             
-        let attributes: [NSAttributedString.Key: Any] = [
+        var attributes: [NSAttributedString.Key: Any] = [
             .font: font,
             .paragraphStyle: paragraphStyle, // 문단 스타일 설정
         ]

@@ -8,15 +8,21 @@
 import DesignSystem
 import UIKit
 
+import ReactorKit
+import RxCocoa
+
 final class VoteResultCollectionViewCell: UICollectionViewCell {
     
     //MARK: - Properties
+    typealias Reactor = VoteResultCellReactor
     private let rankView: VoteRankView = VoteRankView()
-    private let descrptionLabel: WSLabel = WSLabel(wsFont: .Body03)
+    private let descriptionLabel: WSLabel = WSLabel(wsFont: .Body03)
     private let faceImageView: UIImageView = UIImageView()
     private let nameLabel: WSLabel = WSLabel(wsFont: .Header01)
     private let introduceLabel: WSLabel = WSLabel(wsFont: .Body07)
-    private let resultButton: WSButton = WSButton(wsButtonType: .secondaryButton)
+    private let resultContainerView: UIView = UIView()
+    private let resultDescriptionLabel: WSLabel = WSLabel(wsFont: .Body06)
+    var disposeBag: DisposeBag = DisposeBag()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,7 +36,8 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
     }
     
     private func setupUI() {
-        addSubviews(rankView, descrptionLabel, faceImageView, nameLabel, introduceLabel, resultButton)
+        resultContainerView.addSubview(resultDescriptionLabel)
+        addSubviews(rankView, descriptionLabel, faceImageView, nameLabel, introduceLabel, resultContainerView)
     }
     
     //MARK: - Configure
@@ -42,7 +49,7 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
             $0.height.equalTo(36)
         }
         
-        descrptionLabel.snp.makeConstraints {
+        descriptionLabel.snp.makeConstraints {
             $0.top.equalTo(rankView.snp.bottom).offset(12)
             $0.left.equalToSuperview().offset(20)
             $0.height.equalTo(48)
@@ -50,7 +57,7 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
         }
         
         faceImageView.snp.makeConstraints {
-            $0.top.equalTo(descrptionLabel.snp.bottom).offset(11)
+            $0.top.equalTo(descriptionLabel.snp.bottom).offset(11)
             $0.width.height.equalTo(120)
             $0.centerX.equalToSuperview()
         }
@@ -67,25 +74,36 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
             $0.centerX.equalToSuperview()
         }
         
-        resultButton.snp.makeConstraints {
+        resultContainerView.snp.makeConstraints {
             $0.top.equalTo(introduceLabel.snp.bottom).offset(24)
             $0.height.equalTo(33)
-            $0.width.equalTo(104)
             $0.centerX.equalToSuperview()
-        }        
+        }
+        
+        resultDescriptionLabel.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(12)
+            $0.verticalEdges.equalToSuperview().inset(5)
+        }
+            
     }
     
     private func setupAttributes() {
         
-        //TODO: 테스트 코드
+        self.do {
+            $0.backgroundColor = DesignSystemAsset.Colors.white.color.withAlphaComponent(0.15)
+            $0.layer.cornerRadius = 20
+            $0.clipsToBounds = true
+        }
         
-        backgroundColor = DesignSystemAsset.Colors.white.color.withAlphaComponent(0.15)
-        layer.cornerRadius = 20
-        clipsToBounds = true
+        resultContainerView.do {
+            $0.backgroundColor = DesignSystemAsset.Colors.gray500.color
+            $0.layer.cornerRadius = 8
+            $0.clipsToBounds = true
+        }
 
-        resultButton.do {
-            $0.setupButton(text: "전체 결과 보기")
-            $0.setupFont(font: .Body06)
+        resultDescriptionLabel.do {
+            $0.text = "전체 결과 보기"
+            $0.textColor = DesignSystemAsset.Colors.gray100.color
         }
         
         introduceLabel.do {
@@ -112,9 +130,76 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
             $0.image = DesignSystemAsset.Images.voteCharacter.image
         }
         
-        descrptionLabel.do {
+        descriptionLabel.do {
             $0.text = "우리 반에서 모르는게생기면물어보고싶은은은은은은은은 친구는?"
             $0.textColor = DesignSystemAsset.Colors.gray100.color
         }
+    }
+}
+
+extension VoteResultCollectionViewCell: ReactorKit.View {
+    
+    func bind(reactor: Reactor) {
+        reactor.state
+            .map { $0.content }
+            .distinctUntilChanged()
+            .bind(to: descriptionLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { "\($0.voteCount)표" }
+            .distinctUntilChanged()
+            .bind(to: rankView.rankLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.winnerUser }
+            .map { $0.name }
+            .distinctUntilChanged()
+            .bind(to: nameLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.winnerUser }
+            .map { $0.introduction }
+            .distinctUntilChanged()
+            .bind(to: introduceLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .filter { $0.winnerUser == nil }
+            .map { _ in "분석 중이에요"}
+            .distinctUntilChanged()
+            .bind(to: nameLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .filter { $0.winnerUser == nil }
+            .map { _ in "더 많은 친구들의 투표가 필요해요" }
+            .distinctUntilChanged()
+            .bind(to: introduceLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .filter { $0.winnerUser == nil }
+            .map { _ in "친구에게 물어보기" }
+            .distinctUntilChanged()
+            .bind(to: resultDescriptionLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .filter { $0.winnerUser == nil }
+            .map { _ in DesignSystemAsset.Images.icVoteAnalyze.image }
+            .distinctUntilChanged()
+            .bind(to: faceImageView.rx.image)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .filter { $0.winnerUser == nil }
+            .map { _ in "??표" }
+            .distinctUntilChanged()
+            .bind(to: rankView.rankLabel.rx.text)
+            .disposed(by: disposeBag)
+        
     }
 }

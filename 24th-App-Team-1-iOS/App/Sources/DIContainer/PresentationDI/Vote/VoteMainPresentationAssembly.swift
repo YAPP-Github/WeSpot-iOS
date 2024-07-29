@@ -66,8 +66,9 @@ struct VotePagePresentationAssembly: Assembly {
 /// VoteResult DIContainer
 struct VoteResultPresentationAssembly: Assembly {
     func assemble(container: Container) {
-        container.register(VoteResultViewReactor.self) { _ in
-            return VoteResultViewReactor()
+        container.register(VoteResultViewReactor.self) { resolver in
+            let fetchWinnerUseCase = resolver.resolve(FetchWinnerVoteOptionsUseCaseProtocol.self)!
+            return VoteResultViewReactor(fetchWinnerVoteOptionsUseCase: fetchWinnerUseCase)
         }
         
         container.register(VoteResultViewController.self) { resolver in

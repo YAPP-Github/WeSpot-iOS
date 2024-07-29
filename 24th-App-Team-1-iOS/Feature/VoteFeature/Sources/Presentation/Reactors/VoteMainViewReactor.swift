@@ -35,6 +35,7 @@ public final class VoteMainViewReactor: Reactor {
     public enum Mutation {
         case setVoteTypes(VoteTypes)
         case setVoteResponseItems(VoteResponseEntity)
+        case setVoteUserItems
     }
     
     public func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
@@ -42,7 +43,10 @@ public final class VoteMainViewReactor: Reactor {
             .flatMap { event -> Observable<Mutation> in
                 switch event {
                 case let .didFetchVoteReponseItems(response):
-                    return .just(.setVoteResponseItems(response))
+                    return .concat(
+                        .just(.setVoteResponseItems(response)),
+                        .just(.setVoteUserItems)
+                    )
                 default:
                     return .empty()
                 }
@@ -66,6 +70,8 @@ public final class VoteMainViewReactor: Reactor {
             
         case let .setVoteResponseItems(voteResponseEntity):
             newState.voteResponseEntity = voteResponseEntity
+        case .setVoteUserItems:
+            newState.voteResponseStub = []
         }
         
         return newState
