@@ -14,6 +14,7 @@ public final class VoteCompleteViewReactor: Reactor {
     public let initialState: State
     
     public struct State {
+        @Pulse var completeSection: [VoteCompleteSection]
         var isLoading: Bool
     }
     
@@ -23,10 +24,22 @@ public final class VoteCompleteViewReactor: Reactor {
     
     public enum Mutation {
         case setOnboadingView(Bool)
+        case setCompleteSection([VoteCompleteItem])
     }
     
     public init() {
-        self.initialState = State(isLoading: false)
+        self.initialState = State(
+            completeSection: [
+                .voteHighRankerInfo(
+                    [
+                        .voteHighRankerItem,
+                        .voteHighRankerItem,
+                        .voteHighRankerItem
+                    ]
+                )
+            ],
+            isLoading: false
+        )
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
@@ -42,6 +55,8 @@ public final class VoteCompleteViewReactor: Reactor {
         switch mutation {
         case let .setOnboadingView(isLoading):
             newState.isLoading = isLoading
+        case let .setCompleteSection(items):
+            newState.completeSection = [.voteHighRankerInfo(items)]
         }
         return newState
     }

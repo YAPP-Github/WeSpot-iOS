@@ -100,7 +100,7 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
         
         rankView.do {
             $0.rankLabel.text = "10표"
-            $0.rankImageView.image = DesignSystemAsset.Images.voteCrwon.image
+            $0.rankImageView.image = DesignSystemAsset.Images.icResultCrwonFiled.image
             $0.layer.cornerRadius = 18
             $0.layer.masksToBounds = true
             $0.clipsToBounds = true
@@ -109,7 +109,7 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
         }
         
         faceImageView.do {
-            $0.image = DesignSystemAsset.Images.voteCharacter.image
+            $0.image = DesignSystemAsset.Images.imgResultCharacter.image
         }
         
         descrptionLabel.do {
