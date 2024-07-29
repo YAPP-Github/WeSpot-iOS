@@ -28,7 +28,7 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
     private lazy var voteResultsCollectionViewDataSources: RxCollectionViewSectionedReloadDataSource<VoteResultSection> = .init { dataSources, collectionView, indexPath, sectionItem in
         switch sectionItem {
         case let .voteResultsItem(cellReactor):
-            guard let voteResultsCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteId.voteReulstCell , for: indexPath) as? VoteResultCollectionViewCell else { return UICollectionViewCell() }
+            guard let voteResultsCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteResultId.voteResultCell , for: indexPath) as? VoteResultCollectionViewCell else { return UICollectionViewCell() }
             voteResultsCell.reactor = cellReactor
             return voteResultsCell
         }
