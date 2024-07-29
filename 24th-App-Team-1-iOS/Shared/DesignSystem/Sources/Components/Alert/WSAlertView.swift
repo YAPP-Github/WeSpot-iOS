@@ -18,7 +18,7 @@ public final class WSAlertView: UIViewController {
     var titleLabel: WSLabel = WSLabel(wsFont: .Header01)
     var messageLabel: WSLabel = WSLabel(wsFont: .Body06)
     var confirmButton: WSButton = WSButton(wsButtonType: .default(10))
-    var cancelButton: WSButton = WSButton(wsButtonType: .disableButton)
+    var cancelButton: WSButton = WSButton(wsButtonType: .secondaryButton)
     var alertAction: WSAlertActionProperty?
     
     
@@ -78,16 +78,32 @@ public final class WSAlertView: UIViewController {
     }
     
     private func setupAttributes() {
-        view.backgroundColor = .black.withAlphaComponent(0.6)
-        containerView.backgroundColor = DesignSystemAsset.Colors.gray600.color
-        containerView.layer.cornerRadius = 20
-        containerView.clipsToBounds = true
-        titleLabel.textColor = DesignSystemAsset.Colors.gray100.color
-        titleLabel.textAlignment = .center
-        messageLabel.textColor = DesignSystemAsset.Colors.gray300.color
+        view.do {
+            $0.backgroundColor = .black.withAlphaComponent(0.6)
+        }
         
-        confirmButton.addTarget(self, action: #selector(didTapConfirmButton), for: .touchUpInside)
-        cancelButton.addTarget(self, action: #selector(didTapCancelButton), for: .touchUpInside)
+        containerView.do {
+            $0.backgroundColor = DesignSystemAsset.Colors.gray600.color
+            $0.layer.cornerRadius = 20
+            $0.clipsToBounds = true
+        }
+        
+        titleLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.gray100.color
+            $0.textAlignment = .center
+        }
+        
+        messageLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.gray300.color
+        }
+        
+        confirmButton.do {
+            $0.addTarget(self, action: #selector(didTapConfirmButton), for: .touchUpInside)
+        }
+        
+        cancelButton.do {
+            $0.addTarget(self, action: #selector(didTapCancelButton), for: .touchUpInside)
+        }
     }
     
     

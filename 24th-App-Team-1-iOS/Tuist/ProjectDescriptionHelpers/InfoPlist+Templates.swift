@@ -11,7 +11,7 @@ extension InfoPlist {
     
     public static var `default`: Self = {
         return .extendingDefault(with: [
-            "BASE_URL": .string("https://24b0b5f1-548f-4c72-aaf9-65f747a2e62b.mock.pstmn.io/api/v1")
+            "BASE_URL": .string("https://2b0c4a7a-16b4-4b4e-a7c2-5494a7c2f696.mock.pstmn.io/api/v1")
         ])
     }()
     
@@ -41,7 +41,7 @@ extension InfoPlist {
                 .string("Pretendard-Medium.otf"),
                 .string("Pretendard-SemiBold.otf")
             ]),
-            "BASE_URL": .string("https://24b0b5f1-548f-4c72-aaf9-65f747a2e62b.mock.pstmn.io/api/v1")
+            "BASE_URL": .string("https://2b0c4a7a-16b4-4b4e-a7c2-5494a7c2f696.mock.pstmn.io/api/v1")
         ]
         
         return InfoPlist.extendingDefault(with: basePlist)

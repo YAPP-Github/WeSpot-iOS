@@ -9,23 +9,34 @@ import UIKit
 import Util
 
 import LoginFeature
+import VoteFeature
+import VoteFeature
+import VoteDomain
+import VoteService
+import Swinject
 import SnapKit
 import ReactorKit
 
-class SceneDelegate: UIResponder, UISceneDelegate {
+public class SceneDelegate: UIResponder, UISceneDelegate {
     
     var window: UIWindow?
+    public let injector: Injector = DependencyInjector(container: Container())
     
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+    public func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let scene = (scene as? UIWindowScene) else { return }
         
-        window = UIWindow(windowScene: scene)
-        //TODO: 임시 코드 입니다 DIContainer 추가 후 변경 예정
-        let signInViewReactor = SignInViewReactor()
-        let signInViewController = SignInViewController(reactor: signInViewReactor)
-        window?.rootViewController = UINavigationController(rootViewController: signInViewController)
-        window?.makeKeyAndVisible()
+        DependencyContainer.shared.injector.assemble([
+            VotePresentationAssembly(),
+            VoteMainPresentationAssembly(),
+            VoteHomePresentationAssembly(),
+            VotePagePresentationAssembly(),
+            VoteResultPresentationAssembly(),
+            DataAssembly(),
+            DomainAssembly()
+        ])
         
+        window = UIWindow(windowScene: scene)
+        window?.rootViewController =  UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(VoteMainViewController.self))
+        window?.makeKeyAndVisible()
     }
-    
 }
