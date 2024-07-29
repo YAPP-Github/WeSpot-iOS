@@ -1,8 +1,8 @@
 //
-//  WSGlobalNotification.swift
-//  Util
+//  NotificationName+Extensions.swift
+//  Extensions
 //
-//  Created by eunseou on 7/20/24.
+//  Created by eunseou on 7/29/24.
 //
 
 import Foundation

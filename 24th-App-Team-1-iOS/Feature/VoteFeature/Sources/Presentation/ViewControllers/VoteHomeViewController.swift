@@ -15,36 +15,36 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-fileprivate typealias VoteStr = VoteStrings
-final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
+fileprivate typealias VoteHomeStr = VoteStrings
+public final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
 
     //MARK: - Properties
     private let voteBannerView: WSBanner = WSBanner(
         image: DesignSystemAsset.Images.invite.image,
-        titleText: VoteStr.voteBannerMainText,
-        subText: VoteStr.voteBannerSubText
+        titleText: VoteHomeStr.voteBannerMainText,
+        subText: VoteHomeStr.voteBannerSubText
     )
     private let voteContainerView: UIView = UIView()
     private let voteConfirmButton: WSButton = WSButton(wsButtonType: .default(12))
     private let voteDateLabel: WSLabel = WSLabel(wsFont: .Body06, text: Date().toFormatString(with: .MddEEE))
-    private let voteDescriptionLabel: WSLabel = WSLabel(wsFont: .Body01, text: VoteStr.voteDescrptionText)
+    private let voteDescriptionLabel: WSLabel = WSLabel(wsFont: .Body01, text: VoteHomeStr.voteDescrptionText)
     private let voteImageView: UIImageView = UIImageView()
     
     //MARK: - LifeCycle
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         
     }
 
     //MARK: - Configure
-    override func setupUI() {
+    public override func setupUI() {
         super.setupUI()
         voteContainerView.addSubviews(voteConfirmButton, voteDateLabel, voteImageView, voteDescriptionLabel)
         
         view.addSubviews(voteBannerView, voteContainerView)
     }
     
-    override func setupAutoLayout() {
+    public override func setupAutoLayout() {
         super.setupAutoLayout()
         
         voteBannerView.snp.makeConstraints {
@@ -85,7 +85,7 @@ final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
         
     }
     
-    override func setupAttributes() {
+    public override func setupAttributes() {
         super.setupAttributes()
         voteContainerView.do {
             $0.backgroundColor = DesignSystemAsset.Colors.gray700.color
@@ -94,7 +94,7 @@ final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
         }
         
         voteConfirmButton.do {
-            $0.setupButton(text: VoteStr.voteText)
+            $0.setupButton(text: VoteHomeStr.voteText)
         }
         
         voteDateLabel.do {
@@ -111,8 +111,14 @@ final class VoteHomeViewController: BaseViewController<VoteHomeViewReactor> {
         }
     }
     
-    override func bind(reactor: Reactor) {
+    public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        voteConfirmButton
+            .rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTappedVoteButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
 }
