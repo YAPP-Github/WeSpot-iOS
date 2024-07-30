@@ -16,6 +16,8 @@ import VoteService
 import Swinject
 import SnapKit
 import ReactorKit
+import RxKakaoSDKAuth
+import KakaoSDKAuth
 
 public class SceneDelegate: UIResponder, UISceneDelegate {
     
@@ -40,4 +42,15 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         window?.rootViewController =  UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(VoteCompleteViewController.self))
         window?.makeKeyAndVisible()
     }
+
+    
+    // kakao login
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        if let url = URLContexts.first?.url {
+            if (AuthApi.isKakaoTalkLoginUrl(url)) {
+                _ = AuthController.rx.handleOpenUrl(url: url)
+            }
+        }
+    }
+    
 }

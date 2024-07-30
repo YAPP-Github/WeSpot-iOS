@@ -35,6 +35,23 @@ extension InfoPlist {
                     ])
                 ]
             ]),
+            "LSApplicationQueriesSchemes": [
+                "kakaokompassauth",
+                "kakaolink",
+                "kakaoplus"
+            ],
+            "KAKAO_NATIVE_APP_KEY": .string("$(KAKAO_NATIVE_APP_KEY)"),
+            "CFBundleURLTypes": .array([
+                .dictionary([
+                    "CFBundleTypeRole": .string("Editor"),
+                    "CFBundleURLSchemes": .array([
+                        .string("kakao$(KAKAO_NATIVE_APP_KEY)")
+                    ])
+                ])
+            ]),
+            "NSAppTransportSecurity": .dictionary([
+                "NSAllowsArbitraryLoads": .boolean(false)
+            ]),
             "UIAppFonts": .array([
                 .string("Pretendard-Regular.otf"),
                 .string("Pretendard-Bold.otf"),
