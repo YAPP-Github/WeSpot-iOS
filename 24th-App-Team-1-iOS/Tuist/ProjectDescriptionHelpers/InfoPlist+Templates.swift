@@ -27,7 +27,12 @@ extension InfoPlist {
                         ])
                     ])
                 ]
-            ])
+            ]),
+            "LSApplicationQueriesSchemes": [
+                "kakaokompassauth",
+                "kakaolink",
+                "kakaoplus"
+            ]
         
         ]
         

@@ -8,6 +8,8 @@
 import UIKit
 import Util
 
+import RxKakaoSDKAuth
+import KakaoSDKAuth
 
 class SceneDelegate: UIResponder, UISceneDelegate {
     
@@ -20,6 +22,15 @@ class SceneDelegate: UIResponder, UISceneDelegate {
         //TODO: ViewControle 생성 해서 RootViewController로 지정 해주세요
         window?.makeKeyAndVisible()
         
+    }
+    
+    // kakao login
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        if let url = URLContexts.first?.url {
+            if (AuthApi.isKakaoTalkLoginUrl(url)) {
+                _ = AuthController.rx.handleOpenUrl(url: url)
+            }
+        }
     }
     
 }

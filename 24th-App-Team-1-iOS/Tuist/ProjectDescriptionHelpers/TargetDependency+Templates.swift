@@ -54,4 +54,12 @@ extension TargetDependency.SPM {
     
     //MARK: DI
     public static let swinject: TargetDependency = .external(name: "Swinject")
+    
+    //MARK: Kakao SDK
+    public static let kakaoSDKCommon: TargetDependency = .external(name: "KakaoSDKCommon")
+    public static let rxKakaoSDKCommon: TargetDependency = .external(name: "RxKakaoSDKCommon")
+    public static let kakaoSDKAuth: TargetDependency = .external(name: "KakaoSDKAuth")
+    public static let rxKakaoSDKAuth: TargetDependency = .external(name: "RxKakaoSDKAuth")
+    public static let kakaoSDKUser: TargetDependency = .external(name: "KakaoSDKUser")
+    public static let rxKakaoSDKUser: TargetDependency = .external(name: "RxKakaoSDKUser")
 }
