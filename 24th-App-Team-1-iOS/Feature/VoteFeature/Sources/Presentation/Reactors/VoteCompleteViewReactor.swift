@@ -36,6 +36,12 @@ public final class VoteCompleteViewReactor: Reactor {
                         .voteHighRankerItem,
                         .voteHighRankerItem
                     ]
+                ),
+                .voteLowRankerInfo(
+                    [
+                        .voteLowRankerItem,
+                        .voteLowRankerItem
+                    ]
                 )
             ],
             isLoading: false
@@ -56,7 +62,7 @@ public final class VoteCompleteViewReactor: Reactor {
         case let .setOnboadingView(isLoading):
             newState.isLoading = isLoading
         case let .setCompleteSection(items):
-            newState.completeSection = [.voteHighRankerInfo(items)]
+            newState.completeSection = [.voteHighRankerInfo(items), .voteLowRankerInfo(items)]
         }
         return newState
     }

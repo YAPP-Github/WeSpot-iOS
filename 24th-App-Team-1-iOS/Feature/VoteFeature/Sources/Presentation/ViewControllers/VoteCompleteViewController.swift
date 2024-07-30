@@ -17,6 +17,7 @@ import RxDataSources
 import ReactorKit
 
 typealias VoteCompleteStr = VoteStrings
+typealias VoteCompleteId = VoteStrings.Identifier
 public final class VoteCompleteViewController: BaseViewController<VoteCompleteViewReactor> {
 
     //MARK: - Properties
@@ -44,11 +45,12 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         
         switch sectionItem {
         case .voteHighRankerItem:
-            guard let highRankerCell = collectionView.dequeueReusableCell(withReuseIdentifier: "VoteHighCollectionViewCell", for: indexPath) as? VoteHighCollectionViewCell else { return UICollectionViewCell() }
+            guard let highRankerCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteCompleteId.voteHighCell, for: indexPath) as? VoteHighCollectionViewCell else { return UICollectionViewCell() }
             
             return highRankerCell
         case .voteLowRankerItem:
-            return UICollectionViewCell()
+            guard let rowRankerCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteCompleteId.voteLowCell, for: indexPath) as? VoteLowCollectionViewCell else { return UICollectionViewCell() }
+            return rowRankerCell
         }
     }
     
@@ -131,7 +133,8 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         }
         
         completeCollectionView.do {
-            $0.register(VoteHighCollectionViewCell.self, forCellWithReuseIdentifier: "VoteHighCollectionViewCell")
+            $0.register(VoteHighCollectionViewCell.self, forCellWithReuseIdentifier: VoteCompleteId.voteHighCell)
+            $0.register(VoteLowCollectionViewCell.self, forCellWithReuseIdentifier: VoteCompleteId.voteLowCell)
             $0.backgroundColor = .clear
             $0.showsVerticalScrollIndicator = false
             $0.showsVerticalScrollIndicator = false
@@ -170,29 +173,35 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
     }
     
     private func createRankerHorizontalSection() -> NSCollectionLayoutSection {
-        let rankerHorizontalItemSize: NSCollectionLayoutSize = .init(
-            widthDimension: .absolute(118),
-            heightDimension: .absolute(172)
-        )
+        let itemWidth: CGFloat = 108
+        let itemHeight: CGFloat = 172
+        let spacing: CGFloat = 10
+        let xOffset: CGFloat = 16
+        let yOffset: CGFloat = 0
+        let yOffsetIncreased: CGFloat = -36
         
-        let rankerHorizontalItem: NSCollectionLayoutItem = NSCollectionLayoutItem(layoutSize: rankerHorizontalItemSize)
-        
-        rankerHorizontalItem.contentInsets = .init(top: 0, leading: 5, bottom: 0, trailing: 5)
+        let rankerHorizontalItem = (0...2).map { index -> NSCollectionLayoutGroupCustomItem in
+            let xPosition = CGFloat(index) * (itemWidth + spacing) + xOffset
+            let yPosition = index == 1 ? yOffsetIncreased : yOffset
+             
+            return NSCollectionLayoutGroupCustomItem(
+                frame: CGRect(x: xPosition, y: yPosition, width: itemWidth, height: itemHeight)
+            )
+         }
         
         let rankerHorizontalGroupSize: NSCollectionLayoutSize = .init(
             widthDimension: .absolute(view.frame.width),
-            heightDimension: .absolute(230)
+            heightDimension: .absolute(200)
         )
         
-        let rankerHorizontalGroup: NSCollectionLayoutGroup = NSCollectionLayoutGroup.horizontal(
-            layoutSize: rankerHorizontalGroupSize,
-            subitems: [rankerHorizontalItem]
-        )
+        let rankerHorizontalGroup: NSCollectionLayoutGroup = NSCollectionLayoutGroup.custom(layoutSize: rankerHorizontalGroupSize) { env in
+            return rankerHorizontalItem
+        }
         
         let rankerHorizontalSection: NSCollectionLayoutSection = NSCollectionLayoutSection(group: rankerHorizontalGroup)
         
         
-        rankerHorizontalSection.contentInsets = .init(top: 20, leading: 10, bottom: 0, trailing: 10)
+        rankerHorizontalSection.contentInsets = .init(top: 55, leading: 0, bottom: 0, trailing: 0)
         rankerHorizontalSection.orthogonalScrollingBehavior = .none
         
         
@@ -201,16 +210,15 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
     
     private func createRankerVerticalSection() -> NSCollectionLayoutSection {
         let rankerVerticalItemSize: NSCollectionLayoutSize = .init(
-            widthDimension: .absolute(view.frame.width),
-            heightDimension: .absolute(48)
+            widthDimension: .absolute(view.frame.width - 60),
+            heightDimension: .absolute(78)
         )
         
         let rankerVerticalItem: NSCollectionLayoutItem = .init(layoutSize: rankerVerticalItemSize)
         
-        rankerVerticalItem.contentInsets = .init(top: 30, leading: 0, bottom: 30, trailing: 0)
         
         let rankerVerticalGroupSize: NSCollectionLayoutSize = .init(
-            widthDimension: .absolute(view.frame.width),
+            widthDimension: .absolute(view.frame.width - 60),
             heightDimension: .absolute(156)
         )
         
@@ -218,6 +226,8 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             layoutSize: rankerVerticalGroupSize,
             subitems: [rankerVerticalItem]
         )
+        
+        rankerVerticalGroup.contentInsets = .init(top: 0, leading: 30, bottom: 0, trailing: 30)
         
         let rankerVerticalSection: NSCollectionLayoutSection = NSCollectionLayoutSection(group: rankerVerticalGroup)
         
