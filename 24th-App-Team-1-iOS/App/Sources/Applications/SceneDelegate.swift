@@ -31,12 +31,13 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             VoteHomePresentationAssembly(),
             VotePagePresentationAssembly(),
             VoteResultPresentationAssembly(),
+            VoteCompletePresentationAssembly(),
             DataAssembly(),
             DomainAssembly()
         ])
         
         window = UIWindow(windowScene: scene)
-        window?.rootViewController =  UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(VoteMainViewController.self))
+        window?.rootViewController =  UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(VoteCompleteViewController.self))
         window?.makeKeyAndVisible()
     }
 }
