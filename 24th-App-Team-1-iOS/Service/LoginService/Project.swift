@@ -12,7 +12,6 @@ let loginService = Project.makeProject(
     module: .service(.LoginService),
     targets: [
         .service(module: .LoginService, dependencies: [
-            .domain(module: .LoginDomain),
             .core(module: .Storage),
             .core(module: .Networking),
             .shared(module: .ThirdPartyLib)
