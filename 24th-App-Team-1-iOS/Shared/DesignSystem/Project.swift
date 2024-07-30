@@ -12,7 +12,13 @@ let project = Project.makeProject(
     module: .shared(.DesignSystem),
     targets: [
         .share(module: .DesignSystem, dependencies: [
-            .shared(module: .ThirdPartyLib)
+            .shared(module: .ThirdPartyLib),
+            .core(module: .Extensions)
         ])
+    ],
+    resourceSynthesizers: [
+        .custom(name: "lottie", parser: .json, extensions: ["lottie"]),
+        .assets(),
+        .fonts(),
     ]
 )

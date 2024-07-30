@@ -7,12 +7,6 @@
 
 import UIKit
 
-public enum PretendardFont: String {
-    case bold = "Pretendard-Bold"
-    case semibold = "Pretendard-SemiBold"
-    case medium = "Pretendard-Medium"
-    case regular = "Pretendard-Regular"
-}
 
 public enum WSFont {
     case Header01
@@ -28,6 +22,7 @@ public enum WSFont {
     case Body08
     case Body09
     case Body10
+    case Body11
     case Badge
     
     var size: CGFloat {
@@ -58,57 +53,59 @@ public enum WSFont {
             12
         case .Body10:
             10
+        case .Body11:
+            10
         case .Badge:
             12
         }
     }
     
-    var weight: PretendardFont {
+    var weight: DesignSystemFontConvertible {
         switch self {
         case .Header01:
-                .bold
+            DesignSystemFontFamily.Pretendard.bold
         case .Header02:
-                .semibold
+            DesignSystemFontFamily.Pretendard.semiBold
         case .Header03:
-                .semibold
+            DesignSystemFontFamily.Pretendard.semiBold
         case .Body01:
-                .bold
+            DesignSystemFontFamily.Pretendard.bold
         case .Body02:
-                .semibold
+            DesignSystemFontFamily.Pretendard.semiBold
         case .Body03:
-                .semibold
+            DesignSystemFontFamily.Pretendard.semiBold
         case .Body04:
-                .medium
+            DesignSystemFontFamily.Pretendard.medium
         case .Body05:
-                .semibold
+            DesignSystemFontFamily.Pretendard.semiBold
         case .Body06:
-                .medium
+            DesignSystemFontFamily.Pretendard.medium
         case .Body07:
-                .medium
+            DesignSystemFontFamily.Pretendard.medium
         case .Body08:
-                .regular
+            DesignSystemFontFamily.Pretendard.regular
         case .Body09:
-                .medium
+            DesignSystemFontFamily.Pretendard.medium
         case .Body10:
-                .medium
+            DesignSystemFontFamily.Pretendard.semiBold
+        case .Body11:
+            DesignSystemFontFamily.Pretendard.medium
         case .Badge:
-                .semibold
+            DesignSystemFontFamily.Pretendard.semiBold
         }
     }
     
     
     var lineHeight: CGFloat {
-        return 1.5
+        return 1.26
     }
     
     var letterSpacing: CGFloat {
         return 0.0
     }
     
-    func font() -> UIFont {
-        let fontName = self.weight.rawValue
-        let fontSize = self.size
-        return UIFont(name: fontName, size: fontSize) ?? UIFont.systemFont(ofSize: fontSize)
+    public func font() -> UIFont {
+        return DesignSystemFontConvertible.Font(font: weight, size: size) ?? UIFont.systemFont(ofSize: size)
     }
 }
 

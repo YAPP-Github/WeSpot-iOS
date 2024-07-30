@@ -45,19 +45,28 @@ extension ModulePaths {
 
 extension ModulePaths {
     public enum Feature: String, ModulePathProtocol {
+        case LoginFeature
         case ProfileFeature
+        case VoteFeature
+        case MessageFeature
     }
 }
 
 extension ModulePaths {
     public enum Domain: String, ModulePathProtocol {
+        case LoginDomain
         case ProfileDomain
+        case MessageDomain
+        case VoteDomain
     }
 }
 
 extension ModulePaths {
     public enum Service: String, ModulePathProtocol {
+        case LoginService
+        case VoteService
         case ProfileService
+        case MessageService
     }
 }
 

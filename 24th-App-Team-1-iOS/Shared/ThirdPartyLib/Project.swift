@@ -26,7 +26,8 @@ let project = Project
                 .SPM.kakaoSDKAuth,
                 .SPM.rxKakaoSDKAuth,
                 .SPM.kakaoSDKUser,
-                .SPM.rxKakaoSDKUser
+                .SPM.rxKakaoSDKUser,
+                .SPM.lottie
             ])
         ]
     )

@@ -1,19 +1,8 @@
 {
   "images" : [
     {
-      "filename" : "Group 482145.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "Group 482145@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "filename" : "Group 482145@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
+      "filename" : "SimgbolLogo.svg",
+      "idiom" : "universal"
     }
   ],
   "info" : {

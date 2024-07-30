@@ -1,0 +1,16 @@
+//
+//  VoteRepositoryProtocol.swift
+//  VoteDomain
+//
+//  Created by Kim dohyun on 7/22/24.
+//
+
+import Foundation
+
+import RxSwift
+
+public protocol VoteRepositoryProtocol {
+    func fetchVoteOptions() -> Single<VoteResponseEntity?>
+    func fetchWinnerVoteOptions(query: VoteWinnerRequestQuery) -> Single<VoteWinnerResponseEntity?>
+    func uploadFinalVoteResults(body: [CreateVoteItemReqeuest]) -> Single<CreateVoteEntity?>
+}

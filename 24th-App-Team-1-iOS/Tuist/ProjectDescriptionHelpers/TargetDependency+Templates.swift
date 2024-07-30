@@ -48,6 +48,7 @@ extension TargetDependency.SPM {
     //MARK: DesignSystems
     public static let snapKit: TargetDependency = .external(name: "SnapKit")
     public static let then: TargetDependency = .external(name: "Then")
+    public static let lottie: TargetDependency = .external(name: "Lottie")
     
     //MARK: Network
     public static let alamofire: TargetDependency = .external(name: "Alamofire")
