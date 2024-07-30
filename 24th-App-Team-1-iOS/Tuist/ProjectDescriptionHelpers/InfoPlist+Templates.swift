@@ -32,8 +32,19 @@ extension InfoPlist {
                 "kakaokompassauth",
                 "kakaolink",
                 "kakaoplus"
-            ]
-        
+            ],
+            "KAKAO_NATIVE_APP_KEY": .string("$(KAKAO_NATIVE_APP_KEY)"),
+            "CFBundleURLTypes": .array([
+                .dictionary([
+                    "CFBundleTypeRole": .string("Editor"),
+                    "CFBundleURLSchemes": .array([
+                        .string("kakao$(KAKAO_NATIVE_APP_KEY)")
+                    ])
+                ])
+            ]),
+            "NSAppTransportSecurity": .dictionary([
+                "NSAllowsArbitraryLoads": .boolean(false)
+            ])
         ]
         
         return InfoPlist.extendingDefault(with: basePlist)
