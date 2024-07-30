@@ -107,7 +107,7 @@ public final class VoteHomeViewController: BaseViewController<VoteHomeViewReacto
         
         voteImageView.do {
             $0.contentMode = .scaleAspectFill
-            $0.image = DesignSystemAsset.Images.voteSymbol.image
+            $0.image = DesignSystemAsset.Images.imgMainSymbol.image
         }
     }
     

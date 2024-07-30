@@ -82,7 +82,7 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
         }
         
         backgrounImageView.do {
-            $0.image = DesignSystemAsset.Images.voteBackground.image
+            $0.image = DesignSystemAsset.Images.bgResultGradation.image
             $0.contentMode = .scaleAspectFill
         }
         
