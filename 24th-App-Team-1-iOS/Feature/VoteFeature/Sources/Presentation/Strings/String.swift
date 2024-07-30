@@ -45,4 +45,5 @@ extension String.VoteResult.Identifier {
     static let voteProcessCell = "VoteProcessTableViewCell"
     static let voteHighCell = "VoteHighCollectionViewCell"
     static let voteLowCell = "VoteLowCollectionViewCell"
+    static let voteAllCell = "VoteAllCollectionViewCell"
 }

@@ -26,15 +26,14 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
     private let descrptionLabel: WSLabel = WSLabel(wsFont: .Header01, text: VoteCompleteStr.voteCompleteText)
     private let noticeButton: WSButton = WSButton(wsButtonType: .default(12))
     private let shareButton: UIButton = UIButton()
+    private let completePageControl: UIPageControl = UIPageControl()
     
-    private lazy var completeCollectionViewLayout: UICollectionViewCompositionalLayout = UICollectionViewCompositionalLayout { [weak self ] section, _ in
+    private lazy var completeCollectionViewLayout: UICollectionViewCompositionalLayout = UICollectionViewCompositionalLayout { [weak self] section, _ in
         let sectionItem = self?.completeCollectionViewDataSources[section]
         
         switch sectionItem {
-        case .voteHighRankerInfo:
-            return self?.createRankerHorizontalSection()
-        case .voteLowRankerInfo:
-            return self?.createRankerVerticalSection()
+        case .voteAllRankerInfo:
+            return self?.createRankerAllLayoutSection()
         case .none:
             break
         }
@@ -44,13 +43,11 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
     private lazy var completeCollectionViewDataSources: RxCollectionViewSectionedReloadDataSource<VoteCompleteSection> = .init { dataSources, collectionView, indexPath, sectionItem in
         
         switch sectionItem {
-        case .voteHighRankerItem:
-            guard let highRankerCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteCompleteId.voteHighCell, for: indexPath) as? VoteHighCollectionViewCell else { return UICollectionViewCell() }
+        case let .voteAllRankerItem(cellReactor):
             
-            return highRankerCell
-        case .voteLowRankerItem:
-            guard let rowRankerCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteCompleteId.voteLowCell, for: indexPath) as? VoteLowCollectionViewCell else { return UICollectionViewCell() }
-            return rowRankerCell
+            guard let allRankerCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteCompleteId.voteAllCell, for: indexPath) as? VoteAllCollectionViewCell else { return UICollectionViewCell() }
+            allRankerCell.reactor = cellReactor
+            return allRankerCell
         }
     }
     
@@ -59,26 +56,24 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
     //MARK: - LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
     }
 
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
-        view.addSubviews(shareButton, noticeButton, descrptionLabel, completeCollectionView)
+        view.addSubviews(shareButton, completePageControl, noticeButton, descrptionLabel, completeCollectionView, lendingView, onboardingView)
     }
     
     public override func setupAutoLayout() {
         super.setupAutoLayout()
 
-//TODO: CollectionView 테스트로로 임시 코드 주석 처리
-//        onboardingView.snp.makeConstraints {
-//            $0.edges.equalToSuperview()
-//        }
-//        
-//        lendingView.snp.makeConstraints {
-//            $0.edges.equalToSuperview()
-//        }
+        onboardingView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        lendingView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
         
         descrptionLabel.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom)
@@ -102,7 +97,12 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         completeCollectionView.snp.makeConstraints {
             $0.top.equalTo(descrptionLabel.snp.bottom).offset(40)
             $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalTo(shareButton.snp.top)
+            $0.height.equalTo(410)
+        }
+        
+        completePageControl.snp.makeConstraints {
+            $0.top.equalTo(completeCollectionView.snp.bottom).offset(56)
+            $0.centerX.equalToSuperview()
         }
         
     }
@@ -132,12 +132,16 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             $0.setupFont(font: .Body03)
         }
         
+        completePageControl.do {
+            $0.currentPage = 0
+            $0.numberOfPages = 3
+        }
+        
         completeCollectionView.do {
-            $0.register(VoteHighCollectionViewCell.self, forCellWithReuseIdentifier: VoteCompleteId.voteHighCell)
-            $0.register(VoteLowCollectionViewCell.self, forCellWithReuseIdentifier: VoteCompleteId.voteLowCell)
+            $0.register(VoteAllCollectionViewCell.self, forCellWithReuseIdentifier: VoteCompleteId.voteAllCell)
             $0.backgroundColor = .clear
             $0.showsVerticalScrollIndicator = false
-            $0.showsVerticalScrollIndicator = false
+            $0.showsHorizontalScrollIndicator = false
         }
         
     }
@@ -155,85 +159,56 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             .drive(completeCollectionView.rx.items(dataSource: completeCollectionViewDataSources))
             .disposed(by: disposeBag)
         
-//TODO: CollectionView 테스트로로 임시 코드 주석 처리
-//        lendingView
-//            .rx.swipeGestureRecognizer(direction: .right)
-//            .bind(with: self) { owner, _ in
-//                owner.fadeInOutLendigView()
-//            }
-//            .disposed(by: disposeBag)
-//        
-//        reactor.state
-//            .map { $0.isLoading }
-//            .distinctUntilChanged()
-//            .bind(with: self) { owner, _ in
-//                owner.fadeInOutOnboardingView()
-//            }
-//            .disposed(by: disposeBag)
+        reactor.state
+            .map { $0.currentPage }
+            .distinctUntilChanged()
+            .bind(to: completePageControl.rx.currentPage)
+            .disposed(by: disposeBag)
+        
+        lendingView
+            .rx.swipeGestureRecognizer(direction: .right)
+            .bind(with: self) { owner, _ in
+                owner.fadeInOutLendigView()
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isLoading }
+            .distinctUntilChanged()
+            .bind(with: self) { owner, _ in
+                owner.fadeInOutOnboardingView()
+            }
+            .disposed(by: disposeBag)
     }
     
-    private func createRankerHorizontalSection() -> NSCollectionLayoutSection {
-        let itemWidth: CGFloat = 108
-        let itemHeight: CGFloat = 172
-        let spacing: CGFloat = 10
-        let xOffset: CGFloat = 16
-        let yOffset: CGFloat = 0
-        let yOffsetIncreased: CGFloat = -36
-        
-        let rankerHorizontalItem = (0...2).map { index -> NSCollectionLayoutGroupCustomItem in
-            let xPosition = CGFloat(index) * (itemWidth + spacing) + xOffset
-            let yPosition = index == 1 ? yOffsetIncreased : yOffset
-             
-            return NSCollectionLayoutGroupCustomItem(
-                frame: CGRect(x: xPosition, y: yPosition, width: itemWidth, height: itemHeight)
-            )
-         }
-        
-        let rankerHorizontalGroupSize: NSCollectionLayoutSize = .init(
+    private func createRankerAllLayoutSection() -> NSCollectionLayoutSection {
+        let rankerAllItemSize: NSCollectionLayoutSize = .init(
             widthDimension: .absolute(view.frame.width),
-            heightDimension: .absolute(200)
+            heightDimension: .absolute(410)
         )
         
-        let rankerHorizontalGroup: NSCollectionLayoutGroup = NSCollectionLayoutGroup.custom(layoutSize: rankerHorizontalGroupSize) { env in
-            return rankerHorizontalItem
+        let rankerAllItem: NSCollectionLayoutItem = NSCollectionLayoutItem(layoutSize: rankerAllItemSize)
+        
+        let rankerGroupSize: NSCollectionLayoutSize = .init(
+            widthDimension: .absolute(view.frame.width),
+            heightDimension: .absolute(410)
+        )
+        
+        let rankerAllGroup: NSCollectionLayoutGroup = NSCollectionLayoutGroup.horizontal(
+            layoutSize: rankerGroupSize,
+            subitems: [rankerAllItem]
+        )
+        
+        let rankerGroupSection: NSCollectionLayoutSection = NSCollectionLayoutSection(group: rankerAllGroup)
+        
+        rankerGroupSection.visibleItemsInvalidationHandler = { [weak self] visibleItems, offset, env in
+            let position = offset.x / env.container.contentSize.width
+            let roundPosition = Int(round(position))
+            self?.reactor?.action.onNext(.didShowVisibleCell(roundPosition))
         }
         
-        let rankerHorizontalSection: NSCollectionLayoutSection = NSCollectionLayoutSection(group: rankerHorizontalGroup)
-        
-        
-        rankerHorizontalSection.contentInsets = .init(top: 55, leading: 0, bottom: 0, trailing: 0)
-        rankerHorizontalSection.orthogonalScrollingBehavior = .none
-        
-        
-        return rankerHorizontalSection
-    }
-    
-    private func createRankerVerticalSection() -> NSCollectionLayoutSection {
-        let rankerVerticalItemSize: NSCollectionLayoutSize = .init(
-            widthDimension: .absolute(view.frame.width - 60),
-            heightDimension: .absolute(78)
-        )
-        
-        let rankerVerticalItem: NSCollectionLayoutItem = .init(layoutSize: rankerVerticalItemSize)
-        
-        
-        let rankerVerticalGroupSize: NSCollectionLayoutSize = .init(
-            widthDimension: .absolute(view.frame.width - 60),
-            heightDimension: .absolute(156)
-        )
-        
-        let rankerVerticalGroup: NSCollectionLayoutGroup = NSCollectionLayoutGroup.vertical(
-            layoutSize: rankerVerticalGroupSize,
-            subitems: [rankerVerticalItem]
-        )
-        
-        rankerVerticalGroup.contentInsets = .init(top: 0, leading: 30, bottom: 0, trailing: 30)
-        
-        let rankerVerticalSection: NSCollectionLayoutSection = NSCollectionLayoutSection(group: rankerVerticalGroup)
-        
-        rankerVerticalSection.orthogonalScrollingBehavior = .none
-        
-        return rankerVerticalSection
+        rankerGroupSection.orthogonalScrollingBehavior = .groupPaging
+        return rankerGroupSection
     }
 }
 

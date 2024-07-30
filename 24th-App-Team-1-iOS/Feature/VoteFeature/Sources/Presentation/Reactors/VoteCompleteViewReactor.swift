@@ -16,35 +16,33 @@ public final class VoteCompleteViewReactor: Reactor {
     public struct State {
         @Pulse var completeSection: [VoteCompleteSection]
         var isLoading: Bool
+        var currentPage: Int
     }
     
     public enum Action {
         case viewDidLoad
+        case didShowVisibleCell(_ index: Int)
     }
     
     public enum Mutation {
         case setOnboadingView(Bool)
+        case setCurrentPageControl(Int)
         case setCompleteSection([VoteCompleteItem])
     }
     
     public init() {
         self.initialState = State(
             completeSection: [
-                .voteHighRankerInfo(
+                .voteAllRankerInfo(
                     [
-                        .voteHighRankerItem,
-                        .voteHighRankerItem,
-                        .voteHighRankerItem
-                    ]
-                ),
-                .voteLowRankerInfo(
-                    [
-                        .voteLowRankerItem,
-                        .voteLowRankerItem
+                        .voteAllRankerItem(VoteAllCellReactor()),
+                        .voteAllRankerItem(VoteAllCellReactor()),
+                        .voteAllRankerItem(VoteAllCellReactor())
                     ]
                 )
             ],
-            isLoading: false
+            isLoading: false,
+            currentPage: 0
         )
     }
     
@@ -53,6 +51,8 @@ public final class VoteCompleteViewReactor: Reactor {
         switch action {
         case .viewDidLoad:
             return .just(.setOnboadingView(true))
+        case let .didShowVisibleCell(index):
+            return .just(.setCurrentPageControl(index))
         }
     }
     
@@ -61,8 +61,11 @@ public final class VoteCompleteViewReactor: Reactor {
         switch mutation {
         case let .setOnboadingView(isLoading):
             newState.isLoading = isLoading
+        case let .setCurrentPageControl(currentPage):
+            newState.currentPage = currentPage
         case let .setCompleteSection(items):
-            newState.completeSection = [.voteHighRankerInfo(items), .voteLowRankerInfo(items)]
+            newState.completeSection = [.voteAllRankerInfo(items)]
+            
         }
         return newState
     }
