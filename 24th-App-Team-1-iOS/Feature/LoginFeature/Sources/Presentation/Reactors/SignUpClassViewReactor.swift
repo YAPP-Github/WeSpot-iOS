@@ -25,6 +25,10 @@ public final class SignUpClassViewReactor: Reactor {
     
     public var initialState: State = State()
     
+    public init() {
+        self.initialState = State()
+    }
+    
     public func mutate(action: Action) -> Observable<Mutation> {
         
         return .empty()

@@ -12,7 +12,7 @@ import ReactorKit
 
 public final class SignUpSchoolViewReactor: Reactor {
     
-    private let fetchSchoolListUseCase: FetchSchoolListUseCase
+    private let fetchSchoolListUseCase: FetchSchoolListUseCaseProtocol
     public var initialState: State
     
     public struct State {
@@ -31,9 +31,9 @@ public final class SignUpSchoolViewReactor: Reactor {
         case setSelectedSchool(String?)
     }
     
-    public init(fetchSchoolListUseCase: FetchSchoolListUseCase, initialState: State) {
+    public init(fetchSchoolListUseCase: FetchSchoolListUseCaseProtocol) {
         self.fetchSchoolListUseCase = fetchSchoolListUseCase
-        self.initialState = initialState
+        self.initialState = State()
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
