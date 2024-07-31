@@ -198,7 +198,7 @@ extension Target {
         - Returns: Target Type
      */
     public static func app(module: ModulePaths.App, dependencies: [TargetDependency]) -> Self {
-        TargetConfig(infoPlist: .makeInfoPlist() ,sources: .sources, resources: .resources)
+        TargetConfig(infoPlist: .makeInfoPlist() ,sources: .sources, resources: .resources, entitlements: .appEntitlements())
             .makeApp(with: module.appName, bundleId: module.appBundleId, dependencies: dependencies)
     }
 
