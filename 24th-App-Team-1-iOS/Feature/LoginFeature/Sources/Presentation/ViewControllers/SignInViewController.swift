@@ -7,6 +7,7 @@
 
 import UIKit
 import Util
+import Storage
 import DesignSystem
 
 import Then
@@ -30,6 +31,12 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        UserDefaultsManager.shared.isAccessed = true
     }
     
     //MARK: - Configure

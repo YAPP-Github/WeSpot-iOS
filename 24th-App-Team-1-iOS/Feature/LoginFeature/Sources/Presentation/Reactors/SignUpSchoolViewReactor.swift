@@ -6,14 +6,18 @@
 //
 
 import Foundation
+import LoginDomain
 
 import ReactorKit
 
 public final class SignUpSchoolViewReactor: Reactor {
     
+    private let fetchSchoolListUseCase: FetchSchoolListUseCase
+    public var initialState: State
+    
     public struct State {
         var schoolName: String = ""
-        var schoolList: [String] = []
+        var schoolList: [SchoolListEntity] = []
         var selectedSchool: String?
     }
     
@@ -23,25 +27,30 @@ public final class SignUpSchoolViewReactor: Reactor {
     }
     
     public enum Mutation {
-        case setSchoolList(String, [String])
+        case setSchoolList([SchoolListEntity])
         case setSelectedSchool(String?)
     }
     
-    public var initialState: State = State()
-    
-    public init() {
-        self.initialState = State()
+    public init(fetchSchoolListUseCase: FetchSchoolListUseCase, initialState: State) {
+        self.fetchSchoolListUseCase = fetchSchoolListUseCase
+        self.initialState = initialState
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .searchSchool(let schoolName):
             if schoolName.isEmpty {
-                return .just(.setSchoolList(schoolName, []))
+                return .just(.setSchoolList([]))
             }
-            let randomCount = Int.random(in: 0...3)
-            let schoolList = Array(repeating: "test", count: randomCount)
-            return .just(.setSchoolList(schoolName, schoolList))
+            
+            let query = SchoolListRequestQuery(name: schoolName)
+            
+            return fetchSchoolListUseCase
+                .execute(query: query)
+                .asObservable()
+                .map { entity in
+                    return .setSchoolList(entity?.schools ?? [])
+                }
         case .selectSchool(let schoolName):
             return .just(.setSelectedSchool(schoolName))
         }
@@ -50,8 +59,7 @@ public final class SignUpSchoolViewReactor: Reactor {
     public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case .setSchoolList(let schoolName, let results):
-            newState.schoolName = schoolName
+        case .setSchoolList(let results):
             newState.schoolList = results
         case .setSelectedSchool(let schoolName):
             newState.selectedSchool = schoolName
