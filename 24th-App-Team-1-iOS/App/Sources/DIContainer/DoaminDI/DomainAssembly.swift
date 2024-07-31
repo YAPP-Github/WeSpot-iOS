@@ -7,11 +7,45 @@
 
 import Foundation
 import VoteDomain
+import LoginDomain
 
 import Swinject
 
 struct DomainAssembly: Assembly {
     func assemble(container: Container) {
+        
+        // login
+        container.register(CreateAccountUseCaseProtocol.self) { resovler in
+            let repository = resovler.resolve(LoginRepositoryProtocol.self)!
+            return CreateAccountUseCase(loginRepository: repository)
+        }
+        
+        container.register(createProfanityCheckUseCaseProtocol.self) { resovler in
+            let repository = resovler.resolve(LoginRepositoryProtocol.self)!
+            return createProfanityCheckUseCase(loginRepository: repository)
+        }
+        
+        container.register(CreateRefreshTokenUseCaseProtocol.self) { resovler in
+            let repository = resovler.resolve(LoginRepositoryProtocol.self)!
+            return createRefreshTokenUseCase(loginRepository: repository)
+        }
+        
+        container.register(CreateRefreshTokenUseCaseProtocol.self) { resovler in
+            let repository = resovler.resolve(LoginRepositoryProtocol.self)!
+            return createRefreshTokenUseCase(loginRepository: repository)
+        }
+        
+        container.register(CreateSignUpTokenUseCaseProtocol.self) { resovler in
+            let repository = resovler.resolve(LoginRepositoryProtocol.self)!
+            return createSignUpTokenUseCase(loginRepository: repository)
+        }
+        
+        container.register(FetchSchoolListUseCaseProtocol.self) { resovler in
+            let repository = resovler.resolve(LoginRepositoryProtocol.self)!
+            return FetchSchoolListUseCase(loginRepository: repository)
+        }
+        
+        // vote
         container.register(FetchVoteOptionsUseCaseProtocol.self) { resolver in
             let repository = resolver.resolve(VoteRepositoryProtocol.self)!
             return FetchVoteOptionsUseCase(voteRepository: repository)

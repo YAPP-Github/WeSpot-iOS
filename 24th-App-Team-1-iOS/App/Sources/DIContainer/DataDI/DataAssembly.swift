@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import LoginDomain
+import LoginService
 import VoteDomain
 import VoteService
 import Networking
@@ -17,6 +19,10 @@ struct DataAssembly: Assembly {
     func assemble(container: Container) {
         container.register(VoteRepositoryProtocol.self) { _ in
             return VoteRepository()
+        }
+        
+        container.register(LoginRepositoryProtocol.self) { _ in
+            return LoginRepository()
         }
     }
 }
