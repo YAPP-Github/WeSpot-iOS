@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct CreateProfanityCheckRequestDTO: Decodable {
+public struct CreateProfanityCheckRequestDTO: Encodable {
     public let message: String
     
     public init(message: String) {

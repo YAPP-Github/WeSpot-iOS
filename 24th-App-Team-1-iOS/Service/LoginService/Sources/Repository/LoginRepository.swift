@@ -33,7 +33,7 @@ public final class LoginRepository: LoginRepositoryProtocol {
     }
     
     public func createAccount(body: CreateAccountRequest) -> Single<CreateAccountResponseEntity?> {
-        let consents = Consents(marketing: body.consents.marketing)
+        let consents = ConsentsRequestDTO(marketing: body.consents.marketing)
         let body = CreateAccountRequestDTO(name: body.name, gender: body.gender, schoolId: body.schoolId, grade: body.grade, classNumber: body.classNumber, consents: consents, signUpToken: body.signUpToken)
         let endPoint = LoginEndPoint.createAccount(body)
         
@@ -69,7 +69,7 @@ public final class LoginRepository: LoginRepositoryProtocol {
             .asSingle()
     }
     
-    public func createProfanityCheck(body: CreateProfanityCheckRequest) -> Single<Void?> {
+    public func createProfanityCheck(body: CreateProfanityCheckRequest) -> Single<Void> {
         let query = CreateProfanityCheckRequestDTO(message: body.message)
         let endPoint = LoginEndPoint.createProfanityCheck(query)
         
@@ -77,5 +77,6 @@ public final class LoginRepository: LoginRepositoryProtocol {
             .asObservable()
             .logErrorIfDetected(category: Network.error)
             .asSingle()
+            .map { _ in return Void() }
     }
 }

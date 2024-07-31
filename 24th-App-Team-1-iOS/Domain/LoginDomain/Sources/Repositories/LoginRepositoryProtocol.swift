@@ -14,5 +14,5 @@ public protocol LoginRepositoryProtocol {
     func createAccount(body: CreateAccountRequest) -> Single<CreateAccountResponseEntity?> //회원가입
     func createRefreshToken(body: CreateRefreshTokenRequest) -> Single<CreateRefreshTokenResponseEntity?> // 토큰 재발행
     func fetchSchoolList(query: SchoolListRequestQuery) -> Single<SchoolListResponseEntity?> // 학교 검색
-    func createProfanityCheck(body: CreateProfanityCheckRequest) -> Single<Void?>
+    func createProfanityCheck(body: CreateProfanityCheckRequest) -> Single<Void>
 }
