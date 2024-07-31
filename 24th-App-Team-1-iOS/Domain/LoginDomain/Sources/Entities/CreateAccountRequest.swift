@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Consents {
+public struct ConsentsRequest {
     public let marketing: Bool
     
     public init(marketing: Bool) {
@@ -21,10 +21,10 @@ public struct CreateAccountRequest {
     public let schoolId: Int
     public let grade: Int
     public let classNumber: Int
-    public let consents: Consents
+    public let consents: ConsentsRequest
     public let signUpToken: String
     
-    public init(name: String, gender: String, schoolId: Int, grade: Int, classNumber: Int, consents: Consents, signUpToken: String) {
+    public init(name: String, gender: String, schoolId: Int, grade: Int, classNumber: Int, consents: ConsentsRequest, signUpToken: String) {
         self.name = name
         self.gender = gender
         self.schoolId = schoolId
