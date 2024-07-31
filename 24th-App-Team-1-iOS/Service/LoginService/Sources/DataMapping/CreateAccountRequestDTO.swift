@@ -16,6 +16,15 @@ public struct CreateAccountRequestDTO: Encodable {
     public let consents: ConsentsRequestDTO
     public let signUpToken: String
     
+    public init(name: String, gender: String, schoolId: Int, grade: Int, classNumber: Int, consents: ConsentsRequestDTO, signUpToken: String) {
+        self.name = name
+        self.gender = gender
+        self.schoolId = schoolId
+        self.grade = grade
+        self.classNumber = classNumber
+        self.consents = consents
+        self.signUpToken = signUpToken
+    }
 }
 
 public struct ConsentsRequestDTO: Encodable {

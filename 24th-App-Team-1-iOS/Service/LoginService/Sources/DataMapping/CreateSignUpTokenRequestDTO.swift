@@ -12,4 +12,11 @@ public struct CreateSignUpTokenRequestDTO: Encodable {
     public let authorizationCode: String
     public let identityToken: String
     public let fcmToken: String
+    
+    public init(socialType: String, authorizationCode: String, identityToken: String, fcmToken: String) {
+        self.socialType = socialType
+        self.authorizationCode = authorizationCode
+        self.identityToken = identityToken
+        self.fcmToken = fcmToken
+    }
 }

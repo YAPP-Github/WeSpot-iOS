@@ -10,4 +10,7 @@ import Foundation
 public struct CreateProfanityCheckRequestDTO: Decodable {
     public let message: String
     
+    public init(message: String) {
+        self.message = message
+    }
 }
