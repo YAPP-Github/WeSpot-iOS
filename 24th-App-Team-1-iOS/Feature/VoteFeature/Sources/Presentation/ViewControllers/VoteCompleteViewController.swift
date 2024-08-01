@@ -23,10 +23,10 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
     //MARK: - Properties
     private let onboardingView: VoteCompleteOnBoardingView = VoteCompleteOnBoardingView()
     private let lendingView: VoteCompleteLandingView = VoteCompleteLandingView()
-    private let descrptionLabel: WSLabel = WSLabel(wsFont: .Header01, text: VoteCompleteStr.voteCompleteText)
     private let noticeButton: WSButton = WSButton(wsButtonType: .default(12))
     private let shareButton: UIButton = UIButton()
     private let completePageControl: UIPageControl = UIPageControl()
+    private let indicatorView: UIActivityIndicatorView = UIActivityIndicatorView(style: .medium)
     
     private lazy var completeCollectionViewLayout: UICollectionViewCompositionalLayout = UICollectionViewCompositionalLayout { [weak self] section, _ in
         let sectionItem = self?.completeCollectionViewDataSources[section]
@@ -34,6 +34,8 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         switch sectionItem {
         case .voteAllRankerInfo:
             return self?.createRankerAllLayoutSection()
+        case .voteAllEmptyRankerInfo:
+            return self?.createEmptyRankerLayoutSection()
         case .none:
             break
         }
@@ -48,6 +50,10 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             guard let allRankerCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteCompleteId.voteAllCell, for: indexPath) as? VoteAllCollectionViewCell else { return UICollectionViewCell() }
             allRankerCell.reactor = cellReactor
             return allRankerCell
+        case let .voteAllEmptyItem(cellReactor):
+            guard let allEmtpyCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteCompleteId.voteEmptyCell, for: indexPath) as? VoteEmptyCollectionViewCell else { return UICollectionViewCell() }
+            allEmtpyCell.reactor = cellReactor
+            return allEmtpyCell
         }
     }
     
@@ -61,24 +67,22 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
-        view.addSubviews(shareButton, completePageControl, noticeButton, descrptionLabel, completeCollectionView, lendingView, onboardingView)
+        view.addSubviews(indicatorView, shareButton, completePageControl, noticeButton, completeCollectionView, onboardingView, lendingView)
     }
     
     public override func setupAutoLayout() {
         super.setupAutoLayout()
 
+        indicatorView.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
+        
         onboardingView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         
         lendingView.snp.makeConstraints {
             $0.edges.equalToSuperview()
-        }
-        
-        descrptionLabel.snp.makeConstraints {
-            $0.top.equalTo(navigationBar.snp.bottom)
-            $0.horizontalEdges.equalToSuperview().inset(30)
-            $0.height.equalTo(60)
         }
         
         noticeButton.snp.makeConstraints {
@@ -95,9 +99,9 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         }
         
         completeCollectionView.snp.makeConstraints {
-            $0.top.equalTo(descrptionLabel.snp.bottom).offset(40)
+            $0.top.equalTo(navigationBar.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(410)
+            $0.height.equalTo(500)
         }
         
         completePageControl.snp.makeConstraints {
@@ -115,10 +119,6 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             $0.setNavigationBarAutoLayout(property: .rightIcon)
         }
     
-        descrptionLabel.do {
-            $0.textColor = DesignSystemAsset.Colors.gray100.color
-        }
-        
         shareButton.do {
             $0.configuration = .filled()
             $0.layer.cornerRadius = 11
@@ -139,9 +139,11 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         
         completeCollectionView.do {
             $0.register(VoteAllCollectionViewCell.self, forCellWithReuseIdentifier: VoteCompleteId.voteAllCell)
+            $0.register(VoteEmptyCollectionViewCell.self, forCellWithReuseIdentifier: VoteCompleteId.voteEmptyCell)
             $0.backgroundColor = .clear
             $0.showsVerticalScrollIndicator = false
             $0.showsHorizontalScrollIndicator = false
+            $0.isScrollEnabled = false
         }
         
     }
@@ -152,6 +154,12 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         Observable.just(())
             .map { Reactor.Action.viewDidLoad }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isLoading }
+            .distinctUntilChanged()
+            .bind(to: indicatorView.rx.isAnimating)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$completeSection)
@@ -165,33 +173,44 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             .bind(to: completePageControl.rx.currentPage)
             .disposed(by: disposeBag)
         
-        lendingView
-            .rx.swipeGestureRecognizer(direction: .right)
-            .bind(with: self) { owner, _ in
-                owner.fadeInOutLendigView()
-            }
-            .disposed(by: disposeBag)
         
         reactor.state
             .map { $0.isLoading }
             .distinctUntilChanged()
             .bind(with: self) { owner, _ in
-                owner.fadeInOutOnboardingView()
+                owner.fadeInOutOnAnimationView()
             }
             .disposed(by: disposeBag)
+    }
+    
+    private func createEmptyRankerLayoutSection() -> NSCollectionLayoutSection {
+ 
+        let emptyRankerGroupSize: NSCollectionLayoutSize = .init(
+            widthDimension: .absolute(view.frame.width),
+            heightDimension: .absolute(430)
+        )
+        
+        let emptyRankerGroup: NSCollectionLayoutGroup = NSCollectionLayoutGroup(layoutSize: emptyRankerGroupSize)
+        
+        
+        let emptyRankerSection: NSCollectionLayoutSection = NSCollectionLayoutSection(group: emptyRankerGroup)
+        emptyRankerSection.orthogonalScrollingBehavior = .none
+        
+        
+        return emptyRankerSection
     }
     
     private func createRankerAllLayoutSection() -> NSCollectionLayoutSection {
         let rankerAllItemSize: NSCollectionLayoutSize = .init(
             widthDimension: .absolute(view.frame.width),
-            heightDimension: .absolute(410)
+            heightDimension: .absolute(500)
         )
         
         let rankerAllItem: NSCollectionLayoutItem = NSCollectionLayoutItem(layoutSize: rankerAllItemSize)
         
         let rankerGroupSize: NSCollectionLayoutSize = .init(
             widthDimension: .absolute(view.frame.width),
-            heightDimension: .absolute(410)
+            heightDimension: .absolute(500)
         )
         
         let rankerAllGroup: NSCollectionLayoutGroup = NSCollectionLayoutGroup.horizontal(
@@ -215,18 +234,19 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
 
 extension VoteCompleteViewController {
     private func fadeInOutLendigView() {
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) { [weak self] in
+        UIView.animate(withDuration: 2.0, delay: 0.0, options: .curveEaseInOut) { [weak self] in
             self?.lendingView.alpha = 0.0
         } completion: { [weak self] _ in
             self?.lendingView.removeFromSuperview()
         }
     }
     
-    private func fadeInOutOnboardingView() {
-        UIView.animate(withDuration: 2.0, delay: 1.0, options: .curveEaseInOut) { [weak self] in
+    private func fadeInOutOnAnimationView() {
+        UIView.animate(withDuration: 2.0, delay: 0.0, options: .curveEaseInOut) { [weak self] in
             self?.onboardingView.alpha = 0.0
         } completion: { [weak self] _ in
             self?.onboardingView.removeFromSuperview()
+            self?.fadeInOutLendigView()
         }
     }
 }
