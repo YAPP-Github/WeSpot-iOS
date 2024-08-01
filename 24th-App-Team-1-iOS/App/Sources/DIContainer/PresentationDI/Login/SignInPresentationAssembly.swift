@@ -15,8 +15,9 @@ import Swinject
 struct SignInPresentationAssembly: Assembly {
     func assemble(container: Container) {
         
-        container.register(SignInViewReactor.self) { _ in
-            return SignInViewReactor()
+        container.register(SignInViewReactor.self) { resolver in
+            let createSignUpTokenUseCase = resolver.resolve(CreateSignUpTokenUseCaseProtocol.self)!
+            return SignInViewReactor(createSignUpTokenUseCase: createSignUpTokenUseCase)
         }
         
         container.register(SignInViewController.self) { resolver in

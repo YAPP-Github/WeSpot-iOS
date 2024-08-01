@@ -15,17 +15,19 @@ import SnapKit
 import RxSwift
 import RxCocoa
 import ReactorKit
+import AuthenticationServices
 
 public final class SignInViewController: BaseViewController<SignInViewReactor> {
     
     //MARK: - Properties
     private let onboardingCarouselView = UIScrollView()
     private let pageControl = UIPageControl()
-    private let appleLoginButton = UIButton()
+    private let appleLoginButton = ASAuthorizationAppleIDButton()
     private let kakaoLoginButton = UIButton()
     private let onbardingImages: [UIImage] = [.actions,
                                               .checkmark,
                                               .add]
+    private let onbardingLottieView = WSLottieView()
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -43,8 +45,7 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
     public override func setupUI() {
         super.setupUI()
         
-        view.addSubviews(onboardingCarouselView, pageControl, appleLoginButton, kakaoLoginButton)
-       
+        view.addSubviews(onboardingCarouselView, pageControl, appleLoginButton, kakaoLoginButton, onbardingLottieView)
     }
     
     public override func viewDidLayoutSubviews() {
@@ -77,6 +78,10 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             $0.centerX.equalTo(view.safeAreaLayoutGuide)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(32)
         }
+        onbardingLottieView.snp.makeConstraints {
+            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            $0.height.equalTo(onbardingLottieView.snp.width)
+        }
     }
     
     public override func setupAttributes() {
@@ -85,53 +90,68 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         view.backgroundColor = DesignSystemAsset.Colors.gray900.color
         
         onboardingCarouselView.do {
-           $0.isPagingEnabled = true
-           $0.showsHorizontalScrollIndicator = false
-           $0.isScrollEnabled = true
-           $0.bounces = false
-       }
+            $0.isPagingEnabled = true
+            $0.showsHorizontalScrollIndicator = false
+            $0.isScrollEnabled = true
+            $0.bounces = false
+        }
         
-      pageControl.do {
-           $0.numberOfPages = 3
-           $0.currentPage = 0
-       }
+        pageControl.do {
+            $0.numberOfPages = 3
+            $0.currentPage = 0
+        }
         
-       appleLoginButton.do {
-           $0.setImage(DesignSystemAsset.Images.appleLoginButton.image, for: .normal)
-       }
+        kakaoLoginButton.do {
+            $0.setImage(DesignSystemAsset.Images.kakaoLoginButton.image, for: .normal)
+        }
         
-       kakaoLoginButton.do {
-           $0.setImage(DesignSystemAsset.Images.kakaoLoginButton.image, for: .normal)
-       }
+        onbardingLottieView.do {
+            $0.isHidden = true
+            $0.isStauts = false
+            $0.wsAnimation = DesignSystemAnimationAsset.demo.animation
+        }
     }
     
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
-        appleLoginButton.rx.tap
+        appleLoginButton.rx.loginOnTap()
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                let signUpSchoolViewReactor = SignUpSchoolViewReactor()
-                let signUpSchoolViewController = SignUpSchoolViewController(reactor: signUpSchoolViewReactor)
-                signUpSchoolViewController.hidesBottomBarWhenPushed = true
-                owner.navigationController?.pushViewController(signUpSchoolViewController, animated: true)
-            }
+            .map { authorization in Reactor.Action.signInWithApple(authorization)}
+            .bind(to: reactor.action )
             .disposed(by: disposeBag)
         
         kakaoLoginButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                let signUpSchoolViewReactor = SignUpSchoolViewReactor()
-                let signUpSchoolViewController = SignUpSchoolViewController(reactor: signUpSchoolViewReactor)
-                owner.navigationController?.pushViewController(signUpSchoolViewController, animated: true)
-            }
+            .map { SignInViewReactor.Action.signInWithKakao }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
         
         pageControl.rx.controlEvent(.valueChanged)
             .map { _ in self.pageControl.currentPage }
             .bind(with: self) { owner, currentPage in
                 let offsetX = CGFloat(currentPage) * owner.onboardingCarouselView.frame.width
                 owner.onboardingCarouselView.setContentOffset(CGPoint(x: offsetX, y: 0), animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        // State 변화에 따른 화면 전환 처리
+        reactor.state
+            .compactMap { $0.signUpTokenResponse }
+            .bind(with: self) { owner, signUpToken in
+                print("Received signUpToken: \(signUpToken.signUpToken)")
+                owner.onbardingLottieView.isHidden = false
+                owner.onbardingLottieView.isStauts = true
+                owner.onboardingCarouselView.isHidden = true
+                owner.appleLoginButton.isHidden = true
+                owner.kakaoLoginButton.isHidden = true
+                owner.pageControl.isHidden = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self)
+                    signUpSchoolViewController.hidesBottomBarWhenPushed = true
+                    owner.navigationController?.pushViewController(signUpSchoolViewController, animated: true)
+                }
             }
             .disposed(by: disposeBag)
     }

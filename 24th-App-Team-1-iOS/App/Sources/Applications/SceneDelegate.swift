@@ -41,7 +41,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         ])
         
         window = UIWindow(windowScene: scene)
-        window?.rootViewController =  UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(VoteCompleteViewController.self))
+        window?.rootViewController =  UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(SignInViewController.self))
         window?.makeKeyAndVisible()
     }
     
