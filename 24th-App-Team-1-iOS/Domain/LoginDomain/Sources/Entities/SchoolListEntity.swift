@@ -22,7 +22,7 @@ public enum SchoolType: String {
     case high = "고등학교"
 }
 
-public struct SchoolListEntity {
+public struct SchoolListEntity: Equatable {
     public let id: Int
     public let name: String
     public let address: String

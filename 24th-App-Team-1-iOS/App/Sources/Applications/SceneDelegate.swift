@@ -9,7 +9,8 @@ import UIKit
 import Util
 
 import LoginFeature
-import VoteFeature
+import LoginDomain
+import LoginService
 import VoteFeature
 import VoteDomain
 import VoteService
@@ -26,8 +27,9 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
     
     public func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let scene = (scene as? UIWindowScene) else { return }
-        
         DependencyContainer.shared.injector.assemble([
+            SignInPresentationAssembly(),
+            SignUpNamePresentationAssembly(),
             VotePresentationAssembly(),
             VoteMainPresentationAssembly(),
             VoteHomePresentationAssembly(),
@@ -39,13 +41,12 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         ])
         
         window = UIWindow(windowScene: scene)
-        window?.rootViewController =  UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(VoteCompleteViewController.self))
+        window?.rootViewController =  UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(SignInViewController.self))
         window?.makeKeyAndVisible()
     }
-
     
     // kakao login
-    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+    public func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         if let url = URLContexts.first?.url {
             if (AuthApi.isKakaoTalkLoginUrl(url)) {
                 _ = AuthController.rx.handleOpenUrl(url: url)

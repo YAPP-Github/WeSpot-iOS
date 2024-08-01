@@ -11,12 +11,10 @@ import RxSwift
 import RxCocoa
 
 public protocol createProfanityCheckUseCaseProtocol {
-    func execute(body: CreateProfanityCheckRequest) -> Single<Void?>
+    func execute(body: CreateProfanityCheckRequest) -> Single<Void>
 }
 
-
 public final class createProfanityCheckUseCase: createProfanityCheckUseCaseProtocol {
-    
     
     public let loginRepository: LoginRepositoryProtocol
     
@@ -24,7 +22,7 @@ public final class createProfanityCheckUseCase: createProfanityCheckUseCaseProto
         self.loginRepository = loginRepository
     }
 
-    public func execute(body: CreateProfanityCheckRequest) -> Single<Void?> {
+    public func execute(body: CreateProfanityCheckRequest) -> Single<Void> {
         return loginRepository.createProfanityCheck(body: body)
     }
 }

@@ -15,12 +15,13 @@ import RxSwift
 import RxCocoa
 
 public final class LoginRepository: LoginRepositoryProtocol {
-   
+    
     private let networkService: WSNetworkServiceProtocol = WSNetworkService()
     
     public init() { }
+
     
-    public func createSignUpToken(body: CreateSignUpTokenRequest) -> Single<LoginDomain.CreateSignUpTokenResponseEntity?> {
+    public func createNewMemberToken(body: CreateSignUpTokenRequest) -> Single<CreateSignUpTokenResponseEntity?> {
         let body = CreateSignUpTokenRequestDTO(socialType: body.socialType, authorizationCode: body.authorizationCode, identityToken: body.identityToken, fcmToken: body.fcmToken)
         let endPoint = LoginEndPoint.createSocialLogin(body)
         
@@ -32,8 +33,22 @@ public final class LoginRepository: LoginRepositoryProtocol {
             .asSingle()
     }
     
+    public func createExistingMember(body: CreateSignUpTokenRequest) -> Single<CreateAccountResponseEntity?> {
+        let body = CreateSignUpTokenRequestDTO(socialType: body.socialType, authorizationCode: body.authorizationCode, identityToken: body.identityToken, fcmToken: body.fcmToken)
+        let endPoint = LoginEndPoint.createSocialLogin(body)
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .logErrorIfDetected(category: Network.error)
+            .decodeMap(CreateAccountResponseDTO.self)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
+    
+
+    
     public func createAccount(body: CreateAccountRequest) -> Single<CreateAccountResponseEntity?> {
-        let consents = Consents(marketing: body.consents.marketing)
+        let consents = ConsentsRequestDTO(marketing: body.consents.marketing)
         let body = CreateAccountRequestDTO(name: body.name, gender: body.gender, schoolId: body.schoolId, grade: body.grade, classNumber: body.classNumber, consents: consents, signUpToken: body.signUpToken)
         let endPoint = LoginEndPoint.createAccount(body)
         
@@ -45,14 +60,14 @@ public final class LoginRepository: LoginRepositoryProtocol {
             .asSingle()
     }
     
-    public func createRefreshToken(body: CreateRefreshTokenRequest) -> Single<CreateRefreshTokenResponseEntity?> {
+    public func createRefreshToken(body: CreateRefreshTokenRequest) -> Single<CreateAccountResponseEntity?> {
         let body = CreateRefreshTokenRequestDTO(token: body.token)
         let endPoint = LoginEndPoint.createRefreshToken(body)
         
         return networkService.request(endPoint: endPoint)
             .asObservable()
             .logErrorIfDetected(category: Network.error)
-            .decodeMap(CreateRefreshTokenResponseDTO.self)
+            .decodeMap(CreateAccountResponseDTO.self)
             .map { $0.toDomain() }
             .asSingle()
     }
@@ -69,7 +84,7 @@ public final class LoginRepository: LoginRepositoryProtocol {
             .asSingle()
     }
     
-    public func createProfanityCheck(body: CreateProfanityCheckRequest) -> Single<Void?> {
+    public func createProfanityCheck(body: CreateProfanityCheckRequest) -> Single<Void> {
         let query = CreateProfanityCheckRequestDTO(message: body.message)
         let endPoint = LoginEndPoint.createProfanityCheck(query)
         
@@ -77,5 +92,6 @@ public final class LoginRepository: LoginRepositoryProtocol {
             .asObservable()
             .logErrorIfDetected(category: Network.error)
             .asSingle()
+            .map { _ in return Void() }
     }
 }

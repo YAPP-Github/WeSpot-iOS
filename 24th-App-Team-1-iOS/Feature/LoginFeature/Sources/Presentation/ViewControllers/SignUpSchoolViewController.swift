@@ -151,7 +151,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
             .disposed(by: disposeBag)
         
         reactor.state
-            .map { $0.schoolList }
+            .map { $0.schoolList.schools }
             .distinctUntilChanged()
             .bind(to: schoolSearchTableView.rx.items(cellIdentifier: SchoolSearchTableViewCell.identifier, cellType: SchoolSearchTableViewCell.self)) { (index, school, cell) in
                 
@@ -161,7 +161,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
             .disposed(by: disposeBag)
             
         reactor.state
-            .map { $0.schoolName.isEmpty || (!$0.schoolName.isEmpty && $0.schoolList.count > 0)}
+            .map { $0.schoolName.isEmpty || (!$0.schoolName.isEmpty && $0.schoolList.schools.count > 0)}
             .distinctUntilChanged()
             .bind(to: additionalButton.rx.isHidden, additionalButtonLine.rx.isHidden)
             .disposed(by: disposeBag)

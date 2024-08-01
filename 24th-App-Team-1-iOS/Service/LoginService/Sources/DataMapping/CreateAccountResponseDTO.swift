@@ -15,7 +15,6 @@ public struct CreateAccountResponseDTO: Decodable {
     
 }
 
-
 extension CreateAccountResponseDTO {
     func toDomain() -> CreateAccountResponseEntity {
         return .init(accessToken: accessToken, refreshToken: refreshToken, refreshTokenExpiredAt: refreshTokenExpiredAt)

@@ -10,10 +10,10 @@ import Foundation
 import LoginDomain
 
 public struct SchoolListResponseDTO: Decodable {
-    public let schools: [SchoolListEntityDTO]
+    public let schools: [SchoolListEntityResponseDTO]
 }
 
-public struct SchoolListEntityDTO: Decodable {
+public struct SchoolListEntityResponseDTO: Decodable {
     public let id: Int
     public let name: String
     public let address: String
@@ -34,7 +34,7 @@ extension SchoolListResponseDTO {
     }
 }
 
-extension SchoolListEntityDTO {
+extension SchoolListEntityResponseDTO {
     func toDomain() -> SchoolListEntity {
         return .init(id: id, name: name, address: address, type: SchoolType(rawValue: type) ?? .middle)
     }

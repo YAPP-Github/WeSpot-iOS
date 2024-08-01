@@ -23,7 +23,11 @@ public final class SignUpGenderViewReactor: Reactor {
         
     }
     
-    public var initialState: State = State()
+    public var initialState: State
+    
+    public init() {
+        self.initialState = State()
+    }
     
     public  func mutate(action: Action) -> Observable<Mutation> {
         

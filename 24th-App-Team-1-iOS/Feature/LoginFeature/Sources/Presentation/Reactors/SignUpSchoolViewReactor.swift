@@ -12,12 +12,12 @@ import ReactorKit
 
 public final class SignUpSchoolViewReactor: Reactor {
     
-    private let fetchSchoolListUseCase: FetchSchoolListUseCase
+    private let fetchSchoolListUseCase: FetchSchoolListUseCaseProtocol
     public var initialState: State
     
     public struct State {
         var schoolName: String = ""
-        var schoolList: [SchoolListEntity] = []
+        var schoolList: SchoolListResponseEntity = SchoolListResponseEntity(schools: [])
         var selectedSchool: String?
     }
     
@@ -27,20 +27,20 @@ public final class SignUpSchoolViewReactor: Reactor {
     }
     
     public enum Mutation {
-        case setSchoolList([SchoolListEntity])
+        case setSchoolList(SchoolListResponseEntity)
         case setSelectedSchool(String?)
     }
     
-    public init(fetchSchoolListUseCase: FetchSchoolListUseCase, initialState: State) {
+    public init(fetchSchoolListUseCase: FetchSchoolListUseCaseProtocol) {
         self.fetchSchoolListUseCase = fetchSchoolListUseCase
-        self.initialState = initialState
+        self.initialState = State()
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .searchSchool(let schoolName):
             if schoolName.isEmpty {
-                return .just(.setSchoolList([]))
+                return .just(.setSchoolList(SchoolListResponseEntity(schools: [])))
             }
             
             let query = SchoolListRequestQuery(name: schoolName)
@@ -49,7 +49,7 @@ public final class SignUpSchoolViewReactor: Reactor {
                 .execute(query: query)
                 .asObservable()
                 .map { entity in
-                    return .setSchoolList(entity?.schools ?? [])
+                    return .setSchoolList(entity ?? SchoolListResponseEntity(schools: []))
                 }
         case .selectSchool(let schoolName):
             return .just(.setSelectedSchool(schoolName))

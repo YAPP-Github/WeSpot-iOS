@@ -14,6 +14,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 import ReactorKit
+import LoginDomain
 
 public final class SignUpResultViewController: BaseViewController<SignUpResultViewReactor> {
     
@@ -164,8 +165,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         schoolTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpSchoolViewReactor = SignUpSchoolViewReactor()
-                let signUpSchoolViewController = SignUpSchoolViewController(reactor: signUpSchoolViewReactor)
+                let signUpSchoolViewController =  DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self)
                 owner.navigationController?.pushViewController(signUpSchoolViewController, animated: true)
             }
             .disposed(by: disposeBag)

@@ -10,7 +10,6 @@ import LoginDomain
 
 public struct CreateSignUpTokenResponseDTO: Decodable {
     public let signUpToken: String
-
 }
 
 
