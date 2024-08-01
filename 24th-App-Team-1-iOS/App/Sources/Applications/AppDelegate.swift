@@ -19,9 +19,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         
-        let nativeAppKey = Bundle.main.infoDictionary?["KAKAO_NATIVE_APP_KEY"] ?? ""
+        let nativeAppKey = Bundle.main.kakaoNativeAppKey
         
-        RxKakaoSDK.initSDK(appKey: nativeAppKey as! String)
+        RxKakaoSDK.initSDK(appKey: nativeAppKey)
         
         // APNs 등록 요청
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
