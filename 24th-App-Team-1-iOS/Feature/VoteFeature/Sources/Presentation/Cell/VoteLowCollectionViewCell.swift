@@ -8,6 +8,10 @@
 import DesignSystem
 import UIKit
 
+import ReactorKit
+import RxCocoa
+import Extensions
+
 
 final class VoteLowCollectionViewCell: UICollectionViewCell {
     
@@ -17,6 +21,7 @@ final class VoteLowCollectionViewCell: UICollectionViewCell {
     private let userNameLabel: WSLabel = WSLabel(wsFont: .Body02)
     private let introduceLabel: WSLabel = WSLabel(wsFont: .Body09)
     private let voteCountLabel: WSLabel = WSLabel(wsFont: .Body02)
+    var disposeBag: DisposeBag = DisposeBag()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -110,4 +115,39 @@ final class VoteLowCollectionViewCell: UICollectionViewCell {
         }
     }
     
+}
+
+
+extension VoteLowCollectionViewCell: ReactorKit.View {
+    
+    func bind(reactor: VoteLowCellReactor) {
+        
+        reactor.pulse(\.$lowUser)
+            .map {$0.name}
+            .bind(to: userNameLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$lowUser)
+            .map { UIColor(hex:$0.profile.backgroundColor) }
+            .distinctUntilChanged()
+            .bind(to: userContainerView.rx.backgroundColor)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { "\($0.voteCount)표" }
+            .distinctUntilChanged()
+            .bind(to: voteCountLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { "\($0.rank + 1)" }
+            .distinctUntilChanged()
+            .bind(to: rankLabel.rx.text)
+            .disposed(by: disposeBag)
+            
+        reactor.pulse(\.$lowUser)
+            .map { $0.introduction }
+            .bind(to: introduceLabel.rx.text)
+            .disposed(by: disposeBag)
+    }
 }

@@ -8,6 +8,8 @@
 import DesignSystem
 import UIKit
 
+import ReactorKit
+import RxCocoa
 
 final class VoteHighCollectionViewCell: UICollectionViewCell {
     
@@ -18,6 +20,7 @@ final class VoteHighCollectionViewCell: UICollectionViewCell {
     private let voteCountLabel: WSLabel = WSLabel(wsFont: .Body01)
     private let userNameLabel: WSLabel = WSLabel(wsFont: .Body02)
     private let profileIntroduceLabel: WSLabel = WSLabel(wsFont: .Badge)
+    var disposeBag: DisposeBag = DisposeBag()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -93,7 +96,7 @@ final class VoteHighCollectionViewCell: UICollectionViewCell {
         
         rankerImageView.do {
             $0.contentMode = .scaleAspectFill
-            $0.image = DesignSystemAsset.Images.icCompleteCrownFiled.image
+            $0.image = DesignSystemAsset.Images.icCompleteGoldCrownFiled.image
         }
         
         voteCountLabel.do {
@@ -110,6 +113,7 @@ final class VoteHighCollectionViewCell: UICollectionViewCell {
         
         profileImageView.do {
             //TODO: 테스트 코트 서버 통신시 제거
+            $0.contentMode = .scaleAspectFill
             $0.image = DesignSystemAsset.Images.icCommonProfile427323024.image
         }
         
@@ -126,5 +130,56 @@ final class VoteHighCollectionViewCell: UICollectionViewCell {
         }
         
         
+    }
+}
+
+
+extension VoteHighCollectionViewCell: ReactorKit.View {
+    
+    func bind(reactor: VoteHighCellReactor) {
+        reactor.pulse(\.$highUser)
+            .map { $0.introduction }
+            .bind(to: profileIntroduceLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$highUser)
+            .map { $0.name }
+            .bind(to: userNameLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$highUser)
+            .map { UIColor(hex: $0.profile.backgroundColor) }
+            .distinctUntilChanged()
+            .bind(to: profileContainerView.rx.backgroundColor)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { "\($0.voteCount)표" }
+            .distinctUntilChanged()
+            .bind(to: voteCountLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .withUnretained(self)
+            .map { $0.0.updateHighRankerImage(ranker: $0.1.ranker) }
+            .bind(to: rankerImageView.rx.image)
+            .disposed(by: disposeBag)
+        
+    }
+}
+
+
+extension VoteHighCollectionViewCell {
+    private func updateHighRankerImage(ranker: Int) -> UIImage {
+        switch ranker {
+        case 0:
+            return DesignSystemAsset.Images.icCompleteSilverCrownFiled.image
+        case 1:
+            return DesignSystemAsset.Images.icCompleteGoldCrownFiled.image
+        case 2:
+            return DesignSystemAsset.Images.icCompleteBrozeCrwonFiled.image
+        default:
+            return UIImage()
+        }
     }
 }

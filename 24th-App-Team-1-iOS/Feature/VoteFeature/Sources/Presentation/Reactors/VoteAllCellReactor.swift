@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import VoteDomain
 
 import ReactorKit
 
@@ -14,7 +15,9 @@ public final class VoteAllCellReactor: Reactor {
     public let initialState: State
     
     public struct State {
-        @Pulse var completeSection: [VoteAllCompleteSection]
+        var voteAllResultsEntity: [VoteAllResultEntity]
+        var content: String
+        @Pulse var completeAllSection: [VoteAllCompleteSection]
     }
     
     public enum Action {
@@ -22,25 +25,17 @@ public final class VoteAllCellReactor: Reactor {
     }
     
     public enum Mutation {
-        case setCompleteSection([VoteAllCompleteItem])
+        case setVoteHighRankerItem([VoteAllCompleteItem])
+        case setVoteLowRankerItem([VoteAllCompleteItem])
     }
     
-    init() {
+    init(voteAllResultsEntity: [VoteAllResultEntity], content: String) {
         self.initialState = State(
-            completeSection: [
-                .voteHighRankerInfo(
-                    [
-                        .voteHighRankerItem,
-                        .voteHighRankerItem,
-                        .voteHighRankerItem
-                    ]
-                ),
-                .voteLowRankerInfo(
-                    [
-                        .voteLowRankerItem,
-                        .voteLowRankerItem
-                    ]
-                )
+            voteAllResultsEntity: voteAllResultsEntity,
+            content: content,
+            completeAllSection: [
+                .voteHighRankerInfo([]),
+                .voteLowRankerInfo([])
             ]
         )
     }
@@ -48,7 +43,43 @@ public final class VoteAllCellReactor: Reactor {
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchCompleteSection:
-            return .empty()
+            var highSectionItem: [VoteAllCompleteItem] = []
+            var lowSectionItem: [VoteAllCompleteItem] = []
+            
+            var response = currentState.voteAllResultsEntity
+                
+            response
+                .swapAt(0, 1)
+            
+            response
+                .enumerated()
+                .forEach { (index, entity) in
+                    if index < 3 {
+                        highSectionItem.append(
+                            .voteHighRankerItem(
+                                VoteHighCellReactor(
+                                    highUser: entity.user,
+                                    voteCount: entity.voteCount,
+                                    ranker: index
+                                )
+                            )
+                        )
+                    } else {
+                        lowSectionItem.append(
+                            .voteLowRankerItem(
+                                VoteLowCellReactor(
+                                    lowUser: entity.user,
+                                    rank: index,
+                                    voteCount: entity.voteCount
+                                )
+                            )
+                        )
+                    }
+                }
+            return .concat(
+                .just(.setVoteHighRankerItem(highSectionItem)),
+                .just(.setVoteLowRankerItem(lowSectionItem))
+            )
         }
     }
     
@@ -56,10 +87,27 @@ public final class VoteAllCellReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case let .setCompleteSection(items):
-            newState.completeSection = [.voteHighRankerInfo(items), .voteLowRankerInfo(items)]
+        case let .setVoteHighRankerItem(items):
+            let sectionIndex = getSection(.voteHighRankerInfo([]))
+            newState.completeAllSection[sectionIndex] = .voteHighRankerInfo(items)
+        case let .setVoteLowRankerItem(items):
+            let sectionIndex = getSection(.voteLowRankerInfo([]))
+            newState.completeAllSection[sectionIndex] = .voteLowRankerInfo(items)
         }
         
         return newState
+    }
+}
+
+
+extension VoteAllCellReactor {
+    private func getSection(_ section: VoteAllCompleteSection) -> Int {
+        var index: Int = 0
+        
+        for i in 0 ..< currentState.completeAllSection.count where currentState.completeAllSection[i].getSectionType() == section.getSectionType() {
+            index = i
+        }
+        
+        return index
     }
 }

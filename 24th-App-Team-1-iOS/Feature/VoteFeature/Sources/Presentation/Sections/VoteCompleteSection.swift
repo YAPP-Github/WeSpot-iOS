@@ -10,22 +10,23 @@ import Differentiator
 
 public enum VoteCompleteSection: SectionModelType {
     case voteAllRankerInfo([VoteCompleteItem])
+    case voteAllEmptyRankerInfo([VoteCompleteItem])
     
     
     public var items: [VoteCompleteItem] {
         switch self {
         case let .voteAllRankerInfo(items): return items
+        case let .voteAllEmptyRankerInfo(items): return items
         }
     }
     
     public init(original: VoteCompleteSection, items: [VoteCompleteItem]) {
-        switch original {
-        case .voteAllRankerInfo: self = .voteAllRankerInfo(items)
-        }
+        self = original
     }
 }
 
 
 public enum VoteCompleteItem {
     case voteAllRankerItem(VoteAllCellReactor)
+    case voteAllEmptyItem(VoteEmptyCellReactor)
 }
