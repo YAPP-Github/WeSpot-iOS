@@ -59,7 +59,8 @@ extension InfoPlist {
                 .string("Pretendard-SemiBold.otf")
             ]),
             "BASE_URL": .string("https://2b0c4a7a-16b4-4b4e-a7c2-5494a7c2f696.mock.pstmn.io/api/v1"),
-            "NSAppleIDUsageDescription": .string("로그인에 Apple ID를 사용합니다.")
+            "NSAppleIDUsageDescription": .string("로그인에 Apple ID를 사용합니다."),
+            "aps-environment": .string("development") 
         ]
         
         return InfoPlist.extendingDefault(with: basePlist)

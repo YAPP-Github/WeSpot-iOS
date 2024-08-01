@@ -16,7 +16,7 @@ public extension ModulePathProtocol {
         return "\(self.rawValue)"
     }
     var bundleId: String {
-        return "com.\(self.rawValue).app"
+        return "com.\(self.rawValue).apps"
     }
     
     var appName: String {
@@ -24,7 +24,7 @@ public extension ModulePathProtocol {
     }
     
     var appBundleId: String {
-        return "com.wespot.app"
+        return "com.wespot.apps"
     }
 }
 
