@@ -39,7 +39,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // 디바이스 토큰을 문자열로 변환
         let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
         let token = tokenParts.joined()
-        print("Device Token: \(token)")
         apnsToken = token
         
         APNsTokenManager.shared.token = token

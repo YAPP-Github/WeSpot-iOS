@@ -14,9 +14,7 @@ public protocol createProfanityCheckUseCaseProtocol {
     func execute(body: CreateProfanityCheckRequest) -> Single<Void>
 }
 
-
 public final class createProfanityCheckUseCase: createProfanityCheckUseCaseProtocol {
-    
     
     public let loginRepository: LoginRepositoryProtocol
     
