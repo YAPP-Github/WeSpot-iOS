@@ -16,7 +16,7 @@ public enum VoteEndPoint: WSNetworkEndPoint {
     /// 투표 하기 API
     case addVotes(Encodable)
     /// 투표 결과 전체 조회하기
-    case fetchResultVotes
+    case fetchResultVotes(Encodable)
     /// 투표 결과 전체 조회하기 (1등)
     case fetchWinnerVotes(Encodable)
     /// 내가 받은 투표 목록 조회
@@ -70,6 +70,8 @@ public enum VoteEndPoint: WSNetworkEndPoint {
             return .requestQuery(winnerQuery)
         case let .addVotes(body):
             return .requestBody(body)
+        case let .fetchResultVotes(allQuery):
+            return .requestQuery(allQuery)
         default:
             return .none
         }

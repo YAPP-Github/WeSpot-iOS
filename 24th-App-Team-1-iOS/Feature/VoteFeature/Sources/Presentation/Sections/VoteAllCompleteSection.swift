@@ -8,6 +8,11 @@
 import Differentiator
 
 
+public enum VoteAllCompleteSectionType: String, Equatable {
+    case highType
+    case lowType
+}
+
 public enum VoteAllCompleteSection: SectionModelType {
     case voteHighRankerInfo([VoteAllCompleteItem])
     case voteLowRankerInfo([VoteAllCompleteItem])
@@ -30,6 +35,15 @@ public enum VoteAllCompleteSection: SectionModelType {
 }
 
 public enum VoteAllCompleteItem {
-    case voteHighRankerItem
-    case voteLowRankerItem
+    case voteHighRankerItem(VoteHighCellReactor)
+    case voteLowRankerItem(VoteLowCellReactor)
+}
+
+extension VoteAllCompleteSection {
+    public func getSectionType() -> VoteAllCompleteSectionType {
+        switch self {
+        case .voteHighRankerInfo: return .highType
+        case .voteLowRankerInfo: return .lowType
+        }
+    }
 }

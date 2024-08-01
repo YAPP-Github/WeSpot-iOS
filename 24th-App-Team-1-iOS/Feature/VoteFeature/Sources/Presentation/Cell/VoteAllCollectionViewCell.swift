@@ -5,6 +5,7 @@
 //  Created by Kim dohyun on 7/30/24.
 //
 
+import DesignSystem
 import UIKit
 
 import SnapKit
@@ -17,6 +18,8 @@ import ReactorKit
 final class VoteAllCollectionViewCell: UICollectionViewCell {
     
     var disposeBag: DisposeBag = DisposeBag()
+    private let descrptionLabel: WSLabel = WSLabel(wsFont: .Header01, text: VoteCompleteStr.voteCompleteText)
+    
     private lazy var completeAllCollectionViewLayout: UICollectionViewCompositionalLayout = UICollectionViewCompositionalLayout { [weak self] section, _ in
         let sectionItem = self?.completeAllCollectionViewDataSources[section]
         
@@ -33,12 +36,13 @@ final class VoteAllCollectionViewCell: UICollectionViewCell {
     
     private lazy var completeAllCollectionViewDataSources: RxCollectionViewSectionedReloadDataSource<VoteAllCompleteSection> = .init { dataSources, collectionView, indexPath, sectionItem in
         switch sectionItem {
-        case .voteHighRankerItem:
+        case let .voteHighRankerItem(cellReactor):
             guard let highRankerCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteCompleteId.voteHighCell, for: indexPath) as? VoteHighCollectionViewCell else { return UICollectionViewCell() }
-            
+            highRankerCell.reactor = cellReactor
             return highRankerCell
-        case .voteLowRankerItem:
+        case let .voteLowRankerItem(cellReactor):
             guard let rowRankerCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteCompleteId.voteLowCell, for: indexPath) as? VoteLowCollectionViewCell else { return UICollectionViewCell() }
+            rowRankerCell.reactor = cellReactor
             return rowRankerCell
         }
     }
@@ -57,12 +61,20 @@ final class VoteAllCollectionViewCell: UICollectionViewCell {
     }
     
     private func setupUI() {
-        contentView.addSubview(completeAllCollectionView)
+        contentView.addSubviews(completeAllCollectionView, descrptionLabel)
     }
     
     private func setupAutoLayout() {
+        descrptionLabel.snp.makeConstraints {
+            $0.top.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(30)
+            $0.height.equalTo(60)
+        }
+        
         completeAllCollectionView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.equalTo(descrptionLabel.snp.bottom).offset(25)
+            $0.horizontalEdges.equalToSuperview()
+            $0.bottom.equalToSuperview()
         }
     }
     
@@ -75,6 +87,10 @@ final class VoteAllCollectionViewCell: UICollectionViewCell {
             $0.showsHorizontalScrollIndicator = false
         }
         
+        descrptionLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.gray100.color
+        }
+        
     }
 }
 
@@ -82,7 +98,18 @@ extension VoteAllCollectionViewCell: ReactorKit.View {
     
     func bind(reactor: VoteAllCellReactor) {
         
-        reactor.pulse(\.$completeSection)
+        Observable.just(())
+            .map { Reactor.Action.fetchCompleteSection }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.content}
+            .distinctUntilChanged()
+            .bind(to: descrptionLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$completeAllSection)
             .asDriver(onErrorJustReturn: [])
             .drive(completeAllCollectionView.rx.items(dataSource: completeAllCollectionViewDataSources))
             .disposed(by: disposeBag)

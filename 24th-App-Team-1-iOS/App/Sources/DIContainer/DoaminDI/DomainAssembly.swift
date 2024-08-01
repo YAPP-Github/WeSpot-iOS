@@ -60,5 +60,10 @@ struct DomainAssembly: Assembly {
             let repository = resovler.resolve(VoteRepositoryProtocol.self)!
             return FetchWinnerVoteOptionsUseCase(voteRepository: repository)
         }
+        
+        container.register(FetchAllVoteOptionsUseCaseProtocol.self) { resovler in
+            let repository = resovler.resolve(VoteRepositoryProtocol.self)!
+            return FetchAllVoteOptionsUseCase(voteRepositroy: repository)
+        }
     }
 }
