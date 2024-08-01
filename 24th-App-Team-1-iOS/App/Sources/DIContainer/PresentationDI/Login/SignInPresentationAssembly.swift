@@ -16,8 +16,9 @@ struct SignInPresentationAssembly: Assembly {
     func assemble(container: Container) {
         
         container.register(SignInViewReactor.self) { resolver in
-            let createSignUpTokenUseCase = resolver.resolve(CreateSignUpTokenUseCaseProtocol.self)!
-            return SignInViewReactor(createSignUpTokenUseCase: createSignUpTokenUseCase)
+            let createNewMemberUseCase = resolver.resolve(CreateNewMemberUseCaseProtocol.self)!
+            let createExistingMemberUseCase = resolver.resolve(CreateExistingMemberUseCaseProtocol.self)!
+            return SignInViewReactor(createNewMemberUseCase: createNewMemberUseCase, createExistingUseCase: createExistingMemberUseCase)
         }
         
         container.register(SignInViewController.self) { resolver in

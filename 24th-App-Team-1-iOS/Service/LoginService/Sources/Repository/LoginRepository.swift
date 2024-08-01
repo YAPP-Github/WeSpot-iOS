@@ -15,42 +15,37 @@ import RxSwift
 import RxCocoa
 
 public final class LoginRepository: LoginRepositoryProtocol {
-
+    
     private let networkService: WSNetworkServiceProtocol = WSNetworkService()
     
     public init() { }
+
     
-    public func createSignUpToken(body: CreateSignUpTokenRequest) -> Single<CreateSignUpOrAccountResponseEntity?> {
+    public func createNewMemberToken(body: CreateSignUpTokenRequest) -> Single<CreateSignUpTokenResponseEntity?> {
         let body = CreateSignUpTokenRequestDTO(socialType: body.socialType, authorizationCode: body.authorizationCode, identityToken: body.identityToken, fcmToken: body.fcmToken)
         let endPoint = LoginEndPoint.createSocialLogin(body)
         
-        return networkService.requestWithStatusCode(endPoint: endPoint)
+        return networkService.request(endPoint: endPoint)
             .asObservable()
             .logErrorIfDetected(category: Network.error)
-            .flatMap { statusCode, data -> Observable<CreateSignUpOrAccountResponseEntity?> in
-                switch statusCode {
-                case 200:
-                    return Observable.just(data)
-                        .decodeMap(CreateSignUpTokenResponseDTO.self)
-                        .map { CreateSignUpOrAccountResponseEntity(signUpTokenResponse: $0.toDomain(), accountResponse: nil) }
-                        .catch { error in
-                            print("Decoding error for CreateSignUpTokenResponseDTO: \(error)")
-                            return Observable.error(WSNetworkError.default(message: "Decoding error for CreateSignUpTokenResponseDTO"))
-                        }
-                case 202:
-                    return Observable.just(data)
-                        .decodeMap(CreateAccountResponseDTO.self)
-                        .map { CreateSignUpOrAccountResponseEntity(signUpTokenResponse: nil, accountResponse: $0.toDomain()) }
-                        .catch { error in
-                            print("Decoding error for CreateAccountResponseDTO: \(error)")
-                            return Observable.error(WSNetworkError.default(message: "Decoding error for CreateAccountResponseDTO"))
-                        }
-                default:
-                    return Observable.error(WSNetworkError.default(message: "statusCode: \(statusCode)"))
-                }
-            }
+            .decodeMap(CreateSignUpTokenResponseDTO.self)
+            .map { $0.toDomain() }
             .asSingle()
     }
+    
+    public func createExistingMember(body: CreateSignUpTokenRequest) -> Single<CreateAccountResponseEntity?> {
+        let body = CreateSignUpTokenRequestDTO(socialType: body.socialType, authorizationCode: body.authorizationCode, identityToken: body.identityToken, fcmToken: body.fcmToken)
+        let endPoint = LoginEndPoint.createSocialLogin(body)
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .logErrorIfDetected(category: Network.error)
+            .decodeMap(CreateAccountResponseDTO.self)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
+    
+
     
     public func createAccount(body: CreateAccountRequest) -> Single<CreateAccountResponseEntity?> {
         let consents = ConsentsRequestDTO(marketing: body.consents.marketing)
@@ -65,14 +60,14 @@ public final class LoginRepository: LoginRepositoryProtocol {
             .asSingle()
     }
     
-    public func createRefreshToken(body: CreateRefreshTokenRequest) -> Single<CreateRefreshTokenResponseEntity?> {
+    public func createRefreshToken(body: CreateRefreshTokenRequest) -> Single<CreateAccountResponseEntity?> {
         let body = CreateRefreshTokenRequestDTO(token: body.token)
         let endPoint = LoginEndPoint.createRefreshToken(body)
         
         return networkService.request(endPoint: endPoint)
             .asObservable()
             .logErrorIfDetected(category: Network.error)
-            .decodeMap(CreateRefreshTokenResponseDTO.self)
+            .decodeMap(CreateAccountResponseDTO.self)
             .map { $0.toDomain() }
             .asSingle()
     }

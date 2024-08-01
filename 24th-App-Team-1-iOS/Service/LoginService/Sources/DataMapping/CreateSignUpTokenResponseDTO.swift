@@ -9,12 +9,12 @@ import Foundation
 import LoginDomain
 
 public struct CreateSignUpTokenResponseDTO: Decodable {
-    public let signUpToken: String?
+    public let signUpToken: String
 }
 
 
 extension CreateSignUpTokenResponseDTO {
     func toDomain() -> CreateSignUpTokenResponseEntity {
-        return .init(signUpToken: signUpToken ?? "")
+        return .init(signUpToken: signUpToken)
     }
 }
