@@ -15,20 +15,40 @@ import RxSwift
 import RxCocoa
 
 public final class LoginRepository: LoginRepositoryProtocol {
-   
+
     private let networkService: WSNetworkServiceProtocol = WSNetworkService()
     
     public init() { }
     
-    public func createSignUpToken(body: CreateSignUpTokenRequest) -> Single<LoginDomain.CreateSignUpTokenResponseEntity?> {
+    public func createSignUpToken(body: CreateSignUpTokenRequest) -> Single<CreateSignUpOrAccountResponseEntity?> {
         let body = CreateSignUpTokenRequestDTO(socialType: body.socialType, authorizationCode: body.authorizationCode, identityToken: body.identityToken, fcmToken: body.fcmToken)
         let endPoint = LoginEndPoint.createSocialLogin(body)
         
-        return networkService.request(endPoint: endPoint)
+        return networkService.requestWithStatusCode(endPoint: endPoint)
             .asObservable()
             .logErrorIfDetected(category: Network.error)
-            .decodeMap(CreateSignUpTokenResponseDTO.self)
-            .map { $0.toDomain() }
+            .flatMap { statusCode, data -> Observable<CreateSignUpOrAccountResponseEntity?> in
+                switch statusCode {
+                case 200:
+                    return Observable.just(data)
+                        .decodeMap(CreateSignUpTokenResponseDTO.self)
+                        .map { CreateSignUpOrAccountResponseEntity(signUpTokenResponse: $0.toDomain(), accountResponse: nil) }
+                        .catch { error in
+                            print("Decoding error for CreateSignUpTokenResponseDTO: \(error)")
+                            return Observable.error(WSNetworkError.default(message: "Decoding error for CreateSignUpTokenResponseDTO"))
+                        }
+                case 202:
+                    return Observable.just(data)
+                        .decodeMap(CreateAccountResponseDTO.self)
+                        .map { CreateSignUpOrAccountResponseEntity(signUpTokenResponse: nil, accountResponse: $0.toDomain()) }
+                        .catch { error in
+                            print("Decoding error for CreateAccountResponseDTO: \(error)")
+                            return Observable.error(WSNetworkError.default(message: "Decoding error for CreateAccountResponseDTO"))
+                        }
+                default:
+                    return Observable.error(WSNetworkError.default(message: "statusCode: \(statusCode)"))
+                }
+            }
             .asSingle()
     }
     

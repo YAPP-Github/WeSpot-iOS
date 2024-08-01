@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 
 public protocol CreateSignUpTokenUseCaseProtocol {
-    func execute(body: CreateSignUpTokenRequest) -> Single<CreateSignUpTokenResponseEntity?>
+    func execute(body: CreateSignUpTokenRequest) -> Single<CreateSignUpOrAccountResponseEntity?>
 }
 
 public final class createSignUpTokenUseCase: CreateSignUpTokenUseCaseProtocol {
@@ -23,7 +23,7 @@ public final class createSignUpTokenUseCase: CreateSignUpTokenUseCaseProtocol {
         self.loginRepository = loginRepository
     }
 
-    public func execute(body: CreateSignUpTokenRequest) -> Single<CreateSignUpTokenResponseEntity?> {
+    public func execute(body: CreateSignUpTokenRequest) -> Single<CreateSignUpOrAccountResponseEntity?> {
         return loginRepository.createSignUpToken(body: body)
     }
     
