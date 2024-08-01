@@ -13,13 +13,36 @@ import Extensions
 
 import RxSwift
 import RxCocoa
+import KakaoSDKUser
 
 public final class LoginRepository: LoginRepositoryProtocol {
     
     private let networkService: WSNetworkServiceProtocol = WSNetworkService()
     
     public init() { }
-
+    
+    public func kakaoLogin() -> Single<String> {
+        return Single<String>.create { single in
+            if UserApi.isKakaoTalkLoginAvailable() {
+                UserApi.shared.loginWithKakaoTalk { oauthToken, error in
+                    if let error = error {
+                        single(.failure(error))
+                    } else if let oauthToken = oauthToken {
+                        single(.success(oauthToken.accessToken))
+                    }
+                }
+            } else {
+                UserApi.shared.loginWithKakaoAccount { oauthToken, error in
+                    if let error = error {
+                        single(.failure(error))
+                    } else if let oauthToken = oauthToken {
+                        single(.success(oauthToken.accessToken))
+                    }
+                }
+            }
+            return Disposables.create()
+        }
+    }
     
     public func createNewMemberToken(body: CreateSignUpTokenRequest) -> Single<CreateSignUpTokenResponseEntity?> {
         let body = CreateSignUpTokenRequestDTO(socialType: body.socialType, authorizationCode: body.authorizationCode, identityToken: body.identityToken, fcmToken: body.fcmToken)
@@ -45,7 +68,7 @@ public final class LoginRepository: LoginRepositoryProtocol {
             .asSingle()
     }
     
-
+    
     
     public func createAccount(body: CreateAccountRequest) -> Single<CreateAccountResponseEntity?> {
         let consents = ConsentsRequestDTO(marketing: body.consents.marketing)
