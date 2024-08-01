@@ -53,3 +53,38 @@ public final class WSNetworkService: WSNetworkServiceProtocol {
         }
     }
 }
+
+
+public extension WSNetworkServiceProtocol {
+    
+    func requestWithStatusCode(endPoint: URLRequestConvertible) -> Single<(Int, Data)> {
+        return Single<(Int, Data)>.create { single in
+            let task = AF.request(endPoint)
+                .validate(statusCode: 200...299)
+                .responseData { response in
+                    switch response.result {
+                    case let .success(data):
+                        if let statusCode = response.response?.statusCode {
+                            single(.success((statusCode, data)))
+                        } else {
+                            single(.failure(WSNetworkError.default(message: "Invalid response")))
+                        }
+                    case let .failure(error):
+                        switch response.response?.statusCode {
+                        case 400:
+                            single(.failure(WSNetworkError.badRequest(message: response.request?.url?.absoluteString ?? "")))
+                        case 401:
+                            single(.failure(WSNetworkError.unauthorized))
+                        case 404:
+                            single(.failure(WSNetworkError.notFound))
+                        default:
+                            single(.failure(WSNetworkError.default(message: error.localizedDescription)))
+                        }
+                    }
+                }
+            return Disposables.create {
+                task.cancel()
+            }
+        }
+    }
+}
