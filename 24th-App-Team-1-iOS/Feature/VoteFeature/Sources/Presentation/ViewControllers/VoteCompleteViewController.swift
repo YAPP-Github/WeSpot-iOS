@@ -167,6 +167,12 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             .drive(completeCollectionView.rx.items(dataSource: completeCollectionViewDataSources))
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$voteAllEntity)
+            .map { $0.count }
+            .distinctUntilChanged()
+            .bind(to: completePageControl.rx.numberOfPages)
+            .disposed(by: disposeBag)
+        
         reactor.state
             .map { $0.currentPage }
             .distinctUntilChanged()

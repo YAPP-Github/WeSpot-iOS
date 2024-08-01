@@ -17,6 +17,7 @@ public final class VoteCompleteViewReactor: Reactor {
     
     public struct State {
         @Pulse var completeSection: [VoteCompleteSection]
+        @Pulse var voteAllEntity: [VoteAllEntity]
         var isLoading: Bool
         var currentPage: Int
     }
@@ -31,11 +32,13 @@ public final class VoteCompleteViewReactor: Reactor {
         case setOnboadingView(Bool)
         case setCurrentPageControl(Int)
         case setCompleteSection([VoteCompleteItem])
+        case setVoteAllEntity([VoteAllEntity])
     }
     
     public init(fetchAllVoteOptionsUseCase: FetchAllVoteOptionsUseCaseProtocol) {
         self.initialState = State(
             completeSection: [.voteAllRankerInfo([])],
+            voteAllEntity: [],
             isLoading: false,
             currentPage: 0
         )
@@ -83,6 +86,7 @@ public final class VoteCompleteViewReactor: Reactor {
                     return .concat(
                         .just(.setLoading(true)),
                         .just(.setOnboadingView(true)),
+                        .just(.setVoteAllEntity(originalEntity.response)),
                         .just(.setCompleteSection(completeSectionitem)),
                         .just(.setLoading(false))
                     )
@@ -103,7 +107,8 @@ public final class VoteCompleteViewReactor: Reactor {
             newState.currentPage = currentPage
         case let .setCompleteSection(items):
             newState.completeSection = [.voteAllRankerInfo(items)]
-            
+        case let .setVoteAllEntity(voteAllEntity):
+            newState.voteAllEntity = voteAllEntity
         }
         return newState
     }
