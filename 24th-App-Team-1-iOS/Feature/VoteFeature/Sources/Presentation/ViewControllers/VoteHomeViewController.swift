@@ -116,8 +116,8 @@ public final class VoteHomeViewController: BaseViewController<VoteHomeViewReacto
         
         voteConfirmButton
             .rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .map { Reactor.Action.didTappedVoteButton }
+            .debounce(.seconds(1), scheduler: MainScheduler.instance)
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }

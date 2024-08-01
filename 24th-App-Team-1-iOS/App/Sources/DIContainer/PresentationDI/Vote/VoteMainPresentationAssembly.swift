@@ -30,6 +30,20 @@ struct VoteMainPresentationAssembly: Assembly {
 }
 
 
+struct VoteBeginPresentationAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(VoteBeginViewReactor.self) { _ in
+            return VoteBeginViewReactor()
+        }
+        
+        container.register(VoteBeginViewController.self) { resolver in
+            let reactor = resolver.resolve(VoteBeginViewReactor.self)!
+            return VoteBeginViewController(reactor: reactor)
+        }
+    }
+}
+
+
 /// VoteHome DIContainer
 struct VoteHomePresentationAssembly: Assembly {
     func assemble(container: Container) {

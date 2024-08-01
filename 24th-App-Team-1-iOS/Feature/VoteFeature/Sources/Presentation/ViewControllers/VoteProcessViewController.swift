@@ -202,7 +202,8 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             .compactMap { $0.createVoteEntity }
             .distinctUntilChanged()
             .bind(with: self) { owner, response in
-                owner.navigationController?.popToRootViewController(animated: true)
+                let voteCompleteViewController = DependencyContainer.shared.injector.resolve(VoteCompleteViewController.self)
+                owner.navigationController?.pushViewController(voteCompleteViewController, animated: true)
             }
             .disposed(by: disposeBag)
         
