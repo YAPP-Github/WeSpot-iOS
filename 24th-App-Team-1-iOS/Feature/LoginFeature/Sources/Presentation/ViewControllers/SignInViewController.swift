@@ -16,6 +16,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 import AuthenticationServices
+import VoteFeature
 
 public final class SignInViewController: BaseViewController<SignInViewReactor> {
     
@@ -141,17 +142,20 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             .compactMap { $0.signUpTokenResponse }
             .bind(with: self) { owner, signUpToken in
                 print("Received signUpToken: \(signUpToken.signUpToken)")
-                owner.onbardingLottieView.isHidden = false
-                owner.onbardingLottieView.isStauts = true
-                owner.onboardingCarouselView.isHidden = true
-                owner.appleLoginButton.isHidden = true
-                owner.kakaoLoginButton.isHidden = true
-                owner.pageControl.isHidden = true
+                owner.updateUI()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self)
                     signUpSchoolViewController.hidesBottomBarWhenPushed = true
                     owner.navigationController?.pushViewController(signUpSchoolViewController, animated: true)
                 }
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.accountResponse }
+            .bind(with: self) { owner, assessToken in
+                let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
+                owner.navigationController?.pushViewController(voteMainViewController, animated: true)
             }
             .disposed(by: disposeBag)
     }
@@ -168,6 +172,15 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             onboardingCarouselView.addSubview(imageView)
             onboardingCarouselView.contentSize.width = imageView.frame.width * CGFloat(i + 1)
         }
+    }
+    
+    private func updateUI() {
+        onbardingLottieView.isHidden = false
+        onbardingLottieView.isStauts = true
+        onboardingCarouselView.isHidden = true
+        appleLoginButton.isHidden = true
+        kakaoLoginButton.isHidden = true
+        pageControl.isHidden = true
     }
 }
 

@@ -15,7 +15,8 @@ import AuthenticationServices
 
 public final class SignInViewReactor: Reactor {
     
-    private let createSignUpTokenUseCase: CreateSignUpTokenUseCaseProtocol
+    private let createNewMemberUseCase: CreateNewMemberUseCaseProtocol
+    private let createExistingUseCase: CreateExistingMemberUseCaseProtocol
     public var initialState: State
     
     public struct State {
@@ -33,8 +34,9 @@ public final class SignInViewReactor: Reactor {
         case setAccountResponse(CreateAccountResponseEntity)
     }
     
-    public init(createSignUpTokenUseCase: CreateSignUpTokenUseCaseProtocol) {
-        self.createSignUpTokenUseCase = createSignUpTokenUseCase
+    public init(createNewMemberUseCase: CreateNewMemberUseCaseProtocol, createExistingUseCase: CreateExistingMemberUseCaseProtocol) {
+        self.createNewMemberUseCase = createNewMemberUseCase
+        self.createExistingUseCase = createExistingUseCase
         self.initialState = State()
     }
     
@@ -53,11 +55,6 @@ public final class SignInViewReactor: Reactor {
             }
             let apnsToken = APNsTokenManager.shared.token ?? ""
             
-            let body = CreateSignUpTokenRequest(socialType: "APPLE",
-                                                authorizationCode: authorizationCode,
-                                                identityToken: identityToken,
-                                                fcmToken: apnsToken)
-          
             return executeSignUp(socialType: "APPLE", authorizationCode: authorizationCode, identityToken: identityToken)
         case .signInWithKakao:
             //TODO: 카카오 로그인 로직 추가
@@ -71,20 +68,21 @@ public final class SignInViewReactor: Reactor {
                                             authorizationCode: authorizationCode,
                                             identityToken: identityToken,
                                             fcmToken: apnsToken)
-        return createSignUpTokenUseCase
-            .execute(body: body)
-            .asObservable()
-            .compactMap { $0 }
-            .flatMap { entity -> Observable<Mutation> in
-                if let signUpTokenResponse = entity.signUpTokenResponse {
-                    return .just(.setSignUpTokenResponse(signUpTokenResponse))
-                } else if let accountResponse = entity.accountResponse {
-                    return .just(.setAccountResponse(accountResponse))
-                } else {
-                    print("Error: Unexpected response format")
-                    return .empty()
-                }
-            }
+        
+        if UserDefaultsManager.shared.accessToken != nil {
+            return createNewMemberUseCase
+                .execute(body: body)
+                .asObservable()
+                .compactMap { $0 }
+                .map { .setSignUpTokenResponse($0) }
+            
+        } else {
+            return createExistingUseCase
+                .execute(body: body)
+                .asObservable()
+                .compactMap { $0 }
+                .map { .setAccountResponse($0) }
+        }
     }
     
     public func reduce(state: State, mutation: Mutation) -> State {
