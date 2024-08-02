@@ -19,7 +19,7 @@ public final class LoginRepository: LoginRepositoryProtocol {
     private let networkService: WSNetworkServiceProtocol = WSNetworkService()
     
     public init() { }
-
+    
     
     public func createNewMemberToken(body: CreateSignUpTokenRequest) -> Single<CreateSignUpTokenResponseEntity?> {
         let body = CreateSignUpTokenRequestDTO(socialType: body.socialType, authorizationCode: body.authorizationCode, identityToken: body.identityToken, fcmToken: body.fcmToken)
@@ -45,7 +45,7 @@ public final class LoginRepository: LoginRepositoryProtocol {
             .asSingle()
     }
     
-
+    
     
     public func createAccount(body: CreateAccountRequest) -> Single<CreateAccountResponseEntity?> {
         let consents = ConsentsRequestDTO(marketing: body.consents.marketing)

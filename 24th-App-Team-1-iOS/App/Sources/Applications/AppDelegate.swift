@@ -19,9 +19,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         
-        let nativeAppKey = Bundle.main.infoDictionary?["KAKAO_NATIVE_APP_KEY"] ?? ""
+        let appKey = Bundle.main.kakaoNativeAppKey
+        if !appKey.isEmpty {
+            RxKakaoSDK.initSDK(appKey: appKey)
+        } else {
+            return false
+        }
         
-        RxKakaoSDK.initSDK(appKey: nativeAppKey as! String)
         
         // APNs 등록 요청
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
@@ -44,16 +48,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         APNsTokenManager.shared.token = token
     }
     
-    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print("Failed to register: \(error)")
-    }
-    
-    // kakao login
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         if (AuthApi.isKakaoTalkLoginUrl(url)) {
             return AuthController.rx.handleOpenUrl(url: url)
         }
-        
         return false
     }
+    
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Failed to register: \(error)")
+    }
+    
 }
