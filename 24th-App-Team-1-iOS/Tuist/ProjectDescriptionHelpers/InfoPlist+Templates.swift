@@ -40,12 +40,12 @@ extension InfoPlist {
                 "kakaolink",
                 "kakaoplus"
             ],
-            "KAKAO_NATIVE_APP_KEY": .string("$(KAKAO_NATIVE_APP_KEY)"),
+            "KAKAO_NATIVE_APP_KEY": .string("${KAKAO_NATIVE_APP_KEY}"),
             "CFBundleURLTypes": .array([
                 .dictionary([
                     "CFBundleTypeRole": .string("Editor"),
                     "CFBundleURLSchemes": .array([
-                        .string("kakao$(KAKAO_NATIVE_APP_KEY)")
+                        .string("kakao${KAKAO_NATIVE_APP_KEY}")
                     ])
                 ])
             ]),
