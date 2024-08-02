@@ -28,6 +28,7 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
     private let onbardingImages: [UIImage] = [.actions,
                                               .checkmark,
                                               .add]
+    private let onbardingLabel = WSLabel(wsFont: .Header01, text: "우리가 연결되어 공간\n위스팟에 오신 것을 환영해요")
     private let onbardingLottieView = WSLottieView()
     
     //MARK: - LifeCycle
@@ -40,13 +41,14 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         super.viewWillAppear(animated)
         
         UserDefaultsManager.shared.isAccessed = true
+        UserDefaultsManager.shared.accessToken = nil
     }
     
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
         
-        view.addSubviews(onboardingCarouselView, pageControl, appleLoginButton, kakaoLoginButton, onbardingLottieView)
+        view.addSubviews(onboardingCarouselView, pageControl, appleLoginButton, kakaoLoginButton, onbardingLabel, onbardingLottieView)
     }
     
     public override func viewDidLayoutSubviews() {
@@ -79,9 +81,14 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             $0.centerX.equalTo(view.safeAreaLayoutGuide)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(32)
         }
+        onbardingLabel.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(60)
+            $0.horizontalEdges.equalTo(30)
+        }
         onbardingLottieView.snp.makeConstraints {
-            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
-            $0.height.equalTo(onbardingLottieView.snp.width)
+            $0.top.equalTo(onbardingLabel.snp.bottom).offset(120)
+            $0.centerX.equalTo(view.safeAreaLayoutGuide)
+            $0.size.equalTo(250)
         }
     }
     
@@ -106,6 +113,11 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             $0.setImage(DesignSystemAsset.Images.kakaoLoginButton.image, for: .normal)
         }
         
+        onbardingLabel.do {
+            $0.textColor = DesignSystemAsset.Colors.gray100.color
+            $0.isHidden = true
+        }
+        
         onbardingLottieView.do {
             $0.isHidden = true
             $0.isStauts = false
@@ -119,7 +131,7 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         appleLoginButton.rx.loginOnTap()
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .map { authorization in Reactor.Action.signInWithApple(authorization)}
-            .bind(to: reactor.action )
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         kakaoLoginButton.rx.tap
@@ -137,11 +149,9 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             }
             .disposed(by: disposeBag)
         
-        // State 변화에 따른 화면 전환 처리
         reactor.state
-            .compactMap { $0.signUpTokenResponse }
-            .bind(with: self) { owner, signUpToken in
-                print("Received signUpToken: \(signUpToken.signUpToken)")
+            .filter { $0.signUpTokenResponse != nil }
+            .bind(with: self) { owner, state in
                 owner.updateUI()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self)
@@ -152,10 +162,12 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             .disposed(by: disposeBag)
         
         reactor.state
-            .compactMap { $0.accountResponse }
-            .bind(with: self) { owner, assessToken in
-                // 성공
-                print(assessToken)
+            .filter { $0.accountResponse != nil }
+            .bind(with: self) { owner, state in
+                owner.updateUI()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    // 다음 화면으로 이동 처리
+                }
             }
             .disposed(by: disposeBag)
     }
@@ -175,6 +187,7 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
     }
     
     private func updateUI() {
+        onbardingLabel.isHidden = false
         onbardingLottieView.isHidden = false
         onbardingLottieView.isStauts = true
         onboardingCarouselView.isHidden = true

@@ -60,7 +60,7 @@ public final class SignInViewReactor: Reactor {
             return executeSignUp(socialType: "APPLE", authorizationCode: authorizationCode, identityToken: identityToken)
         case .signInWithKakao:
             
-            return handleKakaoLogin().flatMap { self.executeSignUp(socialType: "KAKAO", authorizationCode: $0.accessToken, identityToken: $0.idToken ?? "") }
+            return handleKakaoLogin().flatMap { self.executeSignUp(socialType: "KAKAO", authorizationCode: "", identityToken: $0.idToken ?? "" ) }
         }
     }
     
@@ -100,7 +100,7 @@ public final class SignInViewReactor: Reactor {
                                             identityToken: identityToken,
                                             fcmToken: apnsToken)
         
-        if UserDefaultsManager.shared.accessToken != nil {
+        if UserDefaultsManager.shared.accessToken == nil {
             return createNewMemberUseCase
                 .execute(body: body)
                 .asObservable()
