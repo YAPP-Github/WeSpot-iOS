@@ -73,7 +73,7 @@ public final class LoginRepository: LoginRepositoryProtocol {
     }
     
     public func fetchSchoolList(query: SchoolListRequestQuery) -> Single<SchoolListResponseEntity?> {
-        let query = SchoolListRequestDTO(name: query.name)
+        let query = SchoolListRequestDTO(name: query.name, cursorId: query.cursorId)
         let endPoint = LoginEndPoint.fetchSchoolList(query)
         
         return networkService.request(endPoint: endPoint)
