@@ -151,6 +151,14 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        navigationBar
+            .rightBarButton.rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.navigationController?.popToRootViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+        
         Observable.just(())
             .map { Reactor.Action.viewDidLoad }
             .bind(to: reactor.action)
