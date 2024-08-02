@@ -8,7 +8,7 @@
 import Foundation
 
 public struct SchoolListResponseEntity {
-    public let schools: [SchoolListEntity]
+    public var schools: [SchoolListEntity]
     
     public init(schools: [SchoolListEntity]) {
         self.schools = schools
