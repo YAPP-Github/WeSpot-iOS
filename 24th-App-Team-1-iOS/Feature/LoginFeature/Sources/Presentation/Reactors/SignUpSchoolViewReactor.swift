@@ -50,6 +50,10 @@ public final class SignUpSchoolViewReactor: Reactor {
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .searchSchool(let schoolName):
+            guard !schoolName.isEmpty else {
+                return .just(.setSchoolList(SchoolListResponseEntity(schools: [])))
+            }
+            
             let query = SchoolListRequestQuery(name: schoolName, cursorId: 0)
             
             return fetchSchoolListUseCase

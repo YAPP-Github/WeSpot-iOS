@@ -163,6 +163,11 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
             .bind(to: schoolSearchTableView.rx.items(dataSource: schoolSearchTableViewDataSource))
             .disposed(by: disposeBag)
         
+        schoolSearchTableView.rx.modelSelected(SchoolItem.self)
+                .map { Reactor.Action.selectSchool($0.school) }
+                .bind(to: reactor.action)
+                .disposed(by: disposeBag)
+        
         reactor.state
             .map { $0.schoolName.isEmpty || (!$0.schoolName.isEmpty && $0.schoolList.schools.count > 0)}
             .distinctUntilChanged()
@@ -175,6 +180,12 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
             .bind(to: warningLabel.rx.isHidden)
             .disposed(by: disposeBag)
         
+        reactor.state
+            .map { $0.selectedSchool != nil }
+            .bind(with: self) { owner, isEnabled in
+                owner.nextButton.isEnabled = isEnabled
+            }
+            .disposed(by: disposeBag)
         
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
