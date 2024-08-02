@@ -19,9 +19,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         
-        let nativeAppKey = Bundle.main.kakaoNativeAppKey
+        let appKey = Bundle.main.kakaoNativeAppKey
+        if !appKey.isEmpty {
+            print(appKey)
+            RxKakaoSDK.initSDK(appKey: appKey)
+        } else {
+            print("Kakao Native App Key가 설정되지 않았습니다.")
+            return false
+        }
         
-        RxKakaoSDK.initSDK(appKey: nativeAppKey)
         
         // APNs 등록 요청
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
@@ -48,12 +54,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("Failed to register: \(error)")
     }
     
-    // kakao login
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        if (AuthApi.isKakaoTalkLoginUrl(url)) {
-            return AuthController.rx.handleOpenUrl(url: url)
-        }
-        
-        return false
-    }
 }

@@ -12,6 +12,8 @@ import Storage
 
 import ReactorKit
 import AuthenticationServices
+import KakaoSDKUser
+import KakaoSDKAuth
 
 public final class SignInViewReactor: Reactor {
     
@@ -22,6 +24,7 @@ public final class SignInViewReactor: Reactor {
     public struct State {
         var signUpTokenResponse: CreateSignUpTokenResponseEntity?
         var accountResponse: CreateAccountResponseEntity?
+        
     }
     
     public enum Action {
@@ -34,7 +37,8 @@ public final class SignInViewReactor: Reactor {
         case setAccountResponse(CreateAccountResponseEntity)
     }
     
-    public init(createNewMemberUseCase: CreateNewMemberUseCaseProtocol, createExistingUseCase: CreateExistingMemberUseCaseProtocol) {
+    public init(createNewMemberUseCase: CreateNewMemberUseCaseProtocol,
+                createExistingUseCase: CreateExistingMemberUseCaseProtocol) {
         self.createNewMemberUseCase = createNewMemberUseCase
         self.createExistingUseCase = createExistingUseCase
         self.initialState = State()
@@ -53,12 +57,39 @@ public final class SignInViewReactor: Reactor {
             else {
                 return .empty()
             }
-            let apnsToken = APNsTokenManager.shared.token ?? ""
-            
             return executeSignUp(socialType: "APPLE", authorizationCode: authorizationCode, identityToken: identityToken)
         case .signInWithKakao:
-            //TODO: 카카오 로그인 로직 추가
-            return .empty()
+            
+            return handleKakaoLogin().flatMap { self.executeSignUp(socialType: "KAKAO", authorizationCode: $0.accessToken, identityToken: $0.idToken ?? "") }
+        }
+    }
+    
+    func handleKakaoLogin() -> Observable<OAuthToken> {
+        return Observable.create { observer in
+            // 카카오톡 앱에 접근 가능할 때
+            if (UserApi.isKakaoTalkLoginAvailable()) {
+                UserApi.shared.loginWithKakaoTalk { oauthToken, error in
+                    if let error = error {
+                        print(error)
+                        observer.onError(error)
+                    } else if let oauthToken = oauthToken {
+                        print("loginWithKakaoTalk")
+                        observer.onNext(oauthToken)
+                        observer.onCompleted()
+                    }
+                }
+            } else { // 카카오톡 설치가 안되어 있으면
+                UserApi.shared.loginWithKakaoAccount { oauthToken, error in
+                    if let error = error {
+                        print(error)
+                    } else if let oauthToken = oauthToken {
+                        print("loginWithKakaoAccount")
+                        observer.onNext(oauthToken)
+                        observer.onCompleted()
+                    }
+                }
+            }
+            return Disposables.create()
         }
     }
     

@@ -154,8 +154,8 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         reactor.state
             .compactMap { $0.accountResponse }
             .bind(with: self) { owner, assessToken in
-                let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
-                owner.navigationController?.pushViewController(voteMainViewController, animated: true)
+                // 성공
+                print(assessToken)
             }
             .disposed(by: disposeBag)
     }

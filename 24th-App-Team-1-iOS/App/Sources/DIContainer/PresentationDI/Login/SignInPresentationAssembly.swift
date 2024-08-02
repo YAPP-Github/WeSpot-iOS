@@ -18,8 +18,7 @@ struct SignInPresentationAssembly: Assembly {
         container.register(SignInViewReactor.self) { resolver in
             let createNewMemberUseCase = resolver.resolve(CreateNewMemberUseCaseProtocol.self)!
             let createExistingMemberUseCase = resolver.resolve(CreateExistingMemberUseCaseProtocol.self)!
-            let kakaoLoginUseCase = resolver.resolve(KakaoLoginUseCaseProtocol.self)!
-            return SignInViewReactor(createNewMemberUseCase: createNewMemberUseCase, createExistingUseCase: createExistingMemberUseCase, kakaoLoginUseCase: kakaoLoginUseCase)
+            return SignInViewReactor(createNewMemberUseCase: createNewMemberUseCase, createExistingUseCase: createExistingMemberUseCase)
         }
         
         container.register(SignInViewController.self) { resolver in
