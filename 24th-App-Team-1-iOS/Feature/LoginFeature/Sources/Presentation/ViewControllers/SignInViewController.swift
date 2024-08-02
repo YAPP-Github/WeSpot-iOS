@@ -152,7 +152,10 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         reactor.state
             .filter { $0.signUpTokenResponse != nil }
             .bind(with: self) { owner, state in
-                owner.updateUI()
+                // 메인 스레드에서 UI 업데이트
+                DispatchQueue.main.async {
+                    owner.updateUI()
+                }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self)
                     signUpSchoolViewController.hidesBottomBarWhenPushed = true
@@ -164,7 +167,11 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         reactor.state
             .filter { $0.accountResponse != nil }
             .bind(with: self) { owner, state in
-                owner.updateUI()
+                // 메인 스레드에서 UI 업데이트
+                DispatchQueue.main.async {
+                    owner.updateUI()
+                }
+                
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     // 다음 화면으로 이동 처리
                 }
