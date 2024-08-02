@@ -23,7 +23,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if !appKey.isEmpty {
             RxKakaoSDK.initSDK(appKey: appKey)
         } else {
-            print("Kakao Native App Key가 설정되지 않았습니다.")
             return false
         }
         

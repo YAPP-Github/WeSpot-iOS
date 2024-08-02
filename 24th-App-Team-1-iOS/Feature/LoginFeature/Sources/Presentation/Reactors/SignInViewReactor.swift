@@ -73,7 +73,6 @@ public final class SignInViewReactor: Reactor {
                         print(error)
                         observer.onError(error)
                     } else if let oauthToken = oauthToken {
-                        print("loginWithKakaoTalk")
                         observer.onNext(oauthToken)
                         observer.onCompleted()
                     }
@@ -83,7 +82,6 @@ public final class SignInViewReactor: Reactor {
                     if let error = error {
                         print(error)
                     } else if let oauthToken = oauthToken {
-                        print("loginWithKakaoAccount")
                         observer.onNext(oauthToken)
                         observer.onCompleted()
                     }
