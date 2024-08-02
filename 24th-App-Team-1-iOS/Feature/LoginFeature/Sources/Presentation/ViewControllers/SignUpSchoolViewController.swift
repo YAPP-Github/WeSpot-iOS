@@ -17,7 +17,7 @@ import RxDataSources
 import ReactorKit
 
 public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolViewReactor> {
-
+    
     //MARK: - Properties
     private let titleLabel = WSLabel(wsFont: .Header01, text: "학교 검색")
     private let subTitleLabel = WSLabel(wsFont: .Body06, text: "현재 재학 중인 학교 기준으로 검색해 주세요")
@@ -28,6 +28,13 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
     private let schoolSearchTableView = UITableView()
     private let gradientView = GradientView()
     private let nextButton = WSButton(wsButtonType: .default(12))
+    private lazy var schoolSearchTableViewDataSource = RxTableViewSectionedReloadDataSource<SchoolSection>(configureCell: { (dataSource, tableView, indexPath, item) in
+        let cell = tableView.dequeueReusableCell(withIdentifier: SchoolSearchTableViewCell.identifier, for: indexPath) as! SchoolSearchTableViewCell
+        
+        cell.setupCell(schoolName: item.school.name, address: item.school.address)
+        
+        return cell
+    })
     
     //MARK: - LifeCycle
     public override func viewWillAppear(_ animated: Bool) {
@@ -96,7 +103,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         super.setupAttributes()
         
         view.backgroundColor = DesignSystemAsset.Colors.gray900.color
-    
+        
         navigationBar
             .setNavigationBarUI(property: .leftWithCenterItem(DesignSystemAsset.Images.arrow.image, "회원가입"))
             .setNavigationBarAutoLayout(property: .leftWithCenterItem)
@@ -132,6 +139,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         
         nextButton.do {
             $0.setupButton(text: "다음")
+            $0.isEnabled = false
         }
     }
     
@@ -150,16 +158,11 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.state
-            .map { $0.schoolList.schools }
-            .distinctUntilChanged()
-            .bind(to: schoolSearchTableView.rx.items(cellIdentifier: SchoolSearchTableViewCell.identifier, cellType: SchoolSearchTableViewCell.self)) { (index, school, cell) in
-                
-                cell.selectionStyle = .none
-                cell.setupCell(schoolName: "학교이름\(index+1)", address: "주소\(index+1)")
-            }
+        reactor.pulse(\.$schoolList)
+            .map { [SchoolSection.schoolInfo($0.schools.map(SchoolItem.init))] }
+            .bind(to: schoolSearchTableView.rx.items(dataSource: schoolSearchTableViewDataSource))
             .disposed(by: disposeBag)
-            
+        
         reactor.state
             .map { $0.schoolName.isEmpty || (!$0.schoolName.isEmpty && $0.schoolList.schools.count > 0)}
             .distinctUntilChanged()
