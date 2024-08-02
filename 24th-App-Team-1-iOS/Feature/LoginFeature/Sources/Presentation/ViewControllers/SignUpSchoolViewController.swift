@@ -30,9 +30,8 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
     private let nextButton = WSButton(wsButtonType: .default(12))
     private lazy var schoolSearchTableViewDataSource = RxTableViewSectionedReloadDataSource<SchoolSection>(configureCell: { (dataSource, tableView, indexPath, item) in
         let cell = tableView.dequeueReusableCell(withIdentifier: SchoolSearchTableViewCell.identifier, for: indexPath) as! SchoolSearchTableViewCell
-        
+        cell.selectionStyle = .none
         cell.setupCell(schoolName: item.school.name, address: item.school.address)
-        
         return cell
     })
     
@@ -42,6 +41,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         
         schoolTextField.becomeFirstResponder()
         warningLabel.isHidden = true
+        hideKeyboard()
     }
     
     //MARK: - Configure
