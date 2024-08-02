@@ -54,6 +54,7 @@ extension ModulePaths {
 
 extension ModulePaths {
     public enum Domain: String, ModulePathProtocol {
+        case CommonDomain
         case LoginDomain
         case ProfileDomain
         case MessageDomain
@@ -63,6 +64,7 @@ extension ModulePaths {
 
 extension ModulePaths {
     public enum Service: String, ModulePathProtocol {
+        case CommonService
         case LoginService
         case VoteService
         case ProfileService
