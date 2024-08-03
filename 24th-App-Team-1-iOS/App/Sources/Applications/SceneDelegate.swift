@@ -7,6 +7,8 @@
 
 import UIKit
 import Util
+import Storage
+import DesignSystem
 
 import LoginFeature
 import LoginDomain
@@ -43,7 +45,23 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         ])
         
         window = UIWindow(windowScene: scene)
-        window?.rootViewController =  UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(SignInViewController.self))
+        
+        if (UserDefaultsManager.shared.accessToken?.isEmpty ?? true) { // accessToken 값이 없으면 (회원가입 안됨)
+            let signInViewController = DependencyContainer.shared.injector.resolve(SignInViewController.self)
+            window?.rootViewController = UINavigationController(rootViewController: signInViewController)
+            
+        } else { // accessToken 값이 있으면 (회원가입이 됨)
+            let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
+            let voteNavigationContoller = UINavigationController(rootViewController: voteMainViewController)
+            
+            let messageNavigationContoller = UINavigationController(rootViewController: UIViewController())
+            
+            let allNavigationContoller = UINavigationController(rootViewController: UIViewController())
+            
+            let tabbarcontroller = WSTabBarViewController()
+            tabbarcontroller.viewControllers = [voteNavigationContoller,messageNavigationContoller, allNavigationContoller]
+            window?.rootViewController = tabbarcontroller
+        }
         window?.makeKeyAndVisible()
     }
     
