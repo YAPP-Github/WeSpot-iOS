@@ -31,6 +31,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             SignInPresentationAssembly(),
             SignUpNamePresentationAssembly(),
             VotePresentationAssembly(),
+            VoteEffectPresentationAssembly(),
             VoteBeginPresentationAssembly(),
             VoteMainPresentationAssembly(),
             VoteHomePresentationAssembly(),
