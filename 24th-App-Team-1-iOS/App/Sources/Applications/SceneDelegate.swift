@@ -32,6 +32,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         DependencyContainer.shared.injector.assemble([
             SignInPresentationAssembly(),
             SignUpNamePresentationAssembly(),
+            SignUpSchoolPresentationAssembly(),
             VotePresentationAssembly(),
             VoteEffectPresentationAssembly(),
             VoteBeginPresentationAssembly(),
@@ -45,7 +46,6 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         ])
         
         window = UIWindow(windowScene: scene)
-        
         if (UserDefaultsManager.shared.accessToken?.isEmpty ?? true) { // accessToken 값이 없으면 (회원가입 안됨)
             let signInViewController = DependencyContainer.shared.injector.resolve(SignInViewController.self)
             window?.rootViewController = UINavigationController(rootViewController: signInViewController)
@@ -62,6 +62,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             tabbarcontroller.viewControllers = [voteNavigationContoller,messageNavigationContoller, allNavigationContoller]
             window?.rootViewController = tabbarcontroller
         }
+        window?.rootViewController =  UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self))
         window?.makeKeyAndVisible()
     }
     
