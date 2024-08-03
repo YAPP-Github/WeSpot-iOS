@@ -30,6 +30,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         DependencyContainer.shared.injector.assemble([
             SignInPresentationAssembly(),
             SignUpNamePresentationAssembly(),
+            SignUpSchoolPresentationAssembly(),
             VotePresentationAssembly(),
             VoteBeginPresentationAssembly(),
             VoteMainPresentationAssembly(),
@@ -42,7 +43,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         ])
         
         window = UIWindow(windowScene: scene)
-        window?.rootViewController =  UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(SignInViewController.self))
+        window?.rootViewController =  UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self))
         window?.makeKeyAndVisible()
     }
     

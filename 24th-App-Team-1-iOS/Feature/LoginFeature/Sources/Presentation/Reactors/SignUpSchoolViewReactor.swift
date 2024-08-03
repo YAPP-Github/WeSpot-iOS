@@ -60,7 +60,10 @@ public final class SignUpSchoolViewReactor: Reactor {
                 .execute(query: query)
                 .asObservable()
                 .flatMap { entity -> Observable<Mutation> in
-                    return .just(.setSchoolList(entity ?? SchoolListResponseEntity(schools: [])))
+                    guard let entity else {
+                        return .just(.setSchoolList(SchoolListResponseEntity(schools: [])))
+                    }
+                    return .just(.setSchoolList(entity))
                 }
             
         case .loadMoreSchools:
@@ -70,7 +73,7 @@ public final class SignUpSchoolViewReactor: Reactor {
                 .execute(query: query)
                 .asObservable()
                 .flatMap { entity -> Observable<Mutation> in
-                    guard let entity = entity else {
+                    guard let entity else {
                         return .empty()
                     }
                     return .concat([
