@@ -104,9 +104,10 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         
         view.backgroundColor = DesignSystemAsset.Colors.gray900.color
         
-        navigationBar
-            .setNavigationBarUI(property: .leftWithCenterItem(DesignSystemAsset.Images.arrow.image, "회원가입"))
-            .setNavigationBarAutoLayout(property: .leftWithCenterItem)
+        navigationBar.do {
+            $0.setNavigationBarUI(property: .center("회원가입"))
+            $0.setNavigationBarAutoLayout(property: .center)
+        }
         
         titleLabel.do {
             $0.textColor = DesignSystemAsset.Colors.gray100.color

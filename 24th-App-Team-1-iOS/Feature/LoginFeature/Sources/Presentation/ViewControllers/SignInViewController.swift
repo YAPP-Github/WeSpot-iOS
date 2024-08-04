@@ -159,7 +159,7 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self)
                     signUpSchoolViewController.hidesBottomBarWhenPushed = true
-                    owner.navigationController?.pushViewController(signUpSchoolViewController, animated: true)
+                    owner.navigationController?.setViewControllers([signUpSchoolViewController], animated: true)
                 }
             }
             .disposed(by: disposeBag)
@@ -167,14 +167,16 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         reactor.state
             .filter { $0.accountResponse != nil }
             .bind(with: self) { owner, state in
-                // 메인 스레드에서 UI 업데이트
-                DispatchQueue.main.async {
-                    owner.updateUI()
-                }
+                let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
+                let voteNavigationContoller = UINavigationController(rootViewController: voteMainViewController)
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    // 다음 화면으로 이동 처리
-                }
+                let messageNavigationContoller = UINavigationController(rootViewController: UIViewController())
+                
+                let allNavigationContoller = UINavigationController(rootViewController: UIViewController())
+                
+                let tabbarcontroller = WSTabBarViewController()
+                tabbarcontroller.viewControllers = [voteNavigationContoller,messageNavigationContoller, allNavigationContoller]
+                owner.navigationController?.setViewControllers([tabbarcontroller], animated: true)
             }
             .disposed(by: disposeBag)
     }
