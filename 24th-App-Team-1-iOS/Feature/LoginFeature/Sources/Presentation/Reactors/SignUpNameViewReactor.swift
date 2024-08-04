@@ -6,10 +6,14 @@
 //
 
 import Foundation
-
+import CommonDomain
 import ReactorKit
+import RxSwift
 
 public final class SignUpNameViewReactor: Reactor {
+    
+    private let createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol
+    public var initialState: State
     
     public struct State {
         var name: String = ""
@@ -20,7 +24,6 @@ public final class SignUpNameViewReactor: Reactor {
     
     public enum Action {
         case inputName(String)
-        case nextButtonTap
     }
     
     public enum Mutation {
@@ -30,9 +33,8 @@ public final class SignUpNameViewReactor: Reactor {
         case setWarningHidden(Bool)
     }
     
-    public var initialState: State
-    
-    public init() {
+    public init(createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol) {
+        self.createCheckProfanityUseCase = createCheckProfanityUseCase
         self.initialState = State()
     }
     
@@ -50,9 +52,6 @@ public final class SignUpNameViewReactor: Reactor {
                 .just(Mutation.setButtonEnabled(isButtonEnabled)),
                 .just(Mutation.setWarningHidden(isWarningHidden))
             ])
-            
-        case .nextButtonTap:
-            return .just(.setButtonEnabled(true))
         }
     }
     
