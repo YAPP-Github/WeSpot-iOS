@@ -58,10 +58,6 @@ public final class SignInViewReactor: Reactor {
                 return .empty()
             }
             
-            print("authorizationCode:", authorizationCode)
-            print("identityToken:", identityToken)
-            print("FCM Token:", UserDefaultsManager.shared.fcmToken ?? "")
-            
             return executeSignUp(socialType: "APPLE", authorizationCode: authorizationCode, identityToken: identityToken)
         case .signInWithKakao:
             
