@@ -8,13 +8,17 @@
 import Foundation
 
 import ReactorKit
+import Util
 import VoteDomain
 
 
 public final class VoteResultCellReactor: Reactor {
     public var initialState: State
     
-    public typealias Action = NoAction
+    private var globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
+    public enum Action {
+        case didTappedResultButton
+    }
     
     public struct State {
         public let content: String
@@ -32,5 +36,13 @@ public final class VoteResultCellReactor: Reactor {
             winnerUser: winnerUser,
             voteCount: voteCount
         )
+    }
+    
+    public func mutate(action: Action) -> Observable<Action> {
+        switch action {
+        case .didTappedResultButton:
+            globalService.event.onNext(.didTappedResultButton)
+            return .empty()
+        }
     }
 }

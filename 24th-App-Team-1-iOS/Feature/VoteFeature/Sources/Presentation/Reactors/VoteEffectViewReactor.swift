@@ -15,7 +15,7 @@ public final class VoteEffectViewReactor: Reactor {
     private let fetchVoteEffectOptionsUseCase: FetchAllVoteOptionsUseCaseProtocol
     public let initialState: State
     public struct State {
-        @Pulse var completeSection: [VoteCompleteSection]
+        @Pulse var effectSection: [VoteCompleteSection]
         @Pulse var voteAllEntity: [VoteAllEntity]
         var isLoading: Bool
         var currentPage: Int
@@ -38,7 +38,7 @@ public final class VoteEffectViewReactor: Reactor {
     public init(fetchVoteEffectOptionsUseCase: FetchAllVoteOptionsUseCaseProtocol) {
         self.fetchVoteEffectOptionsUseCase = fetchVoteEffectOptionsUseCase
         self.initialState = State(
-            completeSection: [.voteAllRankerInfo([])],
+            effectSection: [.voteAllRankerInfo([])],
             voteAllEntity: [],
             isLoading: false,
             currentPage: 0
@@ -55,6 +55,7 @@ public final class VoteEffectViewReactor: Reactor {
                 .asObservable()
                 .withUnretained(self)
                 .flatMap { owner, entity -> Observable<Mutation> in
+                    print("voteAllFetch Entity: \(entity)")
                     guard let originalEntity = entity else { return .empty() }
                     var completeSectionitem: [VoteCompleteItem] = []
                     completeSectionitem = owner.createCompleteSectionItem(entity: originalEntity)
@@ -77,6 +78,7 @@ public final class VoteEffectViewReactor: Reactor {
                 .asObservable()
                 .withUnretained(self)
                 .flatMap { owner, entity -> Observable<Mutation> in
+                    print("original Enttiy: \(entity)")
                     guard let originalEntity = entity else { return .empty() }
                     var completeSectionitem: [VoteCompleteItem] = []
                     completeSectionitem = owner.createCompleteSectionItem(entity: originalEntity)
@@ -100,12 +102,12 @@ public final class VoteEffectViewReactor: Reactor {
         case let .setCurrentPageControl(currentPage):
             newState.currentPage = currentPage
         case let .setCompleteSection(items):
-            newState.completeSection = [.voteAllRankerInfo(items)]
+            newState.effectSection = [.voteAllRankerInfo(items)]
         case let .setVoteAllEntity(voteAllEntity):
             newState.voteAllEntity = voteAllEntity
         }
         
-        return state
+        return newState
     }
 }
 
@@ -136,7 +138,7 @@ extension VoteEffectViewReactor {
                     )
                 }
         }
-        
+        print("comleteSection Function : \(completeSectionitem)")
         return completeSectionitem
     }
 }

@@ -14,7 +14,6 @@ import RxCocoa
 final class VoteResultCollectionViewCell: UICollectionViewCell {
     
     //MARK: - Properties
-    typealias Reactor = VoteResultCellReactor
     private let rankView: VoteRankView = VoteRankView()
     private let descriptionLabel: WSLabel = WSLabel(wsFont: .Body03)
     private let faceImageView: UIImageView = UIImageView()
@@ -139,7 +138,15 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
 
 extension VoteResultCollectionViewCell: ReactorKit.View {
     
-    func bind(reactor: Reactor) {
+    func bind(reactor: VoteResultCellReactor) {
+        
+        resultContainerView
+            .rx.tap
+            .map { Reactor.Action.didTappedResultButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        
         reactor.state
             .map { $0.content }
             .distinctUntilChanged()

@@ -194,8 +194,9 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
             .disposed(by: disposeBag)
         
         
-        reactor.pulse(\.$completeSection)
+        reactor.pulse(\.$effectSection)
             .asDriver(onErrorJustReturn: [])
+            .debug("complete Section")
             .drive(effectCollectionView.rx.items(dataSource: effectCollectionViewDataSources))
             .disposed(by: disposeBag)
         
