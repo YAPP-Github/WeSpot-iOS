@@ -9,9 +9,11 @@ import Foundation
 
 public struct SchoolListRequestDTO: Encodable {
     public let name: String
-
-    init(name: String) {
+    public let cursorId: Int
+    
+    public init(name: String, cursorId: Int) {
         self.name = name
+        self.cursorId = cursorId
     }
 }
 
