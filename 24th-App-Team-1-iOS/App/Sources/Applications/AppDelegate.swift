@@ -7,6 +7,7 @@
 
 import UIKit
 import Storage
+import Extensions
 
 import FirebaseCore
 import FirebaseMessaging
@@ -86,7 +87,7 @@ extension AppDelegate: MessagingDelegate {
         
         let dataDict: [String: String] = ["token": fcmToken ?? ""]
         NotificationCenter.default.post(
-            name: Notification.Name("FCMToken"),
+            name: .FCMToken,
             object: nil,
             userInfo: dataDict
         )
