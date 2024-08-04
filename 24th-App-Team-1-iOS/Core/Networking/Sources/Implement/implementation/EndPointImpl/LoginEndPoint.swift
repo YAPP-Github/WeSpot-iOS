@@ -19,8 +19,6 @@ public enum LoginEndPoint: WSNetworkEndPoint {
     case createRefreshToken(Encodable)
     // 학교 정보 검색 API
     case fetchSchoolList(Encodable)
-    // 비속어 검색 API
-    case createProfanityCheck(Encodable)
     
     public var path: String {
         switch self {
@@ -32,8 +30,6 @@ public enum LoginEndPoint: WSNetworkEndPoint {
             return "/auth/reissue"
         case .fetchSchoolList:
             return "/auth/signup/search"
-        case .createProfanityCheck:
-            return "/messages/check-profanity"
         }
     }
     
@@ -47,25 +43,22 @@ public enum LoginEndPoint: WSNetworkEndPoint {
             return .post
         case .fetchSchoolList:
             return .get
-        case .createProfanityCheck:
-            return .post
         }
     }
     
-    public var parameters: WSRequestParameters {
-        switch self {
-        case .createSocialLogin(let body):
-            return .requestBody(body)
-        case .createAccount(let body):
-            return .requestBody(body)
-        case .createRefreshToken(let body):
-            return .requestBody(body)
-        case .fetchSchoolList(let name):
-            return .requestQuery(name)
-        case .createProfanityCheck(let messsage):
-            return .requestBody(messsage)
+        public var parameters: WSRequestParameters {
+            switch self {
+            case .createSocialLogin(let body):
+                return .requestBody(body)
+            case .createAccount(let body):
+                return .requestBody(body)
+            case .createRefreshToken(let body):
+                return .requestBody(body)
+            case .fetchSchoolList(let name):
+                return .requestQuery(name)
+            }
         }
-    }
+        
     
     public var headers: HTTPHeaders {
         return [
