@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import CommonDomain
+import CommonService
 import LoginDomain
 import LoginService
 import VoteDomain
@@ -17,6 +19,11 @@ import Swinject
 
 struct DataAssembly: Assembly {
     func assemble(container: Container) {
+        
+        container.register(CommonRepositoryProtocol.self) { _ in
+            return CommonRepository()
+        }
+        
         container.register(VoteRepositoryProtocol.self) { _ in
             return VoteRepository()
         }
