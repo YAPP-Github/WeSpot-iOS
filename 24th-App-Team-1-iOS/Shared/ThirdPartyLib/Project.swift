@@ -28,7 +28,6 @@ let project = Project
                 .SPM.kakaoSDKUser,
                 .SPM.rxKakaoSDKUser,
                 .SPM.lottie,
-                .SPM.firebaseAuth,
                 .SPM.firebaseAnalytics,
                 .SPM.firebaseMessaging,
                 .SPM.firebaseCrashlytics
