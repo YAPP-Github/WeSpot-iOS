@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CommonDomain
 import LoginFeature
 import LoginDomain
 
@@ -67,9 +68,9 @@ struct SignUpGenderPresentationAssembly: Assembly {
 /// SignUpName DIContainer
 struct SignUpNamePresentationAssembly: Assembly {
     func assemble(container: Container) {
-
-        container.register(SignUpNameViewReactor.self) { _ in
-            return SignUpNameViewReactor()
+        container.register(SignUpNameViewReactor.self) { resolver in
+            let createCheckProfanityUseCase = resolver.resolve(CreateCheckProfanityUseCaseProtocol.self)!
+            return SignUpNameViewReactor(createCheckProfanityUseCase: createCheckProfanityUseCase)
         }
 
         container.register(SignUpNameViewController.self) { resolver in

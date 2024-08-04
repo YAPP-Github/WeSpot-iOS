@@ -83,15 +83,4 @@ public final class LoginRepository: LoginRepositoryProtocol {
             .map { $0.toDomain() }
             .asSingle()
     }
-    
-    public func createProfanityCheck(body: CreateProfanityCheckRequest) -> Single<Void> {
-        let query = CreateProfanityCheckRequestDTO(message: body.message)
-        let endPoint = LoginEndPoint.createProfanityCheck(query)
-        
-        return networkService.request(endPoint: endPoint)
-            .asObservable()
-            .logErrorIfDetected(category: Network.error)
-            .asSingle()
-            .map { _ in return Void() }
-    }
 }

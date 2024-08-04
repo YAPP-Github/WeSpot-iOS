@@ -6,10 +6,14 @@
 //
 
 import Foundation
-
+import CommonDomain
 import ReactorKit
+import RxSwift
 
 public final class SignUpNameViewReactor: Reactor {
+    
+    private let createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol
+    public var initialState: State
     
     public struct State {
         var name: String = ""
@@ -20,7 +24,6 @@ public final class SignUpNameViewReactor: Reactor {
     
     public enum Action {
         case inputName(String)
-        case nextButtonTap
     }
     
     public enum Mutation {
@@ -30,29 +33,42 @@ public final class SignUpNameViewReactor: Reactor {
         case setWarningHidden(Bool)
     }
     
-    public var initialState: State
-    
-    public init() {
+    public init(createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol) {
+        self.createCheckProfanityUseCase = createCheckProfanityUseCase
         self.initialState = State()
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .inputName(let name):
-            let isValid = self.validateName(name)
-            let errorMessage = isValid ? nil : (name.count <= 1 ? nil : "2~5자의 한글만 입력 가능해요")
-            let isButtonEnabled = name.count >= 2 && isValid
-            let isWarningHidden = name.count <= 1
             
-            return Observable.concat([
-                .just(Mutation.setName(name)),
-                .just(Mutation.setErrorMessage(errorMessage)),
-                .just(Mutation.setButtonEnabled(isButtonEnabled)),
-                .just(Mutation.setWarningHidden(isWarningHidden))
-            ])
+            let body = CreateCheckProfanityRequest(message: name)
             
-        case .nextButtonTap:
-            return .just(.setButtonEnabled(true))
+            return createCheckProfanityUseCase
+                .execute(body: body)
+                .asObservable()
+                .flatMap { isProfane -> Observable<Mutation> in
+                    if isProfane {
+                        return Observable.concat([
+                            .just(Mutation.setName(name)),
+                            .just(Mutation.setErrorMessage("비속어가 포함되어 있어요")),
+                            .just(Mutation.setButtonEnabled(false)),
+                            .just(Mutation.setWarningHidden(false))
+                        ])
+                    } else {
+                        let isValid = self.validateName(name)
+                        let errorMessage = isValid ? nil : (name.count <= 1 ? nil : "2~5자의 한글만 입력 가능해요")
+                        let isButtonEnabled = name.count >= 2 && isValid
+                        let isWarningHidden = name.count <= 1
+                        
+                        return Observable.concat([
+                            .just(Mutation.setName(name)),
+                            .just(Mutation.setErrorMessage(errorMessage)),
+                            .just(Mutation.setButtonEnabled(isButtonEnabled)),
+                            .just(Mutation.setWarningHidden(isWarningHidden))
+                        ])
+                    }
+                }
         }
     }
     
