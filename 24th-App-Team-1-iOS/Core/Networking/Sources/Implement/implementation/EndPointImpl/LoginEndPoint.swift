@@ -31,7 +31,7 @@ public enum LoginEndPoint: WSNetworkEndPoint {
         case .createRefreshToken:
             return "/auth/reissue"
         case .fetchSchoolList:
-            return "/auth/signup/search"
+            return "/auth/signup/schools/search"
         case .createProfanityCheck:
             return "/messages/check-profanity"
         }

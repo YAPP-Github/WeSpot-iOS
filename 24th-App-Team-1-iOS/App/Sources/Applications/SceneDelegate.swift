@@ -32,6 +32,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         DependencyContainer.shared.injector.assemble([
             SignInPresentationAssembly(),
             SignUpNamePresentationAssembly(),
+            SignUpSchoolPresentationAssembly(),
             VotePresentationAssembly(),
             VoteBeginPresentationAssembly(),
             VoteMainPresentationAssembly(),
@@ -44,6 +45,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         ])
         
         window = UIWindow(windowScene: scene)
+
         
         if (UserDefaultsManager.shared.accessToken?.isEmpty ?? true) { // accessToken 값이 없으면 (회원가입 안됨)
             let signInViewController = DependencyContainer.shared.injector.resolve(SignInViewController.self)
