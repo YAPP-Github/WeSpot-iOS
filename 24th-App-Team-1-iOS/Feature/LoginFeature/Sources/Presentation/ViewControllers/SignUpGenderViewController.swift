@@ -86,8 +86,7 @@ public final class SignUpGenderViewController: BaseViewController<SignUpGenderVi
         boyCardButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpNameViewReactor = SignUpNameViewReactor()
-                let signUpNameViewController = SignUpNameViewController(reactor: signUpNameViewReactor)
+                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self)
                 owner.navigationController?.pushViewController(signUpNameViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -95,8 +94,7 @@ public final class SignUpGenderViewController: BaseViewController<SignUpGenderVi
         girlCardButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpNameViewReactor = SignUpNameViewReactor()
-                let signUpNameViewController = SignUpNameViewController(reactor: signUpNameViewReactor)
+                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self)
                 owner.navigationController?.pushViewController(signUpNameViewController, animated: true)
             }
             .disposed(by: disposeBag)

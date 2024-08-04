@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CommonDomain
 import VoteDomain
 import LoginDomain
 
@@ -14,15 +15,16 @@ import Swinject
 struct DomainAssembly: Assembly {
     func assemble(container: Container) {
         
+        //common
+        container.register(CreateCheckProfanityUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(CommonRepositoryProtocol.self)!
+            return createCheckProfanityUseCase(commonRepository: repository)
+        }
+        
         // login
         container.register(CreateAccountUseCaseProtocol.self) { resovler in
             let repository = resovler.resolve(LoginRepositoryProtocol.self)!
             return CreateAccountUseCase(loginRepository: repository)
-        }
-        
-        container.register(createProfanityCheckUseCaseProtocol.self) { resovler in
-            let repository = resovler.resolve(LoginRepositoryProtocol.self)!
-            return createProfanityCheckUseCase(loginRepository: repository)
         }
         
         container.register(CreateRefreshTokenUseCaseProtocol.self) { resovler in

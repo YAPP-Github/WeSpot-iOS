@@ -10,11 +10,11 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-public protocol createProfanityCheckUseCaseProtocol {
+public protocol CreateCheckProfanityUseCaseProtocol {
     func execute(body: CreateCheckProfanityRequest) -> Single<Bool>
 }
 
-public final class createProfanityCheckUseCase: createProfanityCheckUseCaseProtocol {
+public final class createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol {
     
     public let commonRepository: CommonRepositoryProtocol
     
