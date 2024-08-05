@@ -82,7 +82,6 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
         
         reactor.pulse(\.$isShowEffectView)
             .filter { $0 == true }
-            .distinctUntilChanged()
             .bind(with: self) { owner, _ in
                 let voteEffectViewController = DependencyContainer.shared.injector.resolve(VoteEffectViewController.self)
                 owner.navigationController?.pushViewController(voteEffectViewController, animated: true)

@@ -10,6 +10,11 @@ import VoteDomain
 
 import ReactorKit
 
+public enum VoteEffectType {
+    case latest
+    case previous
+}
+
 public final class VoteEffectViewReactor: Reactor {
     
     private let fetchVoteEffectOptionsUseCase: FetchAllVoteOptionsUseCaseProtocol
@@ -19,6 +24,7 @@ public final class VoteEffectViewReactor: Reactor {
         @Pulse var voteAllEntity: [VoteAllEntity]
         var isLoading: Bool
         var currentPage: Int
+        var toggleType: VoteEffectType
     }
     
     public enum Action {
@@ -29,6 +35,7 @@ public final class VoteEffectViewReactor: Reactor {
     
     public enum Mutation {
         case setLoading(Bool)
+        case setToggleType(VoteEffectType)
         case setCurrentPageControl(Int)
         case setCompleteSection([VoteCompleteItem])
         case setVoteAllEntity([VoteAllEntity])
@@ -41,7 +48,8 @@ public final class VoteEffectViewReactor: Reactor {
             effectSection: [.voteAllRankerInfo([])],
             voteAllEntity: [],
             isLoading: false,
-            currentPage: 0
+            currentPage: 0,
+            toggleType: .latest
         )
     }
     
@@ -55,13 +63,13 @@ public final class VoteEffectViewReactor: Reactor {
                 .asObservable()
                 .withUnretained(self)
                 .flatMap { owner, entity -> Observable<Mutation> in
-                    print("voteAllFetch Entity: \(entity)")
                     guard let originalEntity = entity else { return .empty() }
                     var completeSectionitem: [VoteCompleteItem] = []
                     completeSectionitem = owner.createCompleteSectionItem(entity: originalEntity)
                     
                     return .concat(
                         .just(.setLoading(true)),
+                        .just(.setToggleType(.latest)),
                         .just(.setVoteAllEntity(originalEntity.response)),
                         .just(.setCompleteSection(completeSectionitem)),
                         .just(.setLoading(false))
@@ -78,13 +86,13 @@ public final class VoteEffectViewReactor: Reactor {
                 .asObservable()
                 .withUnretained(self)
                 .flatMap { owner, entity -> Observable<Mutation> in
-                    print("original Enttiy: \(entity)")
                     guard let originalEntity = entity else { return .empty() }
                     var completeSectionitem: [VoteCompleteItem] = []
                     completeSectionitem = owner.createCompleteSectionItem(entity: originalEntity)
                     
                     return .concat(
                         .just(.setLoading(true)),
+                        .just(.setToggleType(.previous)),
                         .just(.setVoteAllEntity(originalEntity.response)),
                         .just(.setCompleteSection(completeSectionitem)),
                         .just(.setLoading(false))
@@ -99,6 +107,8 @@ public final class VoteEffectViewReactor: Reactor {
         switch mutation {
         case let .setLoading(isLoading):
             newState.isLoading = isLoading
+        case let .setToggleType(toggleType):
+            newState.toggleType = toggleType
         case let .setCurrentPageControl(currentPage):
             newState.currentPage = currentPage
         case let .setCompleteSection(items):
@@ -138,7 +148,6 @@ extension VoteEffectViewReactor {
                     )
                 }
         }
-        print("comleteSection Function : \(completeSectionitem)")
         return completeSectionitem
     }
 }

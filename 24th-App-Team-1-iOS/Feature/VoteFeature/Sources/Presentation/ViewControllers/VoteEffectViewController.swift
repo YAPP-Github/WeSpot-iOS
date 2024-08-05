@@ -16,6 +16,8 @@ import RxCocoa
 import ReactorKit
 import RxDataSources
 
+fileprivate typealias VoteEffectStr = VoteStrings
+fileprivate typealias VoteEffectId = VoteStrings.Identifier
 public final class VoteEffectViewController: BaseViewController<VoteEffectViewReactor> {
 
     //MARK: - Properties
@@ -43,11 +45,11 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
         switch sectionItem {
         case let .voteAllRankerItem(cellReactor):
             
-            guard let allRankerCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteCompleteId.voteAllCell, for: indexPath) as? VoteAllCollectionViewCell else { return UICollectionViewCell() }
+            guard let allRankerCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteEffectId.voteAllCell, for: indexPath) as? VoteAllCollectionViewCell else { return UICollectionViewCell() }
             allRankerCell.reactor = cellReactor
             return allRankerCell
         case let .voteAllEmptyItem(cellReactor):
-            guard let allEmtpyCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteCompleteId.voteEmptyCell, for: indexPath) as? VoteEmptyCollectionViewCell else { return UICollectionViewCell() }
+            guard let allEmtpyCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteEffectId.voteEmptyCell, for: indexPath) as? VoteEmptyCollectionViewCell else { return UICollectionViewCell() }
             allEmtpyCell.reactor = cellReactor
             return allEmtpyCell
         }
@@ -114,25 +116,29 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
     public override func setupAttributes() {
         super.setupAttributes()
         realTimeButton.do {
-            $0.setTitleColor(DesignSystemAsset.Colors.gray100.color, for: .selected)
-            $0.setTitleColor(DesignSystemAsset.Colors.gray400.color, for: .normal)
-            $0.setTitle("실시간 투표", for: .normal)
-            $0.titleLabel?.font = WSFont.Body05.font()
+            $0.configuration = .filled()
+            $0.configuration?.baseForegroundColor = DesignSystemAsset.Colors.gray100.color
+            $0.configuration?.baseBackgroundColor = DesignSystemAsset.Colors.gray500.color
+            $0.configuration?.attributedTitle = AttributedString(NSAttributedString(string: VoteStrings.voteRealTimeButtonText, attributes: [
+                .font: WSFont.Body05.font(),
+            ]))
             $0.layer.cornerRadius = 15
+            $0.layer.borderWidth = 0
+            $0.layer.borderColor = DesignSystemAsset.Colors.gray400.color.cgColor
             $0.clipsToBounds = true
-            $0.backgroundColor = DesignSystemAsset.Colors.gray500.color
         }
         
         lastTimeButton.do {
-            $0.setTitleColor(DesignSystemAsset.Colors.gray100.color, for: .selected)
-            $0.setTitleColor(DesignSystemAsset.Colors.gray400.color, for: .normal)
+            $0.configuration = .filled()
+            $0.configuration?.baseForegroundColor = DesignSystemAsset.Colors.gray400.color
+            $0.configuration?.baseBackgroundColor = .clear
+            $0.configuration?.attributedTitle = AttributedString(NSAttributedString(string: VoteStrings.voteLastTimeButtonText, attributes: [
+                .font: WSFont.Body05.font(),
+            ]))
             $0.layer.borderColor = DesignSystemAsset.Colors.gray400.color.cgColor
             $0.layer.borderWidth = 1
-            $0.setTitle("지난 투표", for: .normal)
-            $0.titleLabel?.font = WSFont.Body05.font()
             $0.layer.cornerRadius = 15
             $0.clipsToBounds = true
-            $0.backgroundColor = .clear
         }
         
         navigationBar.do {
@@ -159,8 +165,8 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
         }
         
         effectCollectionView.do {
-            $0.register(VoteAllCollectionViewCell.self, forCellWithReuseIdentifier: VoteCompleteId.voteAllCell)
-            $0.register(VoteEmptyCollectionViewCell.self, forCellWithReuseIdentifier: VoteCompleteId.voteEmptyCell)
+            $0.register(VoteAllCollectionViewCell.self, forCellWithReuseIdentifier: VoteEffectId.voteAllCell)
+            $0.register(VoteEmptyCollectionViewCell.self, forCellWithReuseIdentifier: VoteEffectId.voteEmptyCell)
             $0.backgroundColor = .clear
             $0.showsVerticalScrollIndicator = false
             $0.showsHorizontalScrollIndicator = false
@@ -180,23 +186,36 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
         
         lastTimeButton
             .rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
             .map { Reactor.Action.fetchPreviousAllVoteOptions }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        
         realTimeButton
             .rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
             .map { Reactor.Action.fetchlatestAllVoteOption }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        reactor.state
+            .map { $0.toggleType == .latest }
+            .distinctUntilChanged()
+            .bind(with: self){ owner, isSelected in
+                owner.updateRealTimeButton(isSelected: isSelected)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.toggleType == .previous }
+            .distinctUntilChanged()
+            .bind(with: self) { owner, isSelected in
+                owner.updateLastTimeButton(isSelected: isSelected)
+            }
+            .disposed(by: disposeBag)
         
         reactor.pulse(\.$effectSection)
             .asDriver(onErrorJustReturn: [])
-            .debug("complete Section")
             .drive(effectCollectionView.rx.items(dataSource: effectCollectionViewDataSources))
             .disposed(by: disposeBag)
         
@@ -211,6 +230,18 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
             .distinctUntilChanged()
             .bind(to: effectPageControl.rx.currentPage)
             .disposed(by: disposeBag)
+    }
+    
+    private func updateLastTimeButton(isSelected: Bool) {
+        lastTimeButton.configuration?.baseBackgroundColor = isSelected ? DesignSystemAsset.Colors.gray500.color : .clear
+        lastTimeButton.configuration?.baseForegroundColor = isSelected ? DesignSystemAsset.Colors.gray100.color : DesignSystemAsset.Colors.gray400.color
+        lastTimeButton.layer.borderWidth = isSelected ? 0 : 1
+    }
+    
+    private func updateRealTimeButton(isSelected: Bool) {
+        realTimeButton.configuration?.baseBackgroundColor = isSelected ? DesignSystemAsset.Colors.gray500.color : .clear
+        realTimeButton.configuration?.baseForegroundColor = isSelected ? DesignSystemAsset.Colors.gray100.color : DesignSystemAsset.Colors.gray400.color
+        realTimeButton.layer.borderWidth = isSelected ? 0 : 1
     }
     
     private func createEmptyRankerLayoutSection() -> NSCollectionLayoutSection {

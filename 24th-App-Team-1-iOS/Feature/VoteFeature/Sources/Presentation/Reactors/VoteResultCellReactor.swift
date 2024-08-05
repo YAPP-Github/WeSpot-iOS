@@ -41,7 +41,10 @@ public final class VoteResultCellReactor: Reactor {
     public func mutate(action: Action) -> Observable<Action> {
         switch action {
         case .didTappedResultButton:
-            globalService.event.onNext(.didTappedResultButton)
+            if currentState.winnerUser != nil {
+                globalService.event.onNext(.didTappedResultButton)
+            }
+            //TODO: 친구에게 물어보기 Global State 추가
             return .empty()
         }
     }
