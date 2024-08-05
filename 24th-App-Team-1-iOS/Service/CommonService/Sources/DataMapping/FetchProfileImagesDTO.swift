@@ -21,7 +21,7 @@ public struct FetchProfileImagesItemDTO: Decodable {
 
 extension FetchProfileImagesResponseDTO {
     func toDomain() -> FetchProfileImageResponseEntity {
-        return .init(characters: characters)
+        return .init(characters: characters.map { $0.toDomain() })
     }
 }
 
