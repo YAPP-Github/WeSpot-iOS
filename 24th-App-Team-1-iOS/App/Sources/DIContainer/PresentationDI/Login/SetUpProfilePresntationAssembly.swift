@@ -7,15 +7,21 @@
 
 import Foundation
 import LoginFeature
-import LoginDomain
+import CommonDomain
 
 import Swinject
 
 struct SetUpProfilePresntationAssembly: Assembly {
     func assemble(container: Container) {
         container.register(SetUpProfileImageViewReactor.self) { resolver in
-
-            return SetUpProfileImageViewReactor()
+            
+            let fetchProfileImagesUseCase = resolver.resolve(FetchProfileImagesUseCaseProtocol.self)!
+            let fetchProfileBackgroundsUseCase = resolver.resolve(FetchProfileBackgroundsUseCaseProtocol.self)!
+            
+            return SetUpProfileImageViewReactor(
+                fetchProfileImagesUseCase: fetchProfileImagesUseCase,
+                fetchProfileBackgroundsUseCase: fetchProfileBackgroundsUseCase
+            )
         }
         
         container.register(SetUpProfileImageViewController.self) {  resolver in
