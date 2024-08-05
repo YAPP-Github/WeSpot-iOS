@@ -30,6 +30,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         DependencyContainer.shared.injector.assemble([
             SignInPresentationAssembly(),
             SignUpNamePresentationAssembly(),
+            SetUpProfilePresntationAssembly(),
             VotePresentationAssembly(),
             VoteBeginPresentationAssembly(),
             VoteMainPresentationAssembly(),
