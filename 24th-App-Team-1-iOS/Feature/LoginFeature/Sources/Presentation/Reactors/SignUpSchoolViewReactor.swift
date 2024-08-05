@@ -16,43 +16,74 @@ public final class SignUpSchoolViewReactor: Reactor {
     public var initialState: State
     
     public struct State {
-        var schoolName: String = ""
-        var schoolList: SchoolListResponseEntity = SchoolListResponseEntity(schools: [])
-        var selectedSchool: String?
+        var schoolName: String
+        @Pulse var schoolList: SchoolListResponseEntity
+        var selectedSchool: SchoolListEntity?
+        var cursorId: Int
+        var isLoading: Bool
     }
     
     public enum Action {
         case searchSchool(String)
-        case selectSchool(String)
+        case loadMoreSchools
+        case selectSchool(SchoolListEntity?)
     }
     
     public enum Mutation {
         case setSchoolList(SchoolListResponseEntity)
-        case setSelectedSchool(String?)
+        case appendSchoolList(SchoolListResponseEntity)
+        case setSelectedSchool(SchoolListEntity?)
+        case setCursorId(Int)
+        case setLoading(Bool)
     }
     
     public init(fetchSchoolListUseCase: FetchSchoolListUseCaseProtocol) {
+        self.initialState = State(
+            schoolName: "",
+            schoolList: SchoolListResponseEntity(schools: []),
+            cursorId: 0,
+            isLoading: false
+        )
         self.fetchSchoolListUseCase = fetchSchoolListUseCase
-        self.initialState = State()
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .searchSchool(let schoolName):
-            if schoolName.isEmpty {
+            guard !schoolName.isEmpty else {
                 return .just(.setSchoolList(SchoolListResponseEntity(schools: [])))
             }
             
-            let query = SchoolListRequestQuery(name: schoolName)
+            let query = SchoolListRequestQuery(name: schoolName, cursorId: 0)
             
             return fetchSchoolListUseCase
                 .execute(query: query)
                 .asObservable()
-                .map { entity in
-                    return .setSchoolList(entity ?? SchoolListResponseEntity(schools: []))
+                .flatMap { entity -> Observable<Mutation> in
+                    guard let entity else {
+                        return .just(.setSchoolList(SchoolListResponseEntity(schools: [])))
+                    }
+                    return .just(.setSchoolList(entity))
                 }
-        case .selectSchool(let schoolName):
-            return .just(.setSelectedSchool(schoolName))
+            
+        case .loadMoreSchools:
+            let query = SchoolListRequestQuery(name: currentState.schoolName, cursorId: currentState.cursorId)
+            
+            return fetchSchoolListUseCase
+                .execute(query: query)
+                .asObservable()
+                .flatMap { entity -> Observable<Mutation> in
+                    guard let entity else {
+                        return .empty()
+                    }
+                    return .concat([
+                        .just(.appendSchoolList(entity)),
+                        .just(.setCursorId(entity.schools.last?.id ?? self.currentState.cursorId))
+                    ])
+                }
+            
+        case .selectSchool(let school):
+            return .just(.setSelectedSchool(school))
         }
     }
     
@@ -61,8 +92,22 @@ public final class SignUpSchoolViewReactor: Reactor {
         switch mutation {
         case .setSchoolList(let results):
             newState.schoolList = results
-        case .setSelectedSchool(let schoolName):
-            newState.selectedSchool = schoolName
+            newState.cursorId = results.schools.last?.id ?? 0
+            
+        case .appendSchoolList(let results):
+            var currentSchools = newState.schoolList.schools
+            currentSchools.append(contentsOf: results.schools)
+            newState.schoolList = SchoolListResponseEntity(schools: currentSchools)
+            newState.cursorId = results.schools.last?.id ?? newState.cursorId
+            
+        case .setSelectedSchool(let school):
+            newState.selectedSchool = school
+            
+        case .setCursorId(let cursorId):
+            newState.cursorId = cursorId
+            
+        case .setLoading(let isLoading):
+            newState.isLoading = isLoading
         }
         return newState
     }

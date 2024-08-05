@@ -29,6 +29,8 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        nextButton.isEnabled = false
+        nameTextField.becomeFirstResponder()
     }
     
     //MARK: - Configure
@@ -87,6 +89,7 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
         textLengthLabel.textColor = DesignSystemAsset.Colors.gray400.color
         
         nextButton.do {
+            $0.isEnabled = false
             $0.setupButton(text: "다음")
         }
     }
@@ -94,16 +97,9 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
-        
         nameTextField.rx.text.orEmpty
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .map { Reactor.Action.inputName($0) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        nextButton.rx.tap
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .map { Reactor.Action.nextButtonTap }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
@@ -129,7 +125,9 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
         reactor.state
             .map { $0.isButtonEnabled }
             .distinctUntilChanged()
-            .bind(to: nextButton.rx.isEnabled)
+            .bind(with: self) { owner, isEnabled in
+                owner.nextButton.isEnabled = isEnabled
+            }
             .disposed(by: disposeBag)
         
         reactor.state

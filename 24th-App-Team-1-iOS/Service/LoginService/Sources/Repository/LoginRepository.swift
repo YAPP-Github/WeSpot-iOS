@@ -73,7 +73,7 @@ public final class LoginRepository: LoginRepositoryProtocol {
     }
     
     public func fetchSchoolList(query: SchoolListRequestQuery) -> Single<SchoolListResponseEntity?> {
-        let query = SchoolListRequestDTO(name: query.name)
+        let query = SchoolListRequestDTO(name: query.name, cursorId: query.cursorId)
         let endPoint = LoginEndPoint.fetchSchoolList(query)
         
         return networkService.request(endPoint: endPoint)
@@ -82,16 +82,5 @@ public final class LoginRepository: LoginRepositoryProtocol {
             .decodeMap(SchoolListResponseDTO.self)
             .map { $0.toDomain() }
             .asSingle()
-    }
-    
-    public func createProfanityCheck(body: CreateProfanityCheckRequest) -> Single<Void> {
-        let query = CreateProfanityCheckRequestDTO(message: body.message)
-        let endPoint = LoginEndPoint.createProfanityCheck(query)
-        
-        return networkService.request(endPoint: endPoint)
-            .asObservable()
-            .logErrorIfDetected(category: Network.error)
-            .asSingle()
-            .map { _ in return Void() }
     }
 }

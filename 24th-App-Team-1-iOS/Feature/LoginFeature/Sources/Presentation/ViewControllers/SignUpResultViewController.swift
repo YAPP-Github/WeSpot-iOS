@@ -129,8 +129,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         nameTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpNameViewReactor = SignUpNameViewReactor()
-                let signUpNameViewController = SignUpNameViewController(reactor: signUpNameViewReactor)
+                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self)
                 owner.navigationController?.pushViewController(signUpNameViewController, animated: true)
             }
             .disposed(by: disposeBag)
