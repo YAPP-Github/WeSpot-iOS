@@ -11,6 +11,7 @@ import DesignSystem
 
 import Then
 import SnapKit
+import Swinject
 import RxSwift
 import RxCocoa
 import ReactorKit
@@ -33,6 +34,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
     private let policyAgreementBottomSheetView = PolicyAgreementBottomSheetView()
     private let dimView = UIView()
     private let nextButton = WSButton(wsButtonType: .default(12))
+    private let accountInjector: Injector = DependencyInjector(container: Container())
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -137,8 +139,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         genderTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpGenderViewReactor = SignUpGenderViewReactor()
-                let signUpGenderViewController = SignUpGenderViewController(reactor: signUpGenderViewReactor)
+                let signUpGenderViewController = DependencyContainer.shared.injector.resolve(SignUpGenderViewController.self)
                 owner.navigationController?.pushViewController(signUpGenderViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -146,8 +147,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         classTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpClassViewReactor = SignUpClassViewReactor()
-                let signUpClassViewController = SignUpClassViewController(reactor: signUpClassViewReactor)
+                let signUpClassViewController = DependencyContainer.shared.injector.resolve(SignUpGradeViewController.self)
                 owner.navigationController?.pushViewController(signUpClassViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -155,8 +155,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         gradeTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpGradeViewReactor = SignUpGradeViewReactor()
-                let signUpGradeViewController = SignUpGradeViewController(reactor: signUpGradeViewReactor)
+                let signUpGradeViewController = DependencyContainer.shared.injector.resolve(SignUpGradeViewController.self)
                 owner.navigationController?.pushViewController(signUpGradeViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -187,8 +186,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         policyAgreementBottomSheetView.confirmButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpCompleteViewReactor = SignUpCompleteViewReactor()
-                let signUpCompleteViewController = SignUpCompleteViewController(reactor: signUpCompleteViewReactor)
+                let signUpCompleteViewController =  DependencyContainer.shared.injector.resolve(SignUpCompleteViewController.self)
                 owner.navigationController?.pushViewController(signUpCompleteViewController, animated: true)
             }
             .disposed(by: disposeBag)

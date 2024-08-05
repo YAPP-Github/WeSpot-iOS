@@ -14,6 +14,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 import ReactorKit
+import LoginDomain
 
 public final class SignUpNameViewController: BaseViewController<SignUpNameViewReactor> {
     
@@ -24,6 +25,7 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
     private let warningLabel = WSLabel(wsFont: .Body07)
     private let textLengthLabel = WSLabel(wsFont: .Body07)
     private let nextButton = WSButton(wsButtonType: .default(12))
+    private let accountInjector: Injector = DependencyInjector(container: Container())
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -140,8 +142,8 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpResultViewReactor = SignUpResultViewReactor()
-                let signUpResultViewController = SignUpResultViewController(reactor: signUpResultViewReactor)
+                let signUpResultViewController = DependencyContainer.shared.injector.resolve(SignUpResultViewController.self)
+                signUpResultViewController.accountRequest = self.accountRequest
                 owner.navigationController?.pushViewController(signUpResultViewController, animated: true)
             }
             .disposed(by: disposeBag)

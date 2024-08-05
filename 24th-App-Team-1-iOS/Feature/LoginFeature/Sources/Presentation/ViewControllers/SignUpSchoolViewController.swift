@@ -11,10 +11,12 @@ import DesignSystem
 
 import Then
 import SnapKit
+import Swinject
 import RxSwift
 import RxCocoa
 import RxDataSources
 import ReactorKit
+import LoginDomain
 
 public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolViewReactor> {
     
@@ -34,6 +36,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         cell.setupCell(schoolName: item.school.name, address: item.school.address)
         return cell
     })
+    private let accountInjector: Injector = DependencyInjector(container: Container())
     
     //MARK: - LifeCycle
     public override func viewWillAppear(_ animated: Bool) {
@@ -191,8 +194,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpGradeViewReactor = SignUpGradeViewReactor()
-                let signUpGradeViewController = SignUpGradeViewController(reactor: signUpGradeViewReactor)
+                let signUpGradeViewController =  DependencyContainer.shared.injector.resolve(SignUpGradeViewController.self)
                 owner.navigationController?.pushViewController(signUpGradeViewController, animated: true)
             }
             .disposed(by: disposeBag)

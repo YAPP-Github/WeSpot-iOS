@@ -11,9 +11,11 @@ import DesignSystem
 
 import Then
 import SnapKit
+import Swinject
 import RxSwift
 import RxCocoa
 import ReactorKit
+import LoginDomain
 
 public final class SignUpGenderViewController: BaseViewController<SignUpGenderViewReactor> {
 
@@ -22,6 +24,7 @@ public final class SignUpGenderViewController: BaseViewController<SignUpGenderVi
     private let subTitleLabel = WSLabel(wsFont: .Body06, text: "회원가입 이후에는 이름을 변경할 수 없어요")
     private let boyCardButton = GenderCardButton(type: .boy)
     private let girlCardButton = GenderCardButton(type: .girl)
+    private let accountInjector: Injector = DependencyInjector(container: Container())
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
