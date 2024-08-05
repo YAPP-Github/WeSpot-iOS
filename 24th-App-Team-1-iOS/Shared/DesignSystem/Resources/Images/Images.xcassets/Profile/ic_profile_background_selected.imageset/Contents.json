@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "ic_profile_background_selected.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
