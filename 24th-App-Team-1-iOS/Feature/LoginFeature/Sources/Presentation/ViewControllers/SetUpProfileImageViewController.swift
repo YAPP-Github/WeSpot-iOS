@@ -7,6 +7,7 @@
 
 import UIKit
 import Util
+import Storage
 import DesignSystem
 import CommonDomain
 
@@ -21,26 +22,35 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
     
     //MARK: - Properties
     private let titleLabel = WSLabel(wsFont: .Header01)
+    private let collectionViewStateLabel = WSLabel(wsFont: .Body06)
     private let characterButton = ToggleProfileTableViewButton(profileButtonType: .character)
     private let backgroundButton = ToggleProfileTableViewButton(profileButtonType: .background)
-    private lazy var characterCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
-    private lazy var backgroundCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
+    private let characterCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
+    private let backgroundCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
     private let userCharacterImageView = UIImageView()
     private let userBackgroundView = UIView()
     private let comfirmButton = WSButton(wsButtonType: .default(12))
+    private lazy var characterCollectionViewDataSources = RxCollectionViewSectionedReloadDataSource<CharacterSection>(configureCell: { _, collectionView, indexPath, item in
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProfileCharacterImageViewCollectionViewCell.identifier, for: indexPath) as? ProfileCharacterImageViewCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        cell.configureCell(image: item.iconUrl)
+        return cell
+    })
+    private lazy var backgroundCollectionViewDataSources = RxCollectionViewSectionedReloadDataSource<BackgroundSection>(configureCell: { _, collectionView, indexPath, item in
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProfileBackgroundColorCollectionViewCell.identifier, for: indexPath) as? ProfileBackgroundColorCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        cell.configureCell(background: item.color)
+        return cell
+    })
     
-    //MARK: - LifeCycle
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        
-    }
     
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
         
-        view.addSubviews(titleLabel, userBackgroundView, userCharacterImageView, characterButton, backgroundButton, backgroundCollectionView, characterCollectionView, comfirmButton)
+        view.addSubviews(titleLabel, userBackgroundView, userCharacterImageView, characterButton, backgroundButton, backgroundCollectionView, characterCollectionView, collectionViewStateLabel, comfirmButton)
     }
     
     public override func setupAutoLayout() {
@@ -86,6 +96,10 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
             $0.height.equalTo(360)
         }
         
+        collectionViewStateLabel.snp.makeConstraints {
+            $0.top.leading.equalTo(characterCollectionView).offset(32)
+        }
+        
         comfirmButton.snp.makeConstraints {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(12)
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
@@ -103,7 +117,12 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
         
         titleLabel.do {
             $0.textColor = DesignSystemAsset.Colors.gray100.color
-            $0.text = "김은수님을 잘 나타낼 수 있는\n프로필을 선택해 주세요"
+            $0.text = "\(UserDefaultsManager.shared.userProfile?.name ?? "User")님을 잘 나타낼 수 있는\n프로필을 선택해 주세요"
+        }
+        
+        collectionViewStateLabel.do {
+            $0.textColor = UIColor(hex: "#AEAFB4")
+            $0.text = "캐릭터 고르기"
         }
         
         userCharacterImageView.do {
@@ -130,7 +149,6 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
         
         backgroundCollectionView.do {
             $0.backgroundColor = DesignSystemAsset.Colors.gray600.color
-            $0.backgroundColor = .blue
             $0.register(ProfileBackgroundColorCollectionViewCell.self, forCellWithReuseIdentifier: ProfileBackgroundColorCollectionViewCell.identifier)
         }
         
@@ -151,21 +169,101 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
         reactor.action.onNext(.fetchProfileImages)
         reactor.action.onNext(.fetchProfileBackgrounds)
         
-        // Characters 바인딩
         reactor.pulse(\.$profileImages)
             .compactMap { $0?.characters }
-            .bind(to: characterCollectionView.rx.items(cellIdentifier: ProfileCharacterImageViewCollectionViewCell.identifier, cellType: ProfileCharacterImageViewCollectionViewCell.self)) { row, image, cell in
-                
-                cell.configureCell(image: image.iconUrl)
+            .map { [CharacterSection(items: $0)] }
+            .bind(to: characterCollectionView.rx.items(dataSource: characterCollectionViewDataSources))
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$profileBackgrounds)
+            .compactMap { $0?.backgrounds }
+            .map { [BackgroundSection(items: $0)] }
+            .bind(to: backgroundCollectionView.rx.items(dataSource: backgroundCollectionViewDataSources))
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.profileImages?.characters }
+            .filter { $0 != nil && !$0!.isEmpty }
+            .take(1)
+            .subscribe(onNext: { [weak self] _ in
+                DispatchQueue.main.async {
+                    let indexPath = IndexPath(item: 0, section: 0)
+                    self?.characterCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                    self?.characterCollectionView.delegate?.collectionView?(self!.characterCollectionView, didSelectItemAt: indexPath)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.profileBackgrounds?.backgrounds }
+            .filter { $0 != nil && !$0!.isEmpty }
+            .take(1)
+            .subscribe(onNext: { [weak self] _ in
+                DispatchQueue.main.async {
+                    let indexPath = IndexPath(item: 0, section: 0)
+                    self?.backgroundCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                    self?.backgroundCollectionView.delegate?.collectionView?(self!.backgroundCollectionView, didSelectItemAt: indexPath)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        backgroundCollectionView.rx.itemSelected
+            .withLatestFrom(reactor.state.map { $0.profileBackgrounds }) { indexPath, profileBackgrounds in
+                return (indexPath, profileBackgrounds?.backgrounds[indexPath.row])
+            }
+            .compactMap { $0.1 }
+            .bind(with: self) { owner, background in
+                owner.userBackgroundView.backgroundColor = UIColor(hex: background.color)
             }
             .disposed(by: disposeBag)
         
-        // Backgrounds 바인딩
-        reactor.pulse(\.$profileBackgrounds)
-            .compactMap { $0?.backgrounds }
-            .bind(to: backgroundCollectionView.rx.items(cellIdentifier: ProfileBackgroundColorCollectionViewCell.identifier, cellType: ProfileBackgroundColorCollectionViewCell.self)) { row, background, cell in
-                
-                cell.configureCell(background: background.color)
+        backgroundCollectionView.rx.itemSelected
+            .bind(with: self) { owner, indexPath in
+                guard let cell = owner.backgroundCollectionView.cellForItem(at: indexPath) as? ProfileBackgroundColorCollectionViewCell else { return }
+                cell.selectedCell()
+            }
+            .disposed(by: disposeBag)
+        
+        backgroundCollectionView.rx.itemDeselected
+            .bind(with: self) { owner, indexPath in
+                guard let cell = owner.backgroundCollectionView.cellForItem(at: indexPath) as? ProfileBackgroundColorCollectionViewCell else { return }
+                cell.deselectCell()
+            }
+            .disposed(by: disposeBag)
+        
+        characterCollectionView.rx.itemSelected
+            .bind(with: self) { owner, indexPath in
+                guard let cell = owner.characterCollectionView.cellForItem(at: indexPath) as? ProfileCharacterImageViewCollectionViewCell else { return }
+                cell.selectedCell()
+            }
+            .disposed(by: disposeBag)
+        
+        characterCollectionView.rx.itemDeselected
+            .bind(with: self) { owner, indexPath in
+                guard let cell = owner.characterCollectionView.cellForItem(at: indexPath) as? ProfileCharacterImageViewCollectionViewCell else { return }
+                cell.deselectCell()
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.profileImages?.characters }
+            .filter { $0 != nil && !$0!.isEmpty }
+            .take(1)
+            .bind(with: self) { owner, entity in
+                let indexPath = IndexPath(item: 0, section: 0)
+                owner.characterCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                owner.characterCollectionView.delegate?.collectionView?(owner.characterCollectionView, didSelectItemAt: indexPath)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.profileBackgrounds?.backgrounds }
+            .filter { $0 != nil && !$0!.isEmpty }
+            .take(1)
+            .bind(with: self) { owner, entity in
+                let indexPath = IndexPath(item: 0, section: 0)
+                owner.backgroundCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                owner.backgroundCollectionView.delegate?.collectionView?(owner.backgroundCollectionView, didSelectItemAt: indexPath)
             }
             .disposed(by: disposeBag)
         
@@ -182,7 +280,7 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
             .disposed(by: disposeBag)
     }
     
-    private func createCollectionViewLayout() -> UICollectionViewFlowLayout {
+    private static func createCollectionViewLayout() -> UICollectionViewFlowLayout {
         let layout = UICollectionViewFlowLayout()
         
         layout.itemSize = CGSize(width: 60, height: 60)
@@ -199,5 +297,6 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
         backgroundCollectionView.isHidden = showCharacter
         characterButton.setSelectedState(showCharacter)
         backgroundButton.setSelectedState(!showCharacter)
+        collectionViewStateLabel.text = showCharacter ? "캐릭터 고르기" : "배경색 고르기"
     }
 }
