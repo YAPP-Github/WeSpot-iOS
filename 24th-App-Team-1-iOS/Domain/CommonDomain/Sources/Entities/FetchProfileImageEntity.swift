@@ -8,7 +8,7 @@
 import Foundation
 
 public struct FetchProfileImageResponseEntity {
-    public let characters: [FetchProfileImageItemEntity]
+    public var characters: [FetchProfileImageItemEntity]
     
     public init(characters: [FetchProfileImageItemEntity]) {
         self.characters = characters

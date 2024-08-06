@@ -9,7 +9,7 @@ import Foundation
 
 
 public struct FetchProfileBackgroundsResponseEntity {
-    public let backgrounds: [FetchProfileBackgroundsItemEntity]
+    public var backgrounds: [FetchProfileBackgroundsItemEntity]
     
     public init(backgrounds: [FetchProfileBackgroundsItemEntity]) {
         self.backgrounds = backgrounds
