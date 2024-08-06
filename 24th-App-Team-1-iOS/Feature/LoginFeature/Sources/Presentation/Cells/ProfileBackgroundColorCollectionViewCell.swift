@@ -34,27 +34,28 @@ public final class ProfileBackgroundColorCollectionViewCell: UICollectionViewCel
     //MARK: - Functions
     private func setupUI() {
         
-        addSubviews(colorView)
+        contentView.addSubviews(colorView)
     }
     
     private func setupAutoLayout() {
         
         colorView.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.edges.equalTo(contentView)
             $0.size.equalTo(60)
         }
     }
     
     private func setupAttributes() {
-        
-        backgroundColor = .clear
+        backgroundColor = .red
         
         colorView.backgroundColor = DesignSystemAsset.Colors.gray200.color
     }
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        colorView.layer.cornerRadius = colorView.bounds.height / 2
-    }
+        colorView.layer.cornerRadius = colorView.bounds.height / 2    }
     
+    public func configureCell(background: String) {
+        colorView.backgroundColor = UIColor(hex: background)
+    }
 }

@@ -33,13 +33,13 @@ public final class ProfileCharacterImageViewCollectionViewCell: UICollectionView
     //MARK: - Functions
     private func setupUI() {
         
-        addSubviews(characterView)
+        contentView.addSubviews(characterView)
     }
     
     private func setupAutoLayout() {
         
         characterView.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.edges.equalTo(contentView)
             $0.size.equalTo(60)
         }
     }
@@ -49,6 +49,10 @@ public final class ProfileCharacterImageViewCollectionViewCell: UICollectionView
         backgroundColor = .clear
         
         characterView.image = DesignSystemAsset.Images.icCommonProfile427323024.image
+    }
+    
+    public func configureCell(image: String) {
+        //TODO: 실제 이미지 URL을 받아올 떄 적용 
     }
     
 }
