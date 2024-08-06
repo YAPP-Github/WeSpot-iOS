@@ -8,6 +8,7 @@
 import UIKit
 import Util
 import DesignSystem
+import CommonDomain
 
 import Then
 import SnapKit
@@ -22,8 +23,8 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
     private let titleLabel = WSLabel(wsFont: .Header01)
     private let characterButton = ToggleProfileTableViewButton(profileButtonType: .character)
     private let backgroundButton = ToggleProfileTableViewButton(profileButtonType: .background)
-    private lazy var characterCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-    private lazy var backgroundCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    private lazy var characterCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
+    private lazy var backgroundCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
     private let userCharacterImageView = UIImageView()
     private let userBackgroundView = UIView()
     private let comfirmButton = WSButton(wsButtonType: .default(12))
@@ -31,6 +32,7 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
     //MARK: - LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
         
     }
     
@@ -114,20 +116,22 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
         }
         
         backgroundButton.do {
-            $0.setSelectedState(true)
-        }
-        
-        characterButton.do {
             $0.setSelectedState(false)
         }
         
-        backgroundCollectionView.do {
-            $0.backgroundColor = DesignSystemAsset.Colors.gray600.color
-            $0.register(ProfileBackgroundColorCollectionViewCell.self, forCellWithReuseIdentifier: ProfileBackgroundColorCollectionViewCell.identifier)
+        characterButton.do {
+            $0.setSelectedState(true)
         }
         
         characterCollectionView.do {
             $0.backgroundColor = DesignSystemAsset.Colors.gray600.color
+            $0.register(ProfileCharacterImageViewCollectionViewCell.self, forCellWithReuseIdentifier: ProfileCharacterImageViewCollectionViewCell.identifier)
+        }
+        
+        backgroundCollectionView.do {
+            $0.backgroundColor = DesignSystemAsset.Colors.gray600.color
+            $0.backgroundColor = .blue
+            $0.register(ProfileBackgroundColorCollectionViewCell.self, forCellWithReuseIdentifier: ProfileBackgroundColorCollectionViewCell.identifier)
         }
         
         comfirmButton.do {
@@ -144,6 +148,56 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        reactor.action.onNext(.fetchProfileImages)
+        reactor.action.onNext(.fetchProfileBackgrounds)
         
+        // Characters 바인딩
+        reactor.pulse(\.$profileImages)
+            .compactMap { $0?.characters }
+            .bind(to: characterCollectionView.rx.items(cellIdentifier: ProfileCharacterImageViewCollectionViewCell.identifier, cellType: ProfileCharacterImageViewCollectionViewCell.self)) { row, image, cell in
+                
+                cell.configureCell(image: image.iconUrl)
+            }
+            .disposed(by: disposeBag)
+        
+        // Backgrounds 바인딩
+        reactor.pulse(\.$profileBackgrounds)
+            .compactMap { $0?.backgrounds }
+            .bind(to: backgroundCollectionView.rx.items(cellIdentifier: ProfileBackgroundColorCollectionViewCell.identifier, cellType: ProfileBackgroundColorCollectionViewCell.self)) { row, background, cell in
+                
+                cell.configureCell(background: background.color)
+            }
+            .disposed(by: disposeBag)
+        
+        characterButton.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.toggleCollections(showCharacter: true)
+            }
+            .disposed(by: disposeBag)
+        
+        backgroundButton.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.toggleCollections(showCharacter: false)
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func createCollectionViewLayout() -> UICollectionViewFlowLayout {
+        let layout = UICollectionViewFlowLayout()
+        
+        layout.itemSize = CGSize(width: 60, height: 60)
+        layout.minimumLineSpacing = 24
+        layout.minimumInteritemSpacing = 24
+        layout.scrollDirection = .vertical
+        layout.sectionInset = UIEdgeInsets(top: 77, left: 32, bottom: 143, right: 31)
+        
+        return layout
+    }
+    
+    private func toggleCollections(showCharacter: Bool) {
+        characterCollectionView.isHidden = !showCharacter
+        backgroundCollectionView.isHidden = showCharacter
+        characterButton.setSelectedState(showCharacter)
+        backgroundButton.setSelectedState(!showCharacter)
     }
 }
