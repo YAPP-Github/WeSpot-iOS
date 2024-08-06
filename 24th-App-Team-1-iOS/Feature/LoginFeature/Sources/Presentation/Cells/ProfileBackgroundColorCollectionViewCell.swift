@@ -17,6 +17,7 @@ public final class ProfileBackgroundColorCollectionViewCell: UICollectionViewCel
     
     //MARK: - Properties
     private let colorView = UIView()
+    private let checkImageView = UIImageView()
     
     //MARK: - Initializer
     public override init(frame: CGRect) {
@@ -34,7 +35,7 @@ public final class ProfileBackgroundColorCollectionViewCell: UICollectionViewCel
     //MARK: - Functions
     private func setupUI() {
         
-        contentView.addSubviews(colorView)
+        contentView.addSubviews(colorView, checkImageView)
     }
     
     private func setupAutoLayout() {
@@ -43,19 +44,43 @@ public final class ProfileBackgroundColorCollectionViewCell: UICollectionViewCel
             $0.edges.equalTo(contentView)
             $0.size.equalTo(60)
         }
+        
+        checkImageView.snp.makeConstraints {
+            $0.size.equalTo(16)
+            $0.top.trailing.equalTo(colorView)
+        }
     }
     
     private func setupAttributes() {
-        backgroundColor = .red
         
-        colorView.backgroundColor = DesignSystemAsset.Colors.gray200.color
+        colorView.do {
+            $0.layer.cornerRadius = 30
+        }
+        
+        checkImageView.do {
+            $0.contentMode = .scaleAspectFit
+            $0.image = DesignSystemAsset.Images.icProfileCheck.image
+            $0.isHidden = true
+        }
     }
-    
-    public override func layoutSubviews() {
-        super.layoutSubviews()
-        colorView.layer.cornerRadius = colorView.bounds.height / 2    }
     
     public func configureCell(background: String) {
         colorView.backgroundColor = UIColor(hex: background)
+    }
+    
+    public func selectedCell() {
+        colorView.do {
+            $0.layer.cornerRadius = 30
+            $0.layer.borderWidth = 2
+            $0.layer.borderColor = DesignSystemAsset.Colors.gray100.color.cgColor
+        }
+        checkImageView.isHidden = false
+    }
+    
+    public func deselectCell() {
+        colorView.do {
+            $0.layer.borderWidth = 0
+        }
+        checkImageView.isHidden = true
     }
 }

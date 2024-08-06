@@ -15,6 +15,8 @@ public final class ProfileCharacterImageViewCollectionViewCell: UICollectionView
     public static let identifier = "ProfileCharacterImageViewCollectionViewCell"
     
     //MARK: - Properties
+    private let selectedBorderView = UIView()
+    private let checkImageView = UIImageView()
     private let characterView = UIImageView()
     
     //MARK: - Initializer
@@ -33,14 +35,25 @@ public final class ProfileCharacterImageViewCollectionViewCell: UICollectionView
     //MARK: - Functions
     private func setupUI() {
         
-        contentView.addSubviews(characterView)
+        contentView.addSubviews(selectedBorderView, checkImageView)
+        selectedBorderView.addSubview(characterView)
     }
     
     private func setupAutoLayout() {
         
-        characterView.snp.makeConstraints {
+        selectedBorderView.snp.makeConstraints {
             $0.edges.equalTo(contentView)
             $0.size.equalTo(60)
+        }
+        
+        checkImageView.snp.makeConstraints {
+            $0.size.equalTo(16)
+            $0.top.trailing.equalTo(selectedBorderView)
+        }
+        
+        characterView.snp.makeConstraints {
+            $0.center.equalTo(selectedBorderView)
+            $0.size.equalTo(selectedBorderView).multipliedBy(0.7)
         }
     }
     
@@ -48,11 +61,38 @@ public final class ProfileCharacterImageViewCollectionViewCell: UICollectionView
         
         backgroundColor = .clear
         
-        characterView.image = DesignSystemAsset.Images.icCommonProfile427323024.image
+        checkImageView.do {
+            $0.contentMode = .scaleAspectFit
+            $0.image = DesignSystemAsset.Images.icProfileCheck.image
+            $0.isHidden = true
+        }
+        
+        characterView.do {
+            $0.image = DesignSystemAsset.Images.icCommonProfile427323024.image
+            $0.contentMode = .scaleAspectFit
+        }
     }
     
     public func configureCell(image: String) {
         //TODO: 실제 이미지 URL을 받아올 떄 적용 
+    }
+    
+    public func selectedCell() {
+        selectedBorderView.do {
+            $0.layer.cornerRadius = 30
+            $0.layer.borderWidth = 2
+            $0.layer.borderColor = DesignSystemAsset.Colors.gray100.color.cgColor
+            $0.backgroundColor = DesignSystemAsset.Colors.gray500.color
+        }
+        checkImageView.isHidden = false
+    }
+    
+    public func deselectCell() {
+        selectedBorderView.do {
+            $0.layer.borderWidth = 0
+            $0.backgroundColor = .clear
+        }
+        checkImageView.isHidden = true
     }
     
 }
