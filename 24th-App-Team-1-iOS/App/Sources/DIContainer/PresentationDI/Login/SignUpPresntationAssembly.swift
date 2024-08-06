@@ -16,15 +16,16 @@ import Swinject
 /// SignUpSchool DIContainer
 struct SignUpSchoolPresentationAssembly: Assembly {
     func assemble(container: Container) {
+        
         container.register(SignUpSchoolViewReactor.self) { resolver in
-            
             let fetchSchoolListUseCase = resolver.resolve(FetchSchoolListUseCaseProtocol.self)!
-            return SignUpSchoolViewReactor(fetchSchoolListUseCase: fetchSchoolListUseCase)
+            
+            return SignUpSchoolViewReactor(fetchSchoolListUseCase: fetchSchoolListUseCase, accountRequest: accountRequest)
         }
 
         container.register(SignUpSchoolViewController.self) { resolver in
             let reactor = resolver.resolve(SignUpSchoolViewReactor.self)!
-
+            
             return SignUpSchoolViewController(reactor: reactor)
         }
 
@@ -47,6 +48,25 @@ struct SignUpClassPresentationAssembly: Assembly {
 
     }
 }
+
+/// SignUpClass DIContainer
+struct SignUpGradePresentationAssembly: Assembly {
+    func assemble(container: Container) {
+
+        container.register(SignUpGradeViewReactor.self) {(resolver, accountRequest: CreateAccountRequest) in
+       
+            return SignUpGradeViewReactor(accountRequest: accountRequest)
+        }
+
+        container.register(SignUpGradeViewController.self) { (resolver, accountRequest: CreateAccountRequest) in
+            let reactor = resolver.resolve(SignUpGradeViewReactor.self, argument: accountRequest)!
+
+            return SignUpGradeViewController(reactor: reactor)
+        }
+
+    }
+}
+
 
 /// SignUpGender DIContainer
 struct SignUpGenderPresentationAssembly: Assembly {
