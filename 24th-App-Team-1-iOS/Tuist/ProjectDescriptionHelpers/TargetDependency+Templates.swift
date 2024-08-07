@@ -63,4 +63,9 @@ extension TargetDependency.SPM {
     public static let rxKakaoSDKAuth: TargetDependency = .external(name: "RxKakaoSDKAuth")
     public static let kakaoSDKUser: TargetDependency = .external(name: "KakaoSDKUser")
     public static let rxKakaoSDKUser: TargetDependency = .external(name: "RxKakaoSDKUser")
+    
+    //MARK: FireBase
+    public static let firebaseAnalytics: TargetDependency = .external(name: "FirebaseAnalytics")
+    public static let firebaseMessaging: TargetDependency = .external(name: "FirebaseMessaging")
+    public static let firebaseCrashlytics: TargetDependency = .external(name: "FirebaseCrashlytics")
 }

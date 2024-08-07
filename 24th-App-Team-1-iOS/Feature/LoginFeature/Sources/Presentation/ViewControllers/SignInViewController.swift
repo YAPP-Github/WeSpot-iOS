@@ -16,7 +16,6 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 import AuthenticationServices
-import VoteFeature
 
 public final class SignInViewController: BaseViewController<SignInViewReactor> {
     

@@ -33,4 +33,26 @@ public final class CommonRepository: CommonRepositoryProtocol {
             .logErrorIfDetected(category: Network.error)
             .asSingle()
     }
+    
+    public func fetchProfileImages() -> Single<FetchProfileImageResponseEntity?> {
+        let endPoint = CommonEndPoint.fetchCharacters
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .logErrorIfDetected(category: Network.error)
+            .decodeMap(FetchProfileImagesResponseDTO.self)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
+    
+    public func fetchProfileBackgrounds() -> Single<FetchProfileBackgroundsResponseEntity?> {
+        let endPoint = CommonEndPoint.fetchBackgrounds
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .logErrorIfDetected(category: Network.error)
+            .decodeMap(FetchProfileBackgroundsResponseDTO.self)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
 }

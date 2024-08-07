@@ -80,6 +80,13 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
             .bind(to: voteToggleView.rx.isSelected)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isShowEffectView)
+            .filter { $0 == true }
+            .bind(with: self) { owner, _ in
+                let voteEffectViewController = DependencyContainer.shared.injector.resolve(VoteEffectViewController.self)
+                owner.navigationController?.pushViewController(voteEffectViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
         Observable.zip(
             reactor.pulse(\.$voteResponseEntity),
             reactor.pulse(\.$voteResponseStub)

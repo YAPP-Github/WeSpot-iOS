@@ -38,7 +38,9 @@ public final class VotePageViewReactor: Reactor {
                 switch event {
                 case let .toggleStatus(voteTypes):
                     return .just(.setViewController(voteTypes))
-                default:
+                case .toogleMessageType(_):
+                    return .empty()
+                case .didFetchVoteReponseItems(_):
                     return .empty()
                 }
             }
