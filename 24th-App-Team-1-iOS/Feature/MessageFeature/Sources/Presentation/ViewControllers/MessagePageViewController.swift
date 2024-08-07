@@ -41,9 +41,6 @@ final class MessagePageViewController: UIPageViewController, View {
 
         setupUI()
         setupAttributes()
-        if let reactor = self.reactor {
-            bind(reactor: reactor)
-        }
     }
 
     //MARK: - Configure
