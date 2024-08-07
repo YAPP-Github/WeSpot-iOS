@@ -245,28 +245,6 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
             }
             .disposed(by: disposeBag)
         
-        reactor.state
-            .map { $0.profileImages?.characters }
-            .filter { $0 != nil && !$0!.isEmpty }
-            .take(1)
-            .bind(with: self) { owner, entity in
-                let indexPath = IndexPath(item: 0, section: 0)
-                owner.characterCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                owner.characterCollectionView.delegate?.collectionView?(owner.characterCollectionView, didSelectItemAt: indexPath)
-            }
-            .disposed(by: disposeBag)
-        
-        reactor.state
-            .map { $0.profileBackgrounds?.backgrounds }
-            .filter { $0 != nil && !$0!.isEmpty }
-            .take(1)
-            .bind(with: self) { owner, entity in
-                let indexPath = IndexPath(item: 0, section: 0)
-                owner.backgroundCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                owner.backgroundCollectionView.delegate?.collectionView?(owner.backgroundCollectionView, didSelectItemAt: indexPath)
-            }
-            .disposed(by: disposeBag)
-        
         characterButton.rx.tap
             .bind(with: self) { owner, _ in
                 owner.toggleCollections(showCharacter: true)
