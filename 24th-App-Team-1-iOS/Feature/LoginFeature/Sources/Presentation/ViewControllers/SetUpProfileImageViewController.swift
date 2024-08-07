@@ -208,6 +208,7 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
             .disposed(by: disposeBag)
         
         backgroundCollectionView.rx.itemSelected
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .withLatestFrom(reactor.state.map { $0.profileBackgrounds }) { indexPath, profileBackgrounds in
                 return (indexPath, profileBackgrounds?.backgrounds[indexPath.row])
             }
@@ -218,6 +219,7 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
             .disposed(by: disposeBag)
         
         backgroundCollectionView.rx.itemSelected
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, indexPath in
                 guard let cell = owner.backgroundCollectionView.cellForItem(at: indexPath) as? ProfileBackgroundColorCollectionViewCell else { return }
                 cell.selectedCell()
@@ -232,6 +234,7 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
             .disposed(by: disposeBag)
         
         characterCollectionView.rx.itemSelected
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, indexPath in
                 guard let cell = owner.characterCollectionView.cellForItem(at: indexPath) as? ProfileCharacterImageViewCollectionViewCell else { return }
                 cell.selectedCell()
@@ -246,12 +249,14 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
             .disposed(by: disposeBag)
         
         characterButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.toggleCollections(showCharacter: true)
             }
             .disposed(by: disposeBag)
         
         backgroundButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.toggleCollections(showCharacter: false)
             }
