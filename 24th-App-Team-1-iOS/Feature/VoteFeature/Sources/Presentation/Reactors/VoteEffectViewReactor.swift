@@ -28,7 +28,7 @@ public final class VoteEffectViewReactor: Reactor {
     }
     
     public enum Action {
-        case fetchlatestAllVoteOption
+        case fetchLatestAllVoteOption
         case fetchPreviousAllVoteOptions
         case didShowVisibleCell(_ index: Int)
     }
@@ -37,7 +37,7 @@ public final class VoteEffectViewReactor: Reactor {
         case setLoading(Bool)
         case setToggleType(VoteEffectType)
         case setCurrentPageControl(Int)
-        case setCompleteSection([VoteCompleteItem])
+        case setEffectSection([VoteCompleteItem])
         case setVoteAllEntity([VoteAllEntity])
     }
     
@@ -45,7 +45,9 @@ public final class VoteEffectViewReactor: Reactor {
     public init(fetchVoteEffectOptionsUseCase: FetchAllVoteOptionsUseCaseProtocol) {
         self.fetchVoteEffectOptionsUseCase = fetchVoteEffectOptionsUseCase
         self.initialState = State(
-            effectSection: [.voteAllRankerInfo([])],
+            effectSection: [
+                .voteAllRankerInfo([])
+            ],
             voteAllEntity: [],
             isLoading: false,
             currentPage: 0,
@@ -56,7 +58,7 @@ public final class VoteEffectViewReactor: Reactor {
     public func mutate(action: Action) -> Observable<Mutation> {
         
         switch action {
-        case .fetchlatestAllVoteOption:
+        case .fetchLatestAllVoteOption:
             let latestQuery = VoteWinnerRequestQuery(date: Date().toFormatString(with: .dashYyyyMMdd))
             return fetchVoteEffectOptionsUseCase
                 .execute(query: latestQuery)
@@ -71,7 +73,7 @@ public final class VoteEffectViewReactor: Reactor {
                         .just(.setLoading(true)),
                         .just(.setToggleType(.latest)),
                         .just(.setVoteAllEntity(originalEntity.response)),
-                        .just(.setCompleteSection(completeSectionitem)),
+                        .just(.setEffectSection(completeSectionitem)),
                         .just(.setLoading(false))
                     )
                 }
@@ -94,7 +96,7 @@ public final class VoteEffectViewReactor: Reactor {
                         .just(.setLoading(true)),
                         .just(.setToggleType(.previous)),
                         .just(.setVoteAllEntity(originalEntity.response)),
-                        .just(.setCompleteSection(completeSectionitem)),
+                        .just(.setEffectSection(completeSectionitem)),
                         .just(.setLoading(false))
                     )
                 }
@@ -111,7 +113,7 @@ public final class VoteEffectViewReactor: Reactor {
             newState.toggleType = toggleType
         case let .setCurrentPageControl(currentPage):
             newState.currentPage = currentPage
-        case let .setCompleteSection(items):
+        case let .setEffectSection(items):
             newState.effectSection = [.voteAllRankerInfo(items)]
         case let .setVoteAllEntity(voteAllEntity):
             newState.voteAllEntity = voteAllEntity

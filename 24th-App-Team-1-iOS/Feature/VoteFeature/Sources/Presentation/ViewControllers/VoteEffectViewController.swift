@@ -21,8 +21,7 @@ fileprivate typealias VoteEffectId = VoteStrings.Identifier
 public final class VoteEffectViewController: BaseViewController<VoteEffectViewReactor> {
 
     //MARK: - Properties
-    private let realTimeButton: UIButton = UIButton(type: .custom)
-    private let lastTimeButton: UIButton = UIButton(type: .custom)
+    private let toggleView: VoteEffectToggleView = VoteEffectToggleView()
     private let noticeButton: WSButton = WSButton(wsButtonType: .default(12))
     private let shareButton: UIButton = UIButton()
     private let effectPageControl: UIPageControl = UIPageControl()
@@ -67,24 +66,16 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
-        view.addSubviews(realTimeButton, lastTimeButton ,shareButton, effectPageControl, noticeButton, effectCollectionView)
+        view.addSubviews(toggleView, shareButton, effectPageControl, noticeButton, effectCollectionView)
     }
     
     public override func setupAutoLayout() {
         super.setupAutoLayout()
         
-        lastTimeButton.snp.makeConstraints {
-            $0.top.equalTo(navigationBar.snp.bottom).offset(6)
-            $0.width.equalTo(76)
-            $0.height.equalTo(31)
-            $0.left.equalToSuperview().inset(20)
-        }
-        
-        realTimeButton.snp.makeConstraints {
-            $0.top.equalTo(navigationBar.snp.bottom).offset(6)
-            $0.width.equalTo(88)
-            $0.height.equalTo(31)
-            $0.left.equalTo(lastTimeButton.snp.right).offset(12)
+        toggleView.snp.makeConstraints {
+            $0.top.equalTo(navigationBar.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(43)
         }
         
         noticeButton.snp.makeConstraints {
@@ -101,7 +92,7 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
         }
         
         effectCollectionView.snp.makeConstraints {
-            $0.top.equalTo(realTimeButton.snp.bottom).offset(12)
+            $0.top.equalTo(toggleView.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(500)
         }
@@ -115,31 +106,6 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
     
     public override func setupAttributes() {
         super.setupAttributes()
-        realTimeButton.do {
-            $0.configuration = .filled()
-            $0.configuration?.baseForegroundColor = DesignSystemAsset.Colors.gray100.color
-            $0.configuration?.baseBackgroundColor = DesignSystemAsset.Colors.gray500.color
-            $0.configuration?.attributedTitle = AttributedString(NSAttributedString(string: VoteStrings.voteRealTimeButtonText, attributes: [
-                .font: WSFont.Body05.font(),
-            ]))
-            $0.layer.cornerRadius = 15
-            $0.layer.borderWidth = 0
-            $0.layer.borderColor = DesignSystemAsset.Colors.gray400.color.cgColor
-            $0.clipsToBounds = true
-        }
-        
-        lastTimeButton.do {
-            $0.configuration = .filled()
-            $0.configuration?.baseForegroundColor = DesignSystemAsset.Colors.gray400.color
-            $0.configuration?.baseBackgroundColor = .clear
-            $0.configuration?.attributedTitle = AttributedString(NSAttributedString(string: VoteStrings.voteLastTimeButtonText, attributes: [
-                .font: WSFont.Body05.font(),
-            ]))
-            $0.layer.borderColor = DesignSystemAsset.Colors.gray400.color.cgColor
-            $0.layer.borderWidth = 1
-            $0.layer.cornerRadius = 15
-            $0.clipsToBounds = true
-        }
         
         navigationBar.do {
             $0.setNavigationBarUI(property: .leftIcon(DesignSystemAsset.Images.arrow.image))
@@ -180,38 +146,28 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         Observable.just(())
-            .map { Reactor.Action.fetchlatestAllVoteOption }
+            .map { Reactor.Action.fetchLatestAllVoteOption }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        lastTimeButton
+        toggleView.previousButton
             .rx.tap
             .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
             .map { Reactor.Action.fetchPreviousAllVoteOptions }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        realTimeButton
+        toggleView.latestButton
             .rx.tap
             .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
-            .map { Reactor.Action.fetchlatestAllVoteOption }
+            .map { Reactor.Action.fetchLatestAllVoteOption }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         reactor.state
-            .map { $0.toggleType == .latest }
+            .map { $0.toggleType }
             .distinctUntilChanged()
-            .bind(with: self){ owner, isSelected in
-                owner.updateRealTimeButton(isSelected: isSelected)
-            }
-            .disposed(by: disposeBag)
-        
-        reactor.state
-            .map { $0.toggleType == .previous }
-            .distinctUntilChanged()
-            .bind(with: self) { owner, isSelected in
-                owner.updateLastTimeButton(isSelected: isSelected)
-            }
+            .bind(to: toggleView.rx.isSelected)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$effectSection)
@@ -230,18 +186,6 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
             .distinctUntilChanged()
             .bind(to: effectPageControl.rx.currentPage)
             .disposed(by: disposeBag)
-    }
-    
-    private func updateLastTimeButton(isSelected: Bool) {
-        lastTimeButton.configuration?.baseBackgroundColor = isSelected ? DesignSystemAsset.Colors.gray500.color : .clear
-        lastTimeButton.configuration?.baseForegroundColor = isSelected ? DesignSystemAsset.Colors.gray100.color : DesignSystemAsset.Colors.gray400.color
-        lastTimeButton.layer.borderWidth = isSelected ? 0 : 1
-    }
-    
-    private func updateRealTimeButton(isSelected: Bool) {
-        realTimeButton.configuration?.baseBackgroundColor = isSelected ? DesignSystemAsset.Colors.gray500.color : .clear
-        realTimeButton.configuration?.baseForegroundColor = isSelected ? DesignSystemAsset.Colors.gray100.color : DesignSystemAsset.Colors.gray400.color
-        realTimeButton.layer.borderWidth = isSelected ? 0 : 1
     }
     
     private func createEmptyRankerLayoutSection() -> NSCollectionLayoutSection {
