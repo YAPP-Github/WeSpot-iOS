@@ -19,15 +19,34 @@ public final class MessageHomeViewController: BaseViewController<MessageHomeView
     
     //MARK: - Properties
     private let messageBannerView = WSBanner(image: DesignSystemAsset.Images.reservation.image ,titleText: "예약 중인 쪽지 3개")
-    private let messageCardView = MessageCardView(type: .evening)
+    private lazy var messageCardView: MessageCardView = {
+        let hour = Calendar.current.component(.hour, from: Date())
+        if (0..<17).contains(hour) {
+            return MessageCardView(type: .morning)
+        } else if (17..<22).contains(hour) {
+            return MessageCardView(type: .evening)
+        } else {
+            return MessageCardView(type: .night)
+        }
+    }()
     private var isAnimating = false
+    private var messageCardHeight: CGFloat {
+        let hour = Calendar.current.component(.hour, from: Date())
+        return (17...22).contains(hour) ? 400 : 352
+    }
+    private var showBanner: Bool {
+        let hour = Calendar.current.component(.hour, from: Date())
+        return (17...22).contains(hour)
+    }
     
     //MARK: - LifeCycle
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         setInitialLayout()
-        animateBanner()
+        if showBanner {
+            animateBanner()
+        }
     }
     
     
@@ -35,7 +54,10 @@ public final class MessageHomeViewController: BaseViewController<MessageHomeView
     public override func setupUI() {
         super.setupUI()
         
-        view.addSubviews(messageBannerView, messageCardView)
+        if showBanner {
+            view.addSubview(messageBannerView)
+        }
+        view.addSubview(messageCardView)
     }
     
     public override func setupAutoLayout() {
@@ -45,16 +67,23 @@ public final class MessageHomeViewController: BaseViewController<MessageHomeView
     }
     
     private func setInitialLayout() {
-        messageBannerView.snp.remakeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(-80)
-            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
-            $0.height.equalTo(80)
-        }
-        
-        messageCardView.snp.remakeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(20)
-            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
-            $0.height.equalTo(400)
+        if showBanner {
+            messageBannerView.snp.remakeConstraints {
+                $0.top.equalTo(view.safeAreaLayoutGuide).offset(-80)
+                $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
+                $0.height.equalTo(80)
+            }
+            messageCardView.snp.remakeConstraints {
+                $0.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+                $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
+                $0.height.equalTo(messageCardHeight)
+            }
+        } else {
+            messageCardView.snp.remakeConstraints {
+                $0.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+                $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
+                $0.height.equalTo(messageCardHeight)
+            }
         }
     }
     
@@ -71,7 +100,7 @@ public final class MessageHomeViewController: BaseViewController<MessageHomeView
                 self.messageCardView.snp.remakeConstraints {
                     $0.top.equalTo(self.messageBannerView.snp.bottom).offset(16)
                     $0.horizontalEdges.equalTo(self.view.safeAreaLayoutGuide).inset(20)
-                    $0.height.equalTo(400)
+                    $0.height.equalTo(self.messageCardHeight)
                 }
                 self.view.layoutIfNeeded()
             }, completion: { _ in
