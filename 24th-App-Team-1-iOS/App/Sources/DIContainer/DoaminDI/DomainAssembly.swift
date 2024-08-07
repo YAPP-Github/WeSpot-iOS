@@ -21,6 +21,16 @@ struct DomainAssembly: Assembly {
             return createCheckProfanityUseCase(commonRepository: repository)
         }
         
+        container.register(FetchProfileImagesUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(CommonRepositoryProtocol.self)!
+            return FetchProfileImagesUseCase(commonRepository: repository)
+        }
+        
+        container.register(FetchProfileBackgroundsUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(CommonRepositoryProtocol.self)!
+            return FetchProfileBackgroundsUseCase(commonRepository: repository)
+        }
+        
         // login
         container.register(CreateAccountUseCaseProtocol.self) { resovler in
             let repository = resovler.resolve(LoginRepositoryProtocol.self)!
