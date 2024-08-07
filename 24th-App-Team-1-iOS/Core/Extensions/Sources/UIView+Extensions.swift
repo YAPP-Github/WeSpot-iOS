@@ -18,7 +18,25 @@ public extension UIView {
     }
 }
 
+public extension Reactive where Base: UITapGestureRecognizer {
+    var tapGesture: ControlEvent<Void> {
+        let tapEvent = self.methodInvoked(#selector(Base.touchesBegan(_:with:))).map { _ in }
+        return ControlEvent(events: tapEvent)
+    }
+}
+
 public extension Reactive where Base: UIView {
+    var tapGesture: UITapGestureRecognizer {
+        return UITapGestureRecognizer()
+    }
+    
+    var tap: ControlEvent<Void> {
+        let tapGestureRecognizer = tapGesture
+        base.addGestureRecognizer(tapGestureRecognizer)
+        
+        return tapGestureRecognizer.rx.tapGesture
+    }
+    
     func swipeGestureRecognizer(direction: UISwipeGestureRecognizer.Direction) -> ControlEvent<UISwipeGestureRecognizer> {
         let gestureRecognizer = UISwipeGestureRecognizer()
         gestureRecognizer.direction = direction

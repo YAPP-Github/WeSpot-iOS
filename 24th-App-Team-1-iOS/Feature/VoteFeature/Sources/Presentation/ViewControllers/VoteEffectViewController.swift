@@ -1,35 +1,32 @@
 //
-//  VoteCompleteViewController.swift
+//  VoteEffectViewController.swift
 //  VoteFeature
 //
-//  Created by Kim dohyun on 7/24/24.
+//  Created by Kim dohyun on 8/3/24.
 //
 
+import DesignSystem
 import UIKit
 import Util
-import DesignSystem
 
 import Then
 import SnapKit
 import RxSwift
 import RxCocoa
-import RxDataSources
 import ReactorKit
+import RxDataSources
 
-typealias VoteCompleteStr = VoteStrings
-typealias VoteCompleteId = VoteStrings.Identifier
-public final class VoteCompleteViewController: BaseViewController<VoteCompleteViewReactor> {
+fileprivate typealias VoteEffectStr = VoteStrings
+fileprivate typealias VoteEffectId = VoteStrings.Identifier
+public final class VoteEffectViewController: BaseViewController<VoteEffectViewReactor> {
 
     //MARK: - Properties
-    private let onboardingView: VoteCompleteOnBoardingView = VoteCompleteOnBoardingView()
-    private let lendingView: VoteCompleteLandingView = VoteCompleteLandingView()
+    private let toggleView: VoteEffectToggleView = VoteEffectToggleView()
     private let noticeButton: WSButton = WSButton(wsButtonType: .default(12))
     private let shareButton: UIButton = UIButton()
-    private let completePageControl: UIPageControl = UIPageControl()
-    private let indicatorView: UIActivityIndicatorView = UIActivityIndicatorView(style: .medium)
-    
-    private lazy var completeCollectionViewLayout: UICollectionViewCompositionalLayout = UICollectionViewCompositionalLayout { [weak self] section, _ in
-        let sectionItem = self?.completeCollectionViewDataSources[section]
+    private let effectPageControl: UIPageControl = UIPageControl()
+    private lazy var effectCollectionViewLayout: UICollectionViewCompositionalLayout = UICollectionViewCompositionalLayout { [weak self] section, _ in
+        let sectionItem = self?.effectCollectionViewDataSources[section]
         
         switch sectionItem {
         case .voteAllRankerInfo:
@@ -42,47 +39,43 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         return nil
     }
     
-    private lazy var completeCollectionViewDataSources: RxCollectionViewSectionedReloadDataSource<VoteCompleteSection> = .init { dataSources, collectionView, indexPath, sectionItem in
+    private lazy var effectCollectionViewDataSources: RxCollectionViewSectionedReloadDataSource<VoteCompleteSection> = .init { dataSources, collectionView, indexPath, sectionItem in
         
         switch sectionItem {
         case let .voteAllRankerItem(cellReactor):
             
-            guard let allRankerCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteCompleteId.voteAllCell, for: indexPath) as? VoteAllCollectionViewCell else { return UICollectionViewCell() }
+            guard let allRankerCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteEffectId.voteAllCell, for: indexPath) as? VoteAllCollectionViewCell else { return UICollectionViewCell() }
             allRankerCell.reactor = cellReactor
             return allRankerCell
         case let .voteAllEmptyItem(cellReactor):
-            guard let allEmtpyCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteCompleteId.voteEmptyCell, for: indexPath) as? VoteEmptyCollectionViewCell else { return UICollectionViewCell() }
+            guard let allEmtpyCell = collectionView.dequeueReusableCell(withReuseIdentifier: VoteEffectId.voteEmptyCell, for: indexPath) as? VoteEmptyCollectionViewCell else { return UICollectionViewCell() }
             allEmtpyCell.reactor = cellReactor
             return allEmtpyCell
         }
     }
     
-    private lazy var completeCollectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: completeCollectionViewLayout)
+    private lazy var effectCollectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: effectCollectionViewLayout)
+    
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
     }
 
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
-        view.addSubviews(indicatorView, shareButton, completePageControl, noticeButton, completeCollectionView, onboardingView, lendingView)
+        view.addSubviews(toggleView, shareButton, effectPageControl, noticeButton, effectCollectionView)
     }
     
     public override func setupAutoLayout() {
         super.setupAutoLayout()
-
-        indicatorView.snp.makeConstraints {
-            $0.center.equalToSuperview()
-        }
         
-        onboardingView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        
-        lendingView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+        toggleView.snp.makeConstraints {
+            $0.top.equalTo(navigationBar.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(43)
         }
         
         noticeButton.snp.makeConstraints {
@@ -98,14 +91,14 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(12)
         }
         
-        completeCollectionView.snp.makeConstraints {
-            $0.top.equalTo(navigationBar.snp.bottom)
+        effectCollectionView.snp.makeConstraints {
+            $0.top.equalTo(toggleView.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(500)
         }
         
-        completePageControl.snp.makeConstraints {
-            $0.top.equalTo(completeCollectionView.snp.bottom).offset(56)
+        effectPageControl.snp.makeConstraints {
+            $0.top.equalTo(effectCollectionView.snp.bottom).offset(56)
             $0.centerX.equalToSuperview()
         }
         
@@ -115,8 +108,8 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         super.setupAttributes()
         
         navigationBar.do {
-            $0.setNavigationBarUI(property: .rightIcon("처음으로"))
-            $0.setNavigationBarAutoLayout(property: .rightIcon)
+            $0.setNavigationBarUI(property: .leftIcon(DesignSystemAsset.Images.arrow.image))
+            $0.setNavigationBarAutoLayout(property: .leftIcon)
         }
     
         shareButton.do {
@@ -132,67 +125,65 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             $0.setupFont(font: .Body03)
         }
         
-        completePageControl.do {
+        effectPageControl.do {
             $0.currentPage = 0
             $0.numberOfPages = 3
         }
         
-        completeCollectionView.do {
-            $0.register(VoteAllCollectionViewCell.self, forCellWithReuseIdentifier: VoteCompleteId.voteAllCell)
-            $0.register(VoteEmptyCollectionViewCell.self, forCellWithReuseIdentifier: VoteCompleteId.voteEmptyCell)
+        effectCollectionView.do {
+            $0.register(VoteAllCollectionViewCell.self, forCellWithReuseIdentifier: VoteEffectId.voteAllCell)
+            $0.register(VoteEmptyCollectionViewCell.self, forCellWithReuseIdentifier: VoteEffectId.voteEmptyCell)
             $0.backgroundColor = .clear
             $0.showsVerticalScrollIndicator = false
             $0.showsHorizontalScrollIndicator = false
             $0.isScrollEnabled = false
         }
         
+        
     }
+    
     
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
-        
-        navigationBar
-            .rightBarButton.rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                owner.navigationController?.popToRootViewController(animated: true)
-            }
+        Observable.just(())
+            .map { Reactor.Action.fetchLatestAllVoteOption }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        Observable.just(())
-            .map { Reactor.Action.viewDidLoad }
+        toggleView.previousButton
+            .rx.tap
+            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
+            .map { Reactor.Action.fetchPreviousAllVoteOptions }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        toggleView.latestButton
+            .rx.tap
+            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
+            .map { Reactor.Action.fetchLatestAllVoteOption }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         reactor.state
-            .map { $0.isLoading }
+            .map { $0.toggleType }
             .distinctUntilChanged()
-            .bind(to: indicatorView.rx.isAnimating)
+            .bind(to: toggleView.rx.isSelected)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$completeSection)
+        reactor.pulse(\.$effectSection)
             .asDriver(onErrorJustReturn: [])
-            .drive(completeCollectionView.rx.items(dataSource: completeCollectionViewDataSources))
+            .drive(effectCollectionView.rx.items(dataSource: effectCollectionViewDataSources))
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$voteAllEntity)
             .map { $0.count }
-            .bind(to: completePageControl.rx.numberOfPages)
+            .bind(to: effectPageControl.rx.numberOfPages)
             .disposed(by: disposeBag)
         
         reactor.state
             .map { $0.currentPage }
             .distinctUntilChanged()
-            .bind(to: completePageControl.rx.currentPage)
-            .disposed(by: disposeBag)
-        
-        
-        reactor.state
-            .map { $0.isLoading }
-            .distinctUntilChanged()
-            .bind(with: self) { owner, _ in
-                owner.fadeInOutOnAnimationView()
-            }
+            .bind(to: effectPageControl.rx.currentPage)
             .disposed(by: disposeBag)
     }
     
@@ -241,25 +232,5 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         
         rankerGroupSection.orthogonalScrollingBehavior = .groupPaging
         return rankerGroupSection
-    }
-}
-
-
-extension VoteCompleteViewController {
-    private func fadeInOutLendigView() {
-        UIView.animate(withDuration: 2.0, delay: 0.0, options: .curveEaseInOut) { [weak self] in
-            self?.lendingView.alpha = 0.0
-        } completion: { [weak self] _ in
-            self?.lendingView.removeFromSuperview()
-        }
-    }
-    
-    private func fadeInOutOnAnimationView() {
-        UIView.animate(withDuration: 2.0, delay: 0.0, options: .curveEaseInOut) { [weak self] in
-            self?.onboardingView.alpha = 0.0
-        } completion: { [weak self] _ in
-            self?.onboardingView.removeFromSuperview()
-            self?.fadeInOutLendigView()
-        }
     }
 }

@@ -18,6 +18,7 @@ public final class VoteMainViewReactor: Reactor {
     public init() {
         self.initialState = State(
             voteTypes: .main,
+            isShowEffectView: false,
             voteResponseStub: []
         )
     }
@@ -28,6 +29,7 @@ public final class VoteMainViewReactor: Reactor {
     
     public struct State {
         var voteTypes: VoteTypes
+        @Pulse var isShowEffectView: Bool
         @Pulse var voteResponseEntity: VoteResponseEntity?
         @Pulse var voteResponseStub: [CreateVoteItemReqeuest]
     }
@@ -36,6 +38,7 @@ public final class VoteMainViewReactor: Reactor {
         case setVoteTypes(VoteTypes)
         case setVoteResponseItems(VoteResponseEntity)
         case setVoteUserItems
+        case setShowEffectView(Bool)
     }
     
     public func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
@@ -47,6 +50,8 @@ public final class VoteMainViewReactor: Reactor {
                         .just(.setVoteResponseItems(response)),
                         .just(.setVoteUserItems)
                     )
+                case .didTappedResultButton:
+                    return .just(.setShowEffectView(true))
                 default:
                     return .empty()
                 }
@@ -72,6 +77,8 @@ public final class VoteMainViewReactor: Reactor {
             newState.voteResponseEntity = voteResponseEntity
         case .setVoteUserItems:
             newState.voteResponseStub = []
+        case let .setShowEffectView(isShowEffectView):
+            newState.isShowEffectView = isShowEffectView
         }
         
         return newState

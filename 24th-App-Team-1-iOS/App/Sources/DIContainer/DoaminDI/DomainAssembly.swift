@@ -30,7 +30,6 @@ struct DomainAssembly: Assembly {
             let repository = resolver.resolve(CommonRepositoryProtocol.self)!
             return FetchProfileBackgroundsUseCase(commonRepository: repository)
         }
-        
         // login
         container.register(CreateAccountUseCaseProtocol.self) { resovler in
             let repository = resovler.resolve(LoginRepositoryProtocol.self)!
