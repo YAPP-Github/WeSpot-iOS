@@ -185,12 +185,11 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
             .map { $0.profileImages?.characters }
             .filter { $0 != nil && !$0!.isEmpty }
             .take(1)
+            .observe(on: MainScheduler.asyncInstance)
             .bind(with: self) { owner, _ in
-                DispatchQueue.main.async {
-                    let indexPath = IndexPath(item: 0, section: 0)
-                    owner.characterCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                    owner.characterCollectionView.delegate?.collectionView?(owner.characterCollectionView, didSelectItemAt: indexPath)
-                }
+                let indexPath = IndexPath(item: 0, section: 0)
+                owner.characterCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                owner.characterCollectionView.delegate?.collectionView?(owner.characterCollectionView, didSelectItemAt: indexPath)
             }
             .disposed(by: disposeBag)
         
@@ -198,12 +197,11 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
             .map { $0.profileBackgrounds?.backgrounds }
             .filter { $0 != nil && !$0!.isEmpty }
             .take(1)
+            .observe(on: MainScheduler.asyncInstance)
             .bind(with: self) { owner, _ in
-                DispatchQueue.main.async {
-                    let indexPath = IndexPath(item: 0, section: 0)
-                    owner.backgroundCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                    owner.backgroundCollectionView.delegate?.collectionView?(owner.backgroundCollectionView, didSelectItemAt: indexPath)
-                }
+                let indexPath = IndexPath(item: 0, section: 0)
+                owner.backgroundCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                owner.backgroundCollectionView.delegate?.collectionView?(owner.backgroundCollectionView, didSelectItemAt: indexPath)
             }
             .disposed(by: disposeBag)
         
