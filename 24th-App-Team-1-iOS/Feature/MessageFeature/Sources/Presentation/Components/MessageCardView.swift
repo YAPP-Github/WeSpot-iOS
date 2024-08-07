@@ -13,7 +13,7 @@ import RxSwift
 import RxCocoa
 
 public final class MessageCardView: UIView {
-
+    
     public enum CardTimeType {
         case morning
         case evening
@@ -24,21 +24,25 @@ public final class MessageCardView: UIView {
     private let messageContanierView = UIView()
     private let messageImageView = UIImageView()
     private let messageTitleLabel = WSLabel(wsFont: .Body01)
-    private let messageButton = WSButton(wsButtonType: .default(12))
+    public let messageButton = WSButton(wsButtonType: .default(12))
     private let messageTimerNoticeLabel = WSLabel(wsFont: .Body09, text: "쪽지 전달까지 남은 시간")
     private let messageTimerImageView = UIImageView()
     private let messageTimerLabel = UILabel()
     private let messageContainerUnderLabel = WSLabel(wsFont: .Body06)
-    
+    private var type: CardTimeType
     private let endTime = Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: Date())!
+    private let disposeBag = DisposeBag()
     
     // MARK: - Initialize
     public init(type: CardTimeType) {
+        self.type = type
         super.init(frame: .zero)
         
         setupUI()
         setupAttributes()
         setupAutoLayout()
+        configureView(type: type)
+        startTimer()
     }
     
     required init?(coder: NSCoder) {
@@ -65,12 +69,10 @@ public final class MessageCardView: UIView {
         
         messageTitleLabel.do {
             $0.textColor = DesignSystemAsset.Colors.gray100.color
-            $0.text = "당신을 설레게 한 친구에게\n익명 쪽지로 마음을 표현해보세요"
         }
         
         messageContainerUnderLabel.do {
             $0.textColor = DesignSystemAsset.Colors.gray200.color
-            $0.text = "서로의 쪽지는 밤 10시에 전달해드릴게요"
         }
         
         messageTimerNoticeLabel.do {
@@ -84,11 +86,6 @@ public final class MessageCardView: UIView {
         messageTimerLabel.do {
             $0.font = DesignSystemFontFamily.Pretendard.bold.font(size: 28)
             $0.textColor = DesignSystemAsset.Colors.gray100.color
-            $0.text = "3:34:20"
-        }
-        
-        messageButton.do {
-            $0.setupButton(text: "익명 쪽지로 마음 표현하기")
         }
     }
     
@@ -138,5 +135,66 @@ public final class MessageCardView: UIView {
             $0.height.equalTo(52)
         }
         
+    }
+
+    private func configureView(type: CardTimeType) {
+        switch type {
+        case .morning:
+            messageTimerNoticeLabel.isHidden = true
+            messageTimerImageView.isHidden = true
+            messageTimerLabel.isHidden = true
+            messageImageView.image = DesignSystemAsset.Images.imgMessageHomeLetterOpen.image
+            messageTitleLabel.text = "당신을 설레게 한 친구에게\n익명 쪽지로 마음을 표현해보세요"
+            messageContainerUnderLabel.text = ""
+            messageButton.do {
+                $0.setupButton(text: "매일 저녁 5시에 쪽지를 보낼 수 있어요")
+                $0.isEnabled = false
+            }
+            
+        case .evening:
+            messageTimerNoticeLabel.isHidden = false
+            messageTimerImageView.isHidden = false
+            messageTimerLabel.isHidden = false
+            messageImageView.image = DesignSystemAsset.Images.imgMessageHomeLetterOpen.image
+            messageTitleLabel.text = "당신을 설레게 한 친구에게\n익명 쪽지로 마음을 표현해보세요"
+            messageContainerUnderLabel.text = "서로의 쪽지는 밤 10시에 전달해드릴게요"
+            messageButton.do {
+                $0.setupButton(text: "익명 쪽지로 마음 표현하기")
+            }
+            
+        case .night:
+            messageTimerNoticeLabel.isHidden = true
+            messageTimerImageView.isHidden = true
+            messageTimerLabel.isHidden = true
+            messageImageView.image = DesignSystemAsset.Images.imgMessageHomeLetterClose.image
+            messageTitleLabel.text = "모두의 소중한 마음이\n상대에게 무사히 전달되었어요"
+            messageContainerUnderLabel.text = "내일 저녁 5시에 새로운 쪽지를 보낼 수 있어요"
+            messageButton.do {
+                $0.setupButton(text: "매일 저녁 5시에 쪽지를 보낼 수 있어요")
+                $0.isEnabled = false
+            }
+        }
+    }
+    
+    private func startTimer() {
+        if type == .evening {
+            Observable<Int>
+                .interval(.seconds(1), scheduler: MainScheduler.instance)
+                .flatMapLatest { [weak self] _ -> Observable<String> in
+                    guard let self = self else { return .just("") }
+                    let now = Date()
+                    let remainTime = self.endTime.timeIntervalSince(now)
+                    if remainTime <= 0 {
+                        return .just("00:00:00")
+                    }
+                    let hours = Int(remainTime) / 3600
+                    let minutes = (Int(remainTime) % 3600) / 60
+                    let seconds = Int(remainTime) % 60
+                    let timeString = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+                    return .just(timeString)
+                }
+                .bind(to: messageTimerLabel.rx.text)
+                .disposed(by: disposeBag)
+        }
     }
 }
