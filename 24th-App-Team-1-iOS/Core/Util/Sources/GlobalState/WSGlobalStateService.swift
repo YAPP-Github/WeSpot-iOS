@@ -24,4 +24,5 @@ public final class WSGlobalStateService: WSGlobalServiceProtocol {
 public enum WSGlobalStateType {
     case toggleStatus(_ type: VoteTypes)
     case didFetchVoteReponseItems(VoteResponseEntity)
+    case toogleMessageType(_ type: MessageTypes)
 }

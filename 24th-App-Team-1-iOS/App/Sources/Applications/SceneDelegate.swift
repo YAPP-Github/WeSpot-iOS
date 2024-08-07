@@ -21,6 +21,7 @@ import SnapKit
 import ReactorKit
 import RxKakaoSDKAuth
 import KakaoSDKAuth
+import MessageFeature
 
 public class SceneDelegate: UIResponder, UISceneDelegate {
     
@@ -55,7 +56,9 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
             let voteNavigationContoller = UINavigationController(rootViewController: voteMainViewController)
             
-            let messageNavigationContoller = UINavigationController(rootViewController: UIViewController())
+            let messageMainViewReactor = MessageMainViewReactor()
+            let messageMainViewController = MessageMainViewController(reactor: messageMainViewReactor)
+            let messageNavigationContoller = UINavigationController(rootViewController: messageMainViewController)
             
             let allNavigationContoller = UINavigationController(rootViewController: UIViewController())
             
