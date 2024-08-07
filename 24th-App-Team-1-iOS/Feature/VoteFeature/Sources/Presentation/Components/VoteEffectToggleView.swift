@@ -15,7 +15,6 @@ final class VoteEffectToggleView: UIView {
     
     var isSelected: VoteEffectType = .latest {
         didSet {
-            print("update isSelected : \(isSelected)")
             updateToggleLayout(isSelected: isSelected)
         }
     }

@@ -177,7 +177,6 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
         
         reactor.pulse(\.$voteAllEntity)
             .map { $0.count }
-            .distinctUntilChanged()
             .bind(to: effectPageControl.rx.numberOfPages)
             .disposed(by: disposeBag)
         
