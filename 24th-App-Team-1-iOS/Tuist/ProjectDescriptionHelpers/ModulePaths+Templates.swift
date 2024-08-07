@@ -16,7 +16,7 @@ public extension ModulePathProtocol {
         return "\(self.rawValue)"
     }
     var bundleId: String {
-        return "com.\(self.rawValue).app"
+        return "com.\(self.rawValue).apps"
     }
     
     var appName: String {
@@ -24,7 +24,7 @@ public extension ModulePathProtocol {
     }
     
     var appBundleId: String {
-        return "com.wespot.app"
+        return "com.wespot.apps"
     }
 }
 
@@ -54,15 +54,19 @@ extension ModulePaths {
 
 extension ModulePaths {
     public enum Domain: String, ModulePathProtocol {
+        case CommonDomain
         case LoginDomain
         case ProfileDomain
         case MessageDomain
+        case VoteDomain
     }
 }
 
 extension ModulePaths {
     public enum Service: String, ModulePathProtocol {
+        case CommonService
         case LoginService
+        case VoteService
         case ProfileService
         case MessageService
     }

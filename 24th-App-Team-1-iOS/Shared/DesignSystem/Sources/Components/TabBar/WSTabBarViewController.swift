@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Extensions
 
 import SnapKit
 import RxSwift
@@ -39,7 +40,8 @@ public final class WSTabBarViewController: UITabBarController {
     public override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         
-        additionalSafeAreaInsets.bottom = tabBarView.isHidden ? 0 : tabBarView.frame.height
+        let bottomSafeAreaHeight = getBottomSafeAreaHeight()
+        additionalSafeAreaInsets.bottom = tabBarView.isHidden ? 0 : tabBarView.frame.height - bottomSafeAreaHeight
         
         updateTabBarButtonState()
     }
@@ -117,5 +119,15 @@ public final class WSTabBarViewController: UITabBarController {
     @objc private func showTabBar() {
         
         setTabBar(hidden: false)
+    }
+    
+    private func getBottomSafeAreaHeight() -> CGFloat {
+        if let window = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .flatMap({ $0.windows })
+            .first(where: { $0.isKeyWindow }) {
+            return window.safeAreaInsets.bottom
+        }
+        return 0
     }
 }

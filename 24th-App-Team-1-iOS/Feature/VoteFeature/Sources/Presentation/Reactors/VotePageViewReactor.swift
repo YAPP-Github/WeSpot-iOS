@@ -10,29 +10,29 @@ import Util
 
 import ReactorKit
 
-final class VotePageViewReactor: Reactor {
+public final class VotePageViewReactor: Reactor {
     
     private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     
-    struct State {
+    public struct State {
         var pageTypes: VoteTypes
     }
     
-    enum Action {
+    public enum Action {
         case updateViewController(Int)
     }
     
-    enum Mutation {
+    public enum Mutation {
         case setViewController(VoteTypes)
     }
     
     public var initialState: State
     
-    init() {
+    public init() {
         self.initialState = State(pageTypes: .main)
     }
     
-    func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
+    public func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
         let setToggleStatus = globalService.event
             .flatMap { event -> Observable<Mutation> in
                 switch event {
@@ -45,14 +45,14 @@ final class VotePageViewReactor: Reactor {
         return .merge(mutation, setToggleStatus)
     }
     
-    func mutate(action: Action) -> Observable<Mutation> {
+    public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case let .updateViewController(pageIndex):
             return .just(.setViewController(pageIndex == 0 ? .main : .result))
         }
     }
     
-    func reduce(state: State, mutation: Mutation) -> State {
+    public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
         case let .setViewController(pageTypes):

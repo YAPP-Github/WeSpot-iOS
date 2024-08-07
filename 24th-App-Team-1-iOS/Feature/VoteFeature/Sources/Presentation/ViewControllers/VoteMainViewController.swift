@@ -24,7 +24,6 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
     //MARK: - LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
-
     }
 
     //MARK: - Configure
@@ -59,6 +58,7 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
 
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
+            
         voteToggleView.mainButton
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
@@ -79,5 +79,23 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
             .skip(1)
             .bind(to: voteToggleView.rx.isSelected)
             .disposed(by: disposeBag)
+        
+        Observable.zip(
+            reactor.pulse(\.$voteResponseEntity),
+            reactor.pulse(\.$voteResponseStub)
+        )
+        .bind(with: self) { owner, response in
+            guard let responseEntity = response.0 else { return }
+            
+            if responseEntity.response.isEmpty {
+                let voteBegingViewController = DependencyContainer.shared.injector.resolve(VoteBeginViewController.self)
+                owner.navigationController?.pushViewController(voteBegingViewController, animated: true)
+            } else {
+                let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self, arguments: responseEntity, response.1, 1)
+                owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
+            }
+        }
+        .disposed(by: disposeBag)        
+        
     }
 }

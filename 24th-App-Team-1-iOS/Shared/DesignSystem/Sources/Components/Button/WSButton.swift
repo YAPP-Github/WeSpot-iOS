@@ -18,6 +18,12 @@ public final class WSButton: UIButton {
         }
     }
     
+    public override var isEnabled: Bool {
+        didSet {
+            setupEnabled(isEnabled)
+        }
+    }
+    
     //MARK: - Initializer
     public init(wsButtonType: WSButtonType) {
         self.wsButtonType = wsButtonType
@@ -45,6 +51,15 @@ public final class WSButton: UIButton {
         return self
     }
     
+
+    private func setupEnabled(_ isEnabled: Bool) {
+        let enabledBackgroundColor = isEnabled ? wsButtonType.buttonProperties.backgroundColor.color : wsButtonType.disabledBackgroundColor
+        let enabledTextColor = isEnabled ? wsButtonType.buttonProperties.textColor : wsButtonType.disabledTextColor
+        backgroundColor = enabledBackgroundColor
+        setTitleColor(enabledTextColor, for: .normal)
+        layer.borderColor = isEnabled ? wsButtonType.pressedBorderColor : UIColor.clear.cgColor
+    }
+
     public func setupFont(font: WSFont) {
         titleLabel?.font = font.font()
     }
@@ -54,4 +69,5 @@ public final class WSButton: UIButton {
         setTitleColor(wsButtonType.pressedTextColor, for: .highlighted)
         layer.borderColor = wsButtonType.pressedBorderColor
     }
+        
 }

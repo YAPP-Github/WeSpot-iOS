@@ -7,20 +7,23 @@
 
 import UIKit
 import Util
+import VoteDomain
+import VoteService
 
 import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class VotePageViewController: UIPageViewController  {
+public final class VotePageViewController: UIPageViewController  {
     //MARK: - Properties
-    typealias Reactor = VotePageViewReactor
+    public typealias Reactor = VotePageViewReactor
     private lazy var voteViewControllers: [UIViewController] = [voteHomeViewController, voteResultViewController]
-    private lazy var voteHomeViewController: VoteHomeViewController = VoteHomeViewController(reactor: VoteHomeViewReactor())
-    private lazy var voteResultViewController: VoteResultViewController = VoteResultViewController(reactor: VoteResultViewReactor())
-    var disposeBag: DisposeBag = DisposeBag()
+    private lazy var voteHomeViewController: VoteHomeViewController = DependencyContainer.shared.injector.resolve(VoteHomeViewController.self)
+    //TODO: DependecyContaine Result 추가 후 코드 변경
+    private lazy var voteResultViewController: VoteResultViewController = DependencyContainer.shared.injector.resolve(VoteResultViewController.self)
+    public var disposeBag: DisposeBag = DisposeBag()
     
-    init(reactor: Reactor) {
+    public init(reactor: Reactor) {
         super.init(transitionStyle: .scroll, navigationOrientation: .horizontal)
         self.reactor = reactor
     }
@@ -30,7 +33,7 @@ final class VotePageViewController: UIPageViewController  {
     }
     
     //MARK: - LifeCycle
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupAttributes()
@@ -60,7 +63,7 @@ final class VotePageViewController: UIPageViewController  {
 }
 
 extension VotePageViewController: ReactorKit.View {
-    func bind(reactor: Reactor) {
+    public func bind(reactor: Reactor) {
         reactor.state
             .map { $0.pageTypes == .main ? 0 : 1 }
             .distinctUntilChanged()
@@ -72,14 +75,14 @@ extension VotePageViewController: ReactorKit.View {
 }
 
 extension VotePageViewController: UIPageViewControllerDelegate, UIPageViewControllerDataSource  {
-    func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         guard let beforeIndex = voteViewControllers.firstIndex(of: viewController),
               beforeIndex - 1 >= 0 else { return nil }
         
         return voteViewControllers[beforeIndex - 1]
     }
     
-    func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         guard let afterIndex = voteViewControllers.firstIndex(of: viewController),
               afterIndex + 1 != voteViewControllers.count else { return nil }
         reactor?.action.onNext(.updateViewController(afterIndex))

@@ -11,7 +11,7 @@ extension InfoPlist {
     
     public static var `default`: Self = {
         return .extendingDefault(with: [
-            "BASE_URL": .string("https://24b0b5f1-548f-4c72-aaf9-65f747a2e62b.mock.pstmn.io/api/v1")
+            "BASE_URL": .string("https://2b0c4a7a-16b4-4b4e-a7c2-5494a7c2f696.mock.pstmn.io/api/v1")
         ])
     }()
     
@@ -35,13 +35,32 @@ extension InfoPlist {
                     ])
                 ]
             ]),
+            "LSApplicationQueriesSchemes": [
+                "kakaokompassauth",
+                "kakaolink",
+                "kakaoplus"
+            ],
+            "KAKAO_NATIVE_APP_KEY": .string("${KAKAO_NATIVE_APP_KEY}"),
+            "CFBundleURLTypes": .array([
+                .dictionary([
+                    "CFBundleTypeRole": .string("Editor"),
+                    "CFBundleURLSchemes": .array([
+                        .string("kakao${KAKAO_NATIVE_APP_KEY}")
+                    ])
+                ])
+            ]),
+            "NSAppTransportSecurity": .dictionary([
+                "NSAllowsArbitraryLoads": .boolean(false)
+            ]),
             "UIAppFonts": .array([
                 .string("Pretendard-Regular.otf"),
                 .string("Pretendard-Bold.otf"),
                 .string("Pretendard-Medium.otf"),
                 .string("Pretendard-SemiBold.otf")
             ]),
-            "BASE_URL": .string("https://24b0b5f1-548f-4c72-aaf9-65f747a2e62b.mock.pstmn.io/api/v1")
+            "BASE_URL": .string("https://2b0c4a7a-16b4-4b4e-a7c2-5494a7c2f696.mock.pstmn.io/api/v1"),
+            "NSAppleIDUsageDescription": .string("로그인에 Apple ID를 사용합니다."),
+            "aps-environment": .string("development") 
         ]
         
         return InfoPlist.extendingDefault(with: basePlist)

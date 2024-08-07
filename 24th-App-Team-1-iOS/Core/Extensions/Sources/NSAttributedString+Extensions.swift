@@ -17,7 +17,7 @@ public extension NSAttributedString {
     ///   - lineHeight: 라인 높이 배수입니다.
     ///   - textAlignment: 텍스트 정렬 방식입니다.
     /// - Returns: 생성된 NSAttributedString입니다.
-    func attributedText(text: String = "", font: UIFont, lineHeight: CGFloat, textAlignment: NSTextAlignment = .left) -> NSAttributedString {
+    func attributedText(text: String = "", font: UIFont, lineHeight: CGFloat, textAlignment: NSTextAlignment = .left, additionalAttributes: [NSAttributedString.Key: Any] = [:]) -> NSAttributedString {
         
         let paragraphStyle = NSMutableParagraphStyle()
         let lineHeightValue = font.pointSize * lineHeight
@@ -26,12 +26,14 @@ public extension NSAttributedString {
         paragraphStyle.lineHeightMultiple = lineHeight
         paragraphStyle.alignment = textAlignment
             
-        // 텍스트 베이스라인 오프셋 계산
-        let baselineOffset = (lineHeightValue - font.pointSize) / 2
-        let attributes: [NSAttributedString.Key: Any] = [
+        var attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
             .paragraphStyle: paragraphStyle, // 문단 스타일 설정
-            .baselineOffset: baselineOffset // 베이스라인 오프셋 설정
         ]
+        
+        for (key, value) in additionalAttributes {
+            attributes[key] = value
+        }
         
         return NSAttributedString(string: text, attributes: attributes)
     }

@@ -13,7 +13,8 @@ let project = Project
         module: .core(.Storage),
         targets: [
             .core(module: .Storage, dependencies: [
-                .shared(module: .ThirdPartyLib)
+                .shared(module: .ThirdPartyLib),
+                .domain(module: .LoginDomain)
             ])
         ]
     )
