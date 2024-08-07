@@ -25,4 +25,5 @@ public enum WSGlobalStateType {
     case toggleStatus(_ type: VoteTypes)
     case didTappedResultButton
     case didFetchVoteReponseItems(VoteResponseEntity)
+    case toogleMessageType(_ type: MessageTypes)
 }

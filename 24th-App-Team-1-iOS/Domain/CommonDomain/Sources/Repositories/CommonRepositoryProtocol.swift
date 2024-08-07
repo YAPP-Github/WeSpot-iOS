@@ -11,4 +11,6 @@ import RxSwift
 
 public protocol CommonRepositoryProtocol {
     func createCheckProfanity(body: CreateCheckProfanityRequest) -> Single<Bool>
+    func fetchProfileImages() -> Single<FetchProfileImageResponseEntity?>
+    func fetchProfileBackgrounds() -> Single<FetchProfileBackgroundsResponseEntity?>
 }

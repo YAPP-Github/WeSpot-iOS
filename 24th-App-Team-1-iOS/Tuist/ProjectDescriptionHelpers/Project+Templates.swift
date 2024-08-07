@@ -23,7 +23,9 @@ extension Project {
         ),
         packages: [Package] = [],
         schemes: [Scheme] = [],
-        settings: Settings? = nil,
+        settings: Settings? = .settings(
+            base: ["OTHER_LDFLAGS": "$(inherited) -ObjC"]
+        ),
         fileHeaderTemplate: FileHeaderTemplate? = nil,
         additionalFiles: [FileElement] = [],
         resourceSynthesizers: [ResourceSynthesizer] = .default
