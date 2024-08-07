@@ -185,26 +185,26 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
             .map { $0.profileImages?.characters }
             .filter { $0 != nil && !$0!.isEmpty }
             .take(1)
-            .subscribe(onNext: { [weak self] _ in
+            .bind(with: self) { owner, _ in
                 DispatchQueue.main.async {
                     let indexPath = IndexPath(item: 0, section: 0)
-                    self?.characterCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                    self?.characterCollectionView.delegate?.collectionView?(self!.characterCollectionView, didSelectItemAt: indexPath)
+                    owner.characterCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                    owner.characterCollectionView.delegate?.collectionView?(owner.characterCollectionView, didSelectItemAt: indexPath)
                 }
-            })
+            }
             .disposed(by: disposeBag)
         
         reactor.state
             .map { $0.profileBackgrounds?.backgrounds }
             .filter { $0 != nil && !$0!.isEmpty }
             .take(1)
-            .subscribe(onNext: { [weak self] _ in
+            .bind(with: self) { owner, _ in
                 DispatchQueue.main.async {
                     let indexPath = IndexPath(item: 0, section: 0)
-                    self?.backgroundCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                    self?.backgroundCollectionView.delegate?.collectionView?(self!.backgroundCollectionView, didSelectItemAt: indexPath)
+                    owner.backgroundCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                    owner.backgroundCollectionView.delegate?.collectionView?(owner.backgroundCollectionView, didSelectItemAt: indexPath)
                 }
-            })
+            }
             .disposed(by: disposeBag)
         
         backgroundCollectionView.rx.itemSelected
