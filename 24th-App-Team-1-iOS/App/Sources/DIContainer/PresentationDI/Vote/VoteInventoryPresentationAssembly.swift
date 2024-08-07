@@ -7,6 +7,7 @@
 
 import Foundation
 import VoteFeature
+import VoteDomain
 
 import Swinject
 
@@ -15,8 +16,14 @@ import Swinject
 struct VoteInventoryPresentationAssembly: Assembly {
     
     func assemble(container: Container) {
-        container.register(VoteInventoryViewReactor.self) { _ in
-            return VoteInventoryViewReactor()
+        container.register(VoteInventoryViewReactor.self) { resolver in
+            let fetchReceiveUseCase = resolver.resolve(FetchVoteReceiveItemUseCaseProtocol.self)!
+            let fetchSentUseCase = resolver.resolve(FetchVoteSentItemUseCaseProtocol.self)!
+            
+            return VoteInventoryViewReactor(
+                fetchVoteReceiveItemUseCase: fetchReceiveUseCase,
+                fetchVoteSentItemUseCase: fetchSentUseCase
+            )
         }
         
         container.register(VoteInventoryViewController.self) { resolver in
