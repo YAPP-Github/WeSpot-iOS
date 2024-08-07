@@ -57,6 +57,7 @@ public final class SignInViewReactor: Reactor {
             else {
                 return .empty()
             }
+            
             return executeSignUp(socialType: "APPLE", authorizationCode: authorizationCode, identityToken: identityToken)
         case .signInWithKakao:
             
@@ -92,11 +93,11 @@ public final class SignInViewReactor: Reactor {
     }
     
     private func executeSignUp(socialType: String, authorizationCode: String, identityToken: String) -> Observable<Mutation> {
-        let apnsToken = APNsTokenManager.shared.token ?? ""
+        let fcmToken = UserDefaultsManager.shared.fcmToken ?? ""
         let body = CreateSignUpTokenRequest(socialType: socialType,
                                             authorizationCode: authorizationCode,
                                             identityToken: identityToken,
-                                            fcmToken: apnsToken)
+                                            fcmToken: fcmToken)
         
         if UserDefaultsManager.shared.accessToken == nil {
             return createNewMemberUseCase

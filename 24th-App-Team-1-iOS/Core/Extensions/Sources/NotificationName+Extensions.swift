@@ -10,4 +10,5 @@ import Foundation
 public extension Notification.Name {
     static let hideTabBar = Notification.Name("hideTabBar")
     static let showTabBar = Notification.Name("showTabBar")
+    static let FCMToken = Notification.Name("FCMToken")
 }

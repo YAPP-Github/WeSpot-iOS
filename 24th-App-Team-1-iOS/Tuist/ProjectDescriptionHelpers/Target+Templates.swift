@@ -46,7 +46,9 @@ struct TargetConfig {
         entitlements: Entitlements? = nil,
         scripts: [TargetScript] = [],
         dependencies: [TargetDependency] = [],
-        settings: Settings? = nil,
+        settings: Settings? = .settings(
+            base: ["OTHER_LDFLAGS": "$(inherited) -ObjC"]
+        ),
         coreDataModels: [CoreDataModel] = [],
         environmentVariables: [String : EnvironmentVariable] = [:],
         launchArguments: [LaunchArgument] = [],

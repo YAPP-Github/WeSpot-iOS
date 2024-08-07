@@ -19,7 +19,7 @@ public class UserDefaultsManager {
         case accessToken // access token
         case refreshToken // 재발행 토큰
         case userProfile // 사용자 프로필
-        case voteWinner
+        case fcmToken
     }
     
     @UserDefaultsWrapper(key: Key.isAccessed.rawValue, defaultValue: false)
@@ -34,4 +34,6 @@ public class UserDefaultsManager {
     @UserDefaultsWrapper(key: Key.userProfile.rawValue, defaultValue: nil)
         public var userProfile: UserProfileResponseEntity?
     
+    @UserDefaultsWrapper(key: Key.fcmToken.rawValue, defaultValue: "")
+        public var fcmToken: String?
 }
