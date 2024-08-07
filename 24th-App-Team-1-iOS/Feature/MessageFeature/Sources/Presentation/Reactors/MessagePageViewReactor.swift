@@ -43,6 +43,8 @@ final class MessagePageViewReactor: Reactor {
                     return .just(.setViewController(messsageTypes))
                 case .didFetchVoteReponseItems(_):
                     return .empty()
+                case .didTappedResultButton:
+                    return .empty()
                 }
             }
         return .merge(mutation, setToggleStatus)
