@@ -40,6 +40,8 @@ public final class VotePageViewReactor: Reactor {
                     return .just(.setViewController(voteTypes))
                 case .toogleMessageType(_):
                     return .empty()
+                case .didFetchVoteReponseItems(_):
+                    return .empty()
                 }
             }
         return .merge(mutation, setToggleStatus)
