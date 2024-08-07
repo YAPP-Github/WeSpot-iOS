@@ -69,4 +69,27 @@ public final class VoteRepository: VoteRepositoryProtocol {
             .map { $0.toDomain() }
             .asSingle()
     }
+    
+    public func fetchVoteReceiveItems() -> Single<VoteRecevieEntity?> {
+        let endPoint = VoteEndPoint.fetchReceivedVotes
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .logErrorIfDetected(category: Network.error)
+            .decodeMap(VoteReceiveResponseDTO.self)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
+    
+    public func fetchVoteSentItems() -> Single<VoteSentEntity?> {
+        let endPoint = VoteEndPoint.fetchVoteSent
+        
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .logErrorIfDetected(category: Network.error)
+            .decodeMap(VoteSentResponseDTO.self)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
 }

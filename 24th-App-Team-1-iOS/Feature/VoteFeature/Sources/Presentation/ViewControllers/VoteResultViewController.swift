@@ -105,6 +105,15 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        confirmButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                let voteInventoryController = DependencyContainer.shared.injector.resolve(VoteInventoryViewController.self)
+                owner.navigationController?.pushViewController(voteInventoryController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$resultSection)
             .asDriver(onErrorJustReturn: [])
             .drive(voteResultCollectionView.rx.items(dataSource: voteResultsCollectionViewDataSources))
