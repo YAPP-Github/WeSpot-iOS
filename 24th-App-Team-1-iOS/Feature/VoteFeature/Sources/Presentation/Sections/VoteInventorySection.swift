@@ -25,6 +25,6 @@ public enum VoteInventorySection: SectionModelType {
 
 
 public enum VoteInventoryItem {
-    case voteReceiveItem
+    case voteReceiveItem(VoteReceiveCellReactor)
     case voteSentItem(VoteSentCellReactor)
 }

@@ -16,11 +16,11 @@ public final class VoteSentCellReactor: Reactor {
     public typealias Action = NoAction
     
     public struct State {
-        var titleContent: String
-        var subContent: String
+        var title: String
+        var profileImage: URL
     }
     
-    init(titleContent: String, subContent: String) {
-        self.initialState = State(titleContent: titleContent, subContent: subContent)
+    init(title: String, profileImage: URL) {
+        self.initialState = State(title: title, profileImage: profileImage)
     }
 }

@@ -16,6 +16,9 @@ import RxCocoa
 import ReactorKit
 import RxDataSources
 
+
+fileprivate typealias VoteInventoryStr = VoteStrings
+fileprivate typealias VoteInventoryId = VoteStrings.Identifier
 public final class VoteInventoryViewController: BaseViewController<VoteInventoryViewReactor> {
 
     //MARK: - Properties
@@ -23,12 +26,14 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
     private let inventoryTableView: UITableView = UITableView()
     private let inventoryTableViewDataSources: RxTableViewSectionedReloadDataSource<VoteInventorySection> = .init { dataSources, tableView, indexPath, sectionItem in
         switch sectionItem {
-        case .voteReceiveItem:
-                        
-            return UITableViewCell()
+        case let .voteReceiveItem(cellReactor):
+            guard let receiveCell = tableView.dequeueReusableCell(withIdentifier: VoteInventoryId.voteReceiveCell, for: indexPath) as? VoteReceiveTableViewCell else { return UITableViewCell() }
+            receiveCell.reactor = cellReactor
+            return receiveCell
         case let .voteSentItem(cellReactor):
             
-            guard let sentCell = tableView.dequeueReusableCell(withIdentifier: "VoteSentTableViewCell", for: indexPath) as? VoteSentTableViewCell else { return UITableViewCell() }
+            guard let sentCell = tableView.dequeueReusableCell(withIdentifier: VoteInventoryId.voteSentCell, for: indexPath) as? VoteSentTableViewCell else { return UITableViewCell() }
+            sentCell.reactor = cellReactor
             return sentCell
         }
     }
@@ -55,7 +60,7 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
         
         inventoryTableView.snp.makeConstraints {
             $0.top.equalTo(toggleView.snp.bottom)
-            $0.horizontalEdges.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(20)
             $0.bottom.equalToSuperview()
         }
     }
@@ -68,10 +73,12 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
         }
         
         inventoryTableView.do {
-            $0.register(VoteSentTableViewCell.self, forCellReuseIdentifier: "VoteSentTableViewCell")
+            $0.register(VoteReceiveTableViewCell.self, forCellReuseIdentifier: VoteInventoryId.voteReceiveCell)
+            $0.register(VoteSentTableViewCell.self, forCellReuseIdentifier: VoteInventoryId.voteSentCell)
             $0.rowHeight = 80
             $0.separatorStyle = .none
             $0.isScrollEnabled = false
+            $0.backgroundColor = .clear
         }
         
         
@@ -85,7 +92,10 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        
+        reactor.pulse(\.$inventorySection)
+            .asDriver(onErrorJustReturn: [])
+            .drive(inventoryTableView.rx.items(dataSource: inventoryTableViewDataSources))
+            .disposed(by: disposeBag)
         
         
     }

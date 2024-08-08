@@ -7,6 +7,7 @@
 
 import Foundation
 import VoteDomain
+import Extensions
 
 import ReactorKit
 
@@ -33,6 +34,7 @@ public final class VoteInventoryViewReactor: Reactor {
     }
     
     public enum Mutation {
+        case setReceiveSection([VoteInventorySection])
         case setReceiveItems(VoteRecevieEntity)
         case setSentItems(VoteSentEntity)
     }
@@ -63,9 +65,10 @@ public final class VoteInventoryViewReactor: Reactor {
                 .asObservable()
                 .flatMap { entity -> Observable<Mutation> in
                     guard let origialEntity = entity else { return .empty() }
-                    var inventorySection: [VoteInventoryItem] = []
-                    
-                    return .just(.setReceiveItems(origialEntity))
+ 
+                    return .concat(
+                        .just(.setReceiveItems(origialEntity))
+                    )
                 }
         case .fetchSentItems:
             return fetchVoteSentItemUseCase
@@ -83,11 +86,11 @@ public final class VoteInventoryViewReactor: Reactor {
         
         switch mutation {
         case let .setReceiveItems(receiveEntity):
-            print("recevie Entity: \(receiveEntity)")
             newState.receiveEntity = receiveEntity
         case let .setSentItems(sentEntity):
-            print("sent Entity: \(sentEntity)")
             newState.sentEntity = sentEntity
+        case let .setReceiveSection(inventorySection):
+            newState.inventorySection = inventorySection
         }
         
         return newState

@@ -17,6 +17,16 @@ public extension Date {
     func toFormatString(with format: DateFormatter.Format) -> String {
         return toFormatString(with: format.type)
     }
+    
+    func toFormatRelative() -> String {
+        let relativeDateformatter = RelativeDateTimeFormatter()
+        relativeDateformatter.unitsStyle = .short
+        relativeDateformatter.locale = Locale(identifier: "ko_KR")
+        relativeDateformatter.calendar = .autoupdatingCurrent
+        
+        let relativeString = relativeDateformatter.localizedString(for: self, relativeTo: .now)
+        return relativeString
+    }
 }
 
 public extension DateFormatter {
