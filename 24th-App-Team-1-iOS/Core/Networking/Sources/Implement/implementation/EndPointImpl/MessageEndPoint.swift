@@ -11,6 +11,8 @@ import Alamofire
 
 public enum MessageEndPoint: WSNetworkEndPoint {
     
+    // 쪽지 상태 조회 API
+    case messagesStatus
     // 예약된 쪽지 조회 API
     case fetchReservedMessages
     // 쪽지 조회 API
@@ -18,6 +20,8 @@ public enum MessageEndPoint: WSNetworkEndPoint {
     
     public var path: String {
         switch self {
+        case .messagesStatus:
+            return "messages/status/me"
         case .fetchReservedMessages:
             return "/messages/scheduled"
         case .fetchMessages:
@@ -27,6 +31,8 @@ public enum MessageEndPoint: WSNetworkEndPoint {
     
     public var method: HTTPMethod {
         switch self {
+        case .messagesStatus:
+            return .get
         case .fetchReservedMessages:
             return .get
         case .fetchMessages:
@@ -36,6 +42,8 @@ public enum MessageEndPoint: WSNetworkEndPoint {
     
     public var parameters: WSRequestParameters {
         switch self {
+        case .messagesStatus:
+            return .none
         case .fetchReservedMessages:
             return .none
         case .fetchMessages(let body):

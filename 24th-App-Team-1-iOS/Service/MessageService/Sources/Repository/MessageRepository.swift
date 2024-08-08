@@ -15,12 +15,24 @@ import RxSwift
 import RxCocoa
 
 public final class messageRepository: MessageRepositoryProtocol {
-    
     private let networkService: WSNetworkServiceProtocol = WSNetworkService()
     
     public init() { }
     
-    public func fetchReservedMessages() -> Single<RecievedMessageResponseEntity?> {
+    
+    public func fetchMessagesStatus() -> Single<MessageStatusResponseEntity?> {
+        let endPoint = MessageEndPoint.messagesStatus
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .logErrorIfDetected(category: Network.error)
+            .decodeMap(MessagesStatusResponseDTO.self)
+            .map { $0.toDomain() }
+            .asSingle()
+    
+    }
+    
+    public func fetchReservedMessages() -> Single<ReservedMessageResponseEntity?> {
         let endPoint = MessageEndPoint.fetchReservedMessages
         
         return networkService.request(endPoint: endPoint)

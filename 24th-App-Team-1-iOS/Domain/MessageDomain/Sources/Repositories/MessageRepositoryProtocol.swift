@@ -10,6 +10,7 @@ import Foundation
 import RxSwift
 
 public protocol MessageRepositoryProtocol {
-    func fetchReservedMessages() -> Single<RecievedMessageResponseEntity?>
-    func fetchMessages(query: MessageRequest) -> Single<RecievedMessageResponseEntity?>
+    func fetchMessagesStatus() -> Single<MessageStatusResponseEntity?>
+    func fetchReservedMessages() -> Single<ReservedMessageResponseEntity?>
+    func fetchMessages(query: MessageRequest) -> Single<ReservedMessageResponseEntity?>
 }
