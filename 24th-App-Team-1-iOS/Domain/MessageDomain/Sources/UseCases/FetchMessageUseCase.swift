@@ -10,7 +10,7 @@ import Foundation
 import RxSwift
 
 public protocol FetchMessageUseCaseProtocol {
-    func execute(query: MessageRequest) -> Single<RecievedMessageResponseEntity?>
+    func execute(query: MessageRequest) -> Single<ReservedMessageResponseEntity?>
 }
 
 public final class FetchRecievedMessageUseCase: FetchMessageUseCaseProtocol {
@@ -21,7 +21,7 @@ public final class FetchRecievedMessageUseCase: FetchMessageUseCaseProtocol {
         self.repository = repository
     }
     
-    public func execute(query: MessageRequest) -> Single<RecievedMessageResponseEntity?> {
+    public func execute(query: MessageRequest) -> Single<ReservedMessageResponseEntity?> {
         return repository.fetchMessages(query: query)
     }
 }

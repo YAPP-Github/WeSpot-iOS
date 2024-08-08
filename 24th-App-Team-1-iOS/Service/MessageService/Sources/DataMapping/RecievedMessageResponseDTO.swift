@@ -43,13 +43,13 @@ public struct ProfileDTO: Decodable {
 }
 
 extension RecievedMessageResponseDTO {
-    func toDomain() -> RecievedMessageResponseEntity {
+    func toDomain() -> ReservedMessageResponseEntity {
         return .init(messages: messages.map { $0.toDomain() })
     }
 }
 
 extension RecievedMessageItemDTO {
-    func toDomain() -> RecievedMessageItemEntity {
+    func toDomain() -> ReservedMessageItemEntity {
         return .init(id: id, senderName: senderName, receiver: receiver.toDomain() , content: content, isRead: isRead, isBlocked: isBlocked, isReported: isReported, readAt: readAt)
     }
 }

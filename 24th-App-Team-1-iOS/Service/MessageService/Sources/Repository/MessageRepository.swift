@@ -31,7 +31,7 @@ public final class messageRepository: MessageRepositoryProtocol {
             .asSingle()
     }
     
-    public func fetchMessages(query: MessageRequest) -> Single<RecievedMessageResponseEntity?> {
+    public func fetchMessages(query: MessageRequest) -> Single<ReservedMessageResponseEntity?> {
         let query = MessageRequest(type: query.type, cursorId: query.cursorId)
         let endPoint = MessageEndPoint.fetchMessages(query)
         

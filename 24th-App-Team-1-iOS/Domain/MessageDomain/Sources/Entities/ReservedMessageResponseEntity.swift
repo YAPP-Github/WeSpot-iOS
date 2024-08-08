@@ -7,16 +7,16 @@
 
 import Foundation
 
-public struct RecievedMessageResponseEntity {
-    public let messages: [RecievedMessageItemEntity]
+public struct ReservedMessageResponseEntity {
+    public let messages: [ReservedMessageItemEntity]
     
-    public init(messages: [RecievedMessageItemEntity]) {
+    public init(messages: [ReservedMessageItemEntity]) {
         self.messages = messages
     }
 }
 
 // MARK: - Message
-public struct RecievedMessageItemEntity {
+public struct ReservedMessageItemEntity {
     public let id: Int
     public let senderName: String
     public let receiver: ReceiverEntity
