@@ -197,4 +197,9 @@ public final class MessageCardView: UIView {
                 .disposed(by: disposeBag)
         }
     }
+    
+    // 외부에서 접근 가능한 메시지 전송 가능 상태 업데이트 함수
+    public func setSendAllowed(_ isEnabled: Bool) {
+        messageButton.isEnabled = isEnabled
+    }
 }
