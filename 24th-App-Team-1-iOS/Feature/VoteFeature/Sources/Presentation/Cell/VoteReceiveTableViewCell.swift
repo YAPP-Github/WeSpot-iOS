@@ -12,6 +12,7 @@ import ReactorKit
 
 final class VoteReceiveTableViewCell: UITableViewCell {
     
+    private let receiveNewImageView: UIImageView = UIImageView()
     private let receiveContainerView: UIView = UIView()
     private let receiveAccessoryView: UIImageView = UIImageView()
     private let receiveTitleLabel: WSLabel = WSLabel(wsFont: .Body04)
@@ -36,13 +37,19 @@ final class VoteReceiveTableViewCell: UITableViewCell {
     }
     
     private func setupUI() {
-        receiveContainerView.addSubviews(receiveTitleLabel, receiveDescprtionLabel, receiveImageView, receiveAccessoryView)
+        receiveContainerView.addSubviews(receiveTitleLabel, receiveDescprtionLabel, receiveImageView, receiveAccessoryView, receiveNewImageView)
         contentView.addSubviews(receiveContainerView)
     }
     
     private func setupAutoLayout() {
         receiveContainerView.snp.makeConstraints {
             $0.edges.equalToSuperview()
+        }
+        
+        receiveNewImageView.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(12)
+            $0.left.equalToSuperview().inset(12)
+            $0.size.equalTo(6)
         }
         
         receiveAccessoryView.snp.makeConstraints {
@@ -102,6 +109,10 @@ final class VoteReceiveTableViewCell: UITableViewCell {
             $0.text = "우리 반 친구 10명이 나에게 투표했어요"
             $0.textColor = DesignSystemAsset.Colors.gray300.color
         }
+        
+        receiveNewImageView.do {
+            $0.image = DesignSystemAsset.Images.icInventoryNewFiled.image
+        }
     }
 }
 
@@ -118,6 +129,12 @@ extension VoteReceiveTableViewCell: ReactorKit.View {
             .map { "우리 반 친구 \($0.voteCount)명이 나에게 투표했어요" }
             .distinctUntilChanged()
             .bind(to: receiveDescprtionLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { !$0.isNew }
+            .distinctUntilChanged()
+            .bind(to: receiveNewImageView.rx.isHidden)
             .disposed(by: disposeBag)
     }
 }
