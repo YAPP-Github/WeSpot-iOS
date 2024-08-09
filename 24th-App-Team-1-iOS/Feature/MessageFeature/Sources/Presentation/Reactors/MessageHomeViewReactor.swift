@@ -7,6 +7,7 @@
 
 import Foundation
 import MessageDomain
+import Extensions
 
 import ReactorKit
 
@@ -66,7 +67,8 @@ public final class MessageHomeViewReactor: Reactor {
                     guard let entity else {
                         return .empty()
                     }
-                    return .just(.setRecievedMessagesBool(self.isReceivedMessageToday(entity)))
+                    let hasMessageToday = self.isReceivedMessageToday(entity.messages.first?.receivedAt ?? "")
+                    return .just(.setRecievedMessagesBool(hasMessageToday))
                 }
         }
     }
@@ -84,21 +86,11 @@ public final class MessageHomeViewReactor: Reactor {
         return newState
     }
     
-
-    func isReceivedMessageToday(_ response: ReceivedMessageResponseEntity) -> Bool {
-        guard let firstMessage = response.messages.first else {
+    func isReceivedMessageToday(_ receivedAt: String) -> Bool {
+        guard let receivedDate = DateFormatter.iso8601().date(from: receivedAt) else {
             return false
         }
-    
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
-        guard let receivedDate = dateFormatter.date(from: firstMessage.receivedAt) else {
-            return false
-        }
-        
-        let calendar = Calendar.current
-        let today = Date()
-        return calendar.isDate(receivedDate, inSameDayAs: today)
+        return receivedDate.isSameDay(as: Date())
     }
 
 }

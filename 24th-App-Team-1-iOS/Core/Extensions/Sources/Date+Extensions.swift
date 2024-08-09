@@ -17,6 +17,11 @@ public extension Date {
     func toFormatString(with format: DateFormatter.Format) -> String {
         return toFormatString(with: format.type)
     }
+    
+    func isSameDay(as otherDate: Date) -> Bool {
+        let calendar = Calendar.current
+        return calendar.isDate(self, inSameDayAs: otherDate)
+    }
 }
 
 public extension DateFormatter {
@@ -64,6 +69,15 @@ public extension DateFormatter {
     static func withFormat(_ format: String) -> DateFormatter {
         let formatter = DateFormatter()
         formatter.dateFormat = format
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.timeZone = TimeZone.autoupdatingCurrent
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter
+    }
+    
+    static func iso8601() -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
         formatter.calendar = Calendar(identifier: .iso8601)
         formatter.timeZone = TimeZone.autoupdatingCurrent
         formatter.locale = Locale(identifier: "ko_KR")
