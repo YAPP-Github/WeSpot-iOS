@@ -22,7 +22,7 @@ public enum VoteEndPoint: WSNetworkEndPoint {
     /// 내가 받은 투표 목록 조회
     case fetchReceivedVotes(Encodable)
     /// 내가 받은 투표 개별 조회
-    case fetchIndividualVotes
+    case fetchIndividualVotes(Int, Encodable)
     /// 내가 받은 투표 목록 조회
     case fetchVoteSent(Encodable)
     
@@ -38,8 +38,8 @@ public enum VoteEndPoint: WSNetworkEndPoint {
             return "/votes/tops"
         case .fetchReceivedVotes:
             return "/votes/received"
-        case .fetchIndividualVotes:
-            return "/votes/receive"
+        case let .fetchIndividualVotes(id, _):
+            return "/votes/received/options/\(id)"
         case .fetchVoteSent:
             return "/votes/sent"
         }
@@ -76,6 +76,8 @@ public enum VoteEndPoint: WSNetworkEndPoint {
             return .requestQuery(receivedQuery)
         case let .fetchVoteSent(sentQuery):
             return .requestQuery(sentQuery)
+        case let .fetchIndividualVotes(_, individualQuery):
+            return .requestQuery(individualQuery)
         default:
             return .none
         }

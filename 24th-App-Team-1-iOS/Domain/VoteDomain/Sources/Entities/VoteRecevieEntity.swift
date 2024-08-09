@@ -18,13 +18,16 @@ public struct VoteRecevieEntity {
 }
 
 public struct VoteReceiveItemEntity {
+    public let voteId: Int
     public let date: String
     public let receiveResponse: [VoteReceiveResponseEntity]
     
     public init(
+        voteId: Int,
         date: String,
         receiveResponse: [VoteReceiveResponseEntity]
     ) {
+        self.voteId = voteId
         self.date = date
         self.receiveResponse = receiveResponse
     }

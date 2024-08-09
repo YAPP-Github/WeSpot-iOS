@@ -28,12 +28,14 @@ public final class VoteInventoryViewReactor: Reactor {
         @Pulse var inventorySection: [VoteInventorySection]
         var isEmpty: Bool
         var inventoryType: InventoryType
+        @Pulse var voteId: Int
     }
     
     public enum Action {
         case fetchReceiveItems
         case fetchSentItems
-        case fetchMoreItems(Int)
+        case fetchMoreItems(Int, Int)
+        case didTappedItems(Int, Int)
     }
     
     public enum Mutation {
@@ -41,6 +43,7 @@ public final class VoteInventoryViewReactor: Reactor {
         case setReceiveItems(VoteRecevieEntity)
         case setSentItems(VoteSentEntity)
         case setEmptyItems(Bool)
+        case setVoteId(Int)
         case setInventoryType(InventoryType)
     }
     
@@ -58,7 +61,8 @@ public final class VoteInventoryViewReactor: Reactor {
                 .voteReceiveInfo(header: "", items: [])
             ],
             isEmpty: true,
-            inventoryType: .receive
+            inventoryType: .receive,
+            voteId: 0
         )
     }
     
@@ -148,16 +152,21 @@ public final class VoteInventoryViewReactor: Reactor {
                         )
                     }
             }
-        case let .fetchMoreItems(index):
+        case let .fetchMoreItems(section, index):
             //TODO: 추후 로직 추가
             switch currentState.inventoryType {
             case .receive:
-                let curosrId = currentState.receiveEntity
+                let curosrId = currentState.receiveEntity?.response[section].receiveResponse[index].voteOption.id
+                
                 return .empty()
             case .sent:
                 return .empty()
             }
             
+        case let .didTappedItems(index, section):
+            let voteId = currentState.receiveEntity?.response[section].receiveResponse[index].voteOption.id ?? 0
+            
+            return .just(.setVoteId(voteId))
         }
     }
     
@@ -175,6 +184,8 @@ public final class VoteInventoryViewReactor: Reactor {
             newState.inventorySection = inventorySection
         case let .setEmptyItems(isEmpty):
             newState.isEmpty = isEmpty
+        case let .setVoteId(voteId):
+            newState.voteId = voteId
         }
         
         return newState

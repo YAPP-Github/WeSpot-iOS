@@ -182,10 +182,30 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
             .disposed(by: disposeBag)
         
         inventoryTableView.rx
-            .prefetchRows
-            .compactMap(\.last?.section)
-            .map { Reactor.Action.fetchMoreItems($0) }
+            .itemSelected
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .compactMap { ($0.row, $0.section) }
+            .map { Reactor.Action.didTappedItems($0, $1)}
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        inventoryTableView.rx
+            .prefetchRows
+            .compactMap { indexPaths in
+                guard let lastIndexPath = indexPaths.last else {
+                    return nil
+                }
+                return (lastIndexPath.section, lastIndexPath.row)
+            }
+            .map { Reactor.Action.fetchMoreItems($0,$1)}
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+       
+        reactor.pulse(\.$voteId)
+            .bind(with: self) { owner, voteId in
+                let voteInventoryDetailViewController = DependencyContainer.shared.injector.resolve(VoteInventoryDetailViewController.self, argument: voteId)
+                owner.navigationController?.pushViewController(voteInventoryDetailViewController, animated: true)
+            }
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$inventorySection)

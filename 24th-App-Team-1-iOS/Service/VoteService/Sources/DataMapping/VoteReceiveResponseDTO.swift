@@ -23,10 +23,12 @@ public struct VoteReceiveResponseDTO: Decodable {
 extension VoteReceiveResponseDTO {
     
     public struct VoteReceiveItemResponseDTO: Decodable {
+        public let voteId: Int
         public let date: String
         public let receiveResponse: [VoteReceiveVoteOptionResponseDTO]
         
         private enum CodingKeys: String, CodingKey {
+            case voteId
             case date
             case receiveResponse = "receivedVoteResults"
         }
@@ -63,6 +65,7 @@ extension VoteReceiveResponseDTO {
 extension VoteReceiveResponseDTO.VoteReceiveItemResponseDTO {
     func toDomain() -> VoteReceiveItemEntity {
         return .init(
+            voteId: voteId,
             date: date,
             receiveResponse: receiveResponse.map { $0.toDomain() }
         )
