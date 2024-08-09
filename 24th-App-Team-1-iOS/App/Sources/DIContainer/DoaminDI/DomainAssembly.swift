@@ -89,9 +89,9 @@ struct DomainAssembly: Assembly {
             return FetchMessagesStatusUseCase(repository: repository)
         }
         
-        container.register(FetchReservedMessageUseCaseProtocol.self) { resolver in
+        container.register(FetchReceivedMessageUseCaseProtocol.self) { resolver in
             let repository = resolver.resolve(MessageRepositoryProtocol.self)!
-            return FetchReservedMessageUseCase(repository: repository)
+            return FetchReceivedMessageUseCase(repository: repository)
         }
     }
 }

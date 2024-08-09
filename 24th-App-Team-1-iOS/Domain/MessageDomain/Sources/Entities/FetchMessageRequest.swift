@@ -7,11 +7,16 @@
 
 import Foundation
 
+public enum MessageType: String, Encodable {
+    case received = "RECEIVED"
+    case sent = "SENT"
+}
+
 public struct MessageRequest: Encodable {
-    public let type: String
+    public let type: MessageType
     public let cursorId: Int
     
-    public init(type: String, cursorId: Int) {
+    public init(type: MessageType, cursorId: Int) {
         self.type = type
         self.cursorId = cursorId
     }    

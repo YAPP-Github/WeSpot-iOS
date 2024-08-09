@@ -15,6 +15,7 @@ import RxSwift
 import RxCocoa
 
 public final class messageRepository: MessageRepositoryProtocol {
+    
     private let networkService: WSNetworkServiceProtocol = WSNetworkService()
     
     public init() { }
@@ -38,19 +39,19 @@ public final class messageRepository: MessageRepositoryProtocol {
         return networkService.request(endPoint: endPoint)
             .asObservable()
             .logErrorIfDetected(category: Network.error)
-            .decodeMap(RecievedMessageResponseDTO.self)
+            .decodeMap(ReservedMessageResponseDTO.self)
             .map { $0.toDomain() }
             .asSingle()
     }
     
-    public func fetchMessages(query: MessageRequest) -> Single<ReservedMessageResponseEntity?> {
-        let query = MessageRequest(type: query.type, cursorId: query.cursorId)
+    public func fetchReceivedMessages(cursorId: Int) -> Single<ReceivedMessageResponseEntity?> {
+        let query = MessageRequest(type: .received, cursorId: cursorId)
         let endPoint = MessageEndPoint.fetchMessages(query)
         
         return networkService.request(endPoint: endPoint)
             .asObservable()
             .logErrorIfDetected(category: Network.error)
-            .decodeMap(RecievedMessageResponseDTO.self)
+            .decodeMap(ReceievedMessageResponseDTO.self)
             .map { $0.toDomain() }
             .asSingle()
     }

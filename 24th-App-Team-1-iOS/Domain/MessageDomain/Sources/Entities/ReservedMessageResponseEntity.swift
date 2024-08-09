@@ -19,14 +19,13 @@ public struct ReservedMessageResponseEntity {
 public struct ReservedMessageItemEntity {
     public let id: Int
     public let senderName: String
-    public let receiver: ReceiverEntity
+    public let receiver: ReservedMessageReceiverEntity
     public let content: String
     public let isRead: Bool
     public let isBlocked: Bool
     public let isReported: Bool
-    public let readAt: String
     
-    public init(id: Int, senderName: String, receiver: ReceiverEntity, content: String, isRead: Bool, isBlocked: Bool, isReported: Bool, readAt: String) {
+    public init(id: Int, senderName: String, receiver: ReservedMessageReceiverEntity, content: String, isRead: Bool, isBlocked: Bool, isReported: Bool) {
         self.id = id
         self.senderName = senderName
         self.receiver = receiver
@@ -34,12 +33,11 @@ public struct ReservedMessageItemEntity {
         self.isRead = isRead
         self.isBlocked = isBlocked
         self.isReported = isReported
-        self.readAt = readAt
     }
 }
 
 // MARK: - Receiver
-public struct ReceiverEntity {
+public struct ReservedMessageReceiverEntity {
     public let id: Int
     public let name: String
     public let gender: String
@@ -47,9 +45,9 @@ public struct ReceiverEntity {
     public let schoolName: String
     public let grade: Int
     public let classNumber: Int
-    public let profile: ProfileEntity
+    public let profile: ReservedMessageProfileEntity
     
-    public init(id: Int, name: String, gender: String, introduction: String, schoolName: String, grade: Int, classNumber: Int, profile: ProfileEntity) {
+    public init(id: Int, name: String, gender: String, introduction: String, schoolName: String, grade: Int, classNumber: Int, profile: ReservedMessageProfileEntity) {
         self.id = id
         self.name = name
         self.gender = gender
@@ -62,7 +60,7 @@ public struct ReceiverEntity {
 }
 
 // MARK: - Profile
-public struct ProfileEntity {
+public struct ReservedMessageProfileEntity {
     public let backgroundColor: String
     public let iconURL: String
     

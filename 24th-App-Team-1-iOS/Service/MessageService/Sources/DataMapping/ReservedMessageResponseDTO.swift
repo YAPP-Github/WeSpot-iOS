@@ -8,24 +8,23 @@
 import Foundation
 import MessageDomain
 
-public struct RecievedMessageResponseDTO: Decodable {
-    public let messages: [RecievedMessageItemDTO]
+public struct ReservedMessageResponseDTO: Decodable {
+    public let messages: [ReservedMessageItemDTO]
 }
 
 // MARK: - Message
-public struct RecievedMessageItemDTO: Decodable {
+public struct ReservedMessageItemDTO: Decodable {
     public let id: Int
     public let senderName: String
-    public let receiver: ReceiverDTO
+    public let receiver: ReservedMessageReceiverDTO
     public let content: String
     public let isRead: Bool
     public let isBlocked: Bool
     public let isReported: Bool
-    public let readAt: String
 }
 
 // MARK: - Receiver
-public struct ReceiverDTO: Decodable {
+public struct ReservedMessageReceiverDTO: Decodable {
     public let id: Int
     public let name: String
     public let gender: String
@@ -33,35 +32,35 @@ public struct ReceiverDTO: Decodable {
     public let schoolName: String
     public let grade: Int
     public let classNumber: Int
-    public let profile: ProfileDTO
+    public let profile: ReservedMessageProfileDTO
 }
 
 // MARK: - Profile
-public struct ProfileDTO: Decodable {
+public struct ReservedMessageProfileDTO: Decodable {
     public let backgroundColor: String
     public let iconURL: String
 }
 
-extension RecievedMessageResponseDTO {
+extension ReservedMessageResponseDTO {
     func toDomain() -> ReservedMessageResponseEntity {
         return .init(messages: messages.map { $0.toDomain() })
     }
 }
 
-extension RecievedMessageItemDTO {
+extension ReservedMessageItemDTO {
     func toDomain() -> ReservedMessageItemEntity {
-        return .init(id: id, senderName: senderName, receiver: receiver.toDomain() , content: content, isRead: isRead, isBlocked: isBlocked, isReported: isReported, readAt: readAt)
+        return .init(id: id, senderName: senderName, receiver: receiver.toDomain() , content: content, isRead: isRead, isBlocked: isBlocked, isReported: isReported)
     }
 }
 
-extension ReceiverDTO {
-    func toDomain() -> ReceiverEntity {
+extension ReservedMessageReceiverDTO {
+    func toDomain() -> ReservedMessageReceiverEntity {
         return .init(id: id, name: name, gender: gender, introduction: introduction, schoolName: schoolName, grade: grade, classNumber: classNumber, profile: profile.toDomain() )
     }
 }
 
-extension ProfileDTO {
-    func toDomain() -> ProfileEntity {
+extension ReservedMessageProfileDTO {
+    func toDomain() -> ReservedMessageProfileEntity {
         return .init(backgroundColor: backgroundColor, iconURL: iconURL)
     }
 }

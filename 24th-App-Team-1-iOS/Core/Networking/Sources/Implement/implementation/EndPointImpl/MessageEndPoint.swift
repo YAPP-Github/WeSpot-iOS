@@ -47,7 +47,7 @@ public enum MessageEndPoint: WSNetworkEndPoint {
         case .fetchReservedMessages:
             return .none
         case .fetchMessages(let body):
-            return .requestBody(body)
+            return .requestQuery(body)
         }
     }
     

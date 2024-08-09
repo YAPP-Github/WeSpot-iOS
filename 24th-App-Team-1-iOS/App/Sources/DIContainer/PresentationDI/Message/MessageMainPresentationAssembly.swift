@@ -16,9 +16,9 @@ struct MessageHomePresentationAssembly: Assembly {
         
         container.register(MessageHomeViewReactor.self) { resolver in
             let fetchMessagesStatusUseCase = resolver.resolve(FetchMessagesStatusUseCaseProtocol.self)!
-            let fetchReservedMessageUseCase = resolver.resolve(FetchReservedMessageUseCaseProtocol.self)!
+            let fetchReceivedMessageUseCase = resolver.resolve(FetchReceivedMessageUseCaseProtocol.self)!
              
-            return MessageHomeViewReactor(fetchMessagesStatusUseCase: fetchMessagesStatusUseCase, fetchReservedMessageUseCase: fetchReservedMessageUseCase)
+            return MessageHomeViewReactor(fetchMessagesStatusUseCase: fetchMessagesStatusUseCase, fetchReceivedMessageUseCase: fetchReceivedMessageUseCase)
         }
         
         container.register(MessageHomeViewController.self) { resolver in
