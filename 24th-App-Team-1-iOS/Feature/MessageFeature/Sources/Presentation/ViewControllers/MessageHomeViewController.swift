@@ -18,7 +18,7 @@ import ReactorKit
 public final class MessageHomeViewController: BaseViewController<MessageHomeViewReactor> {
     
     //MARK: - Properties
-    private let messageBannerView = WSBanner(image: DesignSystemAsset.Images.reservation.image ,titleText: "예약 중인 쪽지 3개")
+    private let messageBannerView = WSBanner(image: DesignSystemAsset.Images.reservation.image , titleText: "예약 중인 쪽지 3개")
     private lazy var messageCardView: MessageCardView = {
         let hour = Calendar.current.component(.hour, from: Date())
         if (0..<17).contains(hour) {
@@ -36,7 +36,7 @@ public final class MessageHomeViewController: BaseViewController<MessageHomeView
     }
     private var showBanner: Bool {
         let hour = Calendar.current.component(.hour, from: Date())
-        return (17...22).contains(hour)
+        return (17...24).contains(hour)
     }
     
     //MARK: - LifeCycle
@@ -117,5 +117,81 @@ public final class MessageHomeViewController: BaseViewController<MessageHomeView
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        let hour = Calendar.current.component(.hour, from: Date())
+        
+        if (17..<22).contains(hour) {
+            reactor.action.onNext(.fetchReceivedMessageList)
+            
+            reactor.pulse(\.$reservedMessages)
+                .compactMap { $0 }
+                .bind(to: messageBannerView.rx.reservedMessages)
+                .disposed(by: disposeBag)
+            
+            reactor.pulse(\.$isSendAllowed)
+                .compactMap { $0 }
+                .bind(to: messageCardView.rx.isSendAllowed)
+                .disposed(by: disposeBag)
+            
+            reactor.pulse(\.$reservedMessages)
+                .bind(with: self) { owner, count in
+                    if count == 3 {
+                        owner.messageCardView.messageButton.do {
+                            $0.setupButton(text: "하루에 3개까지 작성할 수 있어요")
+                            $0.isEnabled = false
+                        }
+                    } else if count == 0 {
+                        owner.messageBannerView.isHidden = true
+                    } else {
+                        owner.messageCardView.messageButton.do {
+                            $0.setupButton(text: "익명 쪽지로 마음 표현하기")
+                            $0.isEnabled = true
+                        }
+                        owner.messageBannerView.isHidden = false
+                    }
+                }
+                .disposed(by: disposeBag)
+        } else if (22..<24).contains(hour) {
+            reactor.action.onNext(.fetchReceivedMessageList)
+            
+            reactor.pulse(\.$recievedMessages)
+                .bind(with: self) { owner, hasMessage in
+                    let showBanner = hasMessage ?? false
+                    owner.messageBannerView.isHidden = !showBanner
+                    
+                    if showBanner {
+                        owner.messageBannerView.do {
+                            $0.setTitleText("익명의 쪽지가 도착했어요")
+                            $0.setSubTitleText("지금 쪽지함을 열어 확인해 보세요")
+                            $0.setImageView(DesignSystemAsset.Images.message.image)
+                        }
+                        owner.animateBanner()
+                    } else {
+                        owner.isAnimating = true
+                        owner.setInitialLayout()
+                    }
+                }
+                .disposed(by: disposeBag)
+        }
+    }
+}
+
+private extension Reactive where Base: WSBanner {
+    var reservedMessages: Binder<Int> {
+        return Binder(self.base) { view, count in
+            if count == 3 {
+                view.setTitleText("예약 중인 쪽지 \(count)개")
+            } else {
+                view.setTitleText("예약 중인 쪽지 \(count)개")
+                view.setSubTitleText("\(3 - count)개의 쪽지를 더 보낼 수 있어요")
+            }
+        }
+    }
+}
+
+private extension Reactive where Base: MessageCardView {
+    var isSendAllowed: Binder<Bool> {
+        return Binder(self.base) { view, isAllowed in
+            view.setSendAllowed(isAllowed)
+        }
     }
 }
