@@ -70,8 +70,9 @@ public final class VoteRepository: VoteRepositoryProtocol {
             .asSingle()
     }
     
-    public func fetchVoteReceiveItems() -> Single<VoteRecevieEntity?> {
-        let endPoint = VoteEndPoint.fetchReceivedVotes
+    public func fetchVoteReceiveItems(query: VoteReceiveRequestQuery) -> Single<VoteRecevieEntity?> {
+        let query = VoteReceiveRequestDTO(cursorId: query.cursorId, limit: query.limit)
+        let endPoint = VoteEndPoint.fetchReceivedVotes(query)
         
         return networkService.request(endPoint: endPoint)
             .asObservable()
@@ -81,14 +82,14 @@ public final class VoteRepository: VoteRepositoryProtocol {
             .asSingle()
     }
     
-    public func fetchVoteSentItems() -> Single<VoteSentEntity?> {
-        let endPoint = VoteEndPoint.fetchVoteSent
-        
+    public func fetchVoteSentItems(query: VoteSentRequestQuery) -> Single<VoteSentEntity?> {
+        let query = VoteSentRequestDTO(cursorId: query.cursorId, limit: query.limit)
+        let endPoint = VoteEndPoint.fetchVoteSent(query)
         
         return networkService.request(endPoint: endPoint)
             .asObservable()
-            .logErrorIfDetected(category: Network.error)
             .decodeMap(VoteSentResponseDTO.self)
+            .logErrorIfDetected(category: Network.error)
             .map { $0.toDomain() }
             .asSingle()
     }

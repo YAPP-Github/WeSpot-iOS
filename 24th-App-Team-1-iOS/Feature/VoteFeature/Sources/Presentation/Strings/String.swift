@@ -51,4 +51,5 @@ extension String.VoteResult.Identifier {
     static let voteEmptyCell = "VoteEmptyCollectionViewCell"
     static let voteReceiveCell = "VoteReceiveTableViewCell"
     static let voteSentCell = "VoteSentTableViewCell"
+    static let voteInventoryHeaderCell = "VoteInventoryHeaderFooterView"
 }

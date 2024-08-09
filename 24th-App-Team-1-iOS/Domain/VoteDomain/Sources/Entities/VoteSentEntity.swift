@@ -9,9 +9,11 @@ import Foundation
 
 public struct VoteSentEntity {
     public let response: [VoteSentItemEntity]
+    public let isLastPage: Bool
     
-    public init(response: [VoteSentItemEntity]) {
+    public init(response: [VoteSentItemEntity], isLastPage: Bool) {
         self.response = response
+        self.isLastPage = isLastPage
     }
 }
 
@@ -32,23 +34,19 @@ public struct VoteSentItemEntity {
 
 public struct VoteSentResponseEntity {
     public let voteContent: VoteSentContentResponseEntity
-    public let voteUser: VoteSentUserResponseEntity
     
-    public init(
-        voteContent: VoteSentContentResponseEntity,
-        voteUser: VoteSentUserResponseEntity
-    ) {
+    public init(voteContent: VoteSentContentResponseEntity) {
         self.voteContent = voteContent
-        self.voteUser = voteUser
     }
 }
 
 
 public struct VoteSentContentResponseEntity {
     public let voteOption: VoteSentContentItemResponseEntity
-    
-    public init(voteOption: VoteSentContentItemResponseEntity) {
+    public let voteUser: VoteSentUserResponseEntity
+    public init(voteOption: VoteSentContentItemResponseEntity, voteUser: VoteSentUserResponseEntity) {
         self.voteOption = voteOption
+        self.voteUser = voteUser
     }
 }
 

@@ -16,7 +16,7 @@ public struct VoteReceiveResponseDTO: Decodable {
     
     private enum CodingKeys: String, CodingKey {
         case response = "voteData"
-        case isLastPage
+        case isLastPage = "hasNext"
     }
 }
 

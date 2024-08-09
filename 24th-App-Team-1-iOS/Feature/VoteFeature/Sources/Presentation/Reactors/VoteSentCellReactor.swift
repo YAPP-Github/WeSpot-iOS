@@ -17,10 +17,11 @@ public final class VoteSentCellReactor: Reactor {
     
     public struct State {
         var title: String
+        var userName: String
         var profileImage: URL
     }
     
-    init(title: String, profileImage: URL) {
-        self.initialState = State(title: title, profileImage: profileImage)
+    init(title: String, userName: String, profileImage: URL) {
+        self.initialState = State(title: title, userName: userName, profileImage: profileImage)
     }
 }

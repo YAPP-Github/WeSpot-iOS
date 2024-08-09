@@ -14,6 +14,6 @@ public protocol VoteRepositoryProtocol {
     func fetchWinnerVoteOptions(query: VoteWinnerRequestQuery) -> Single<VoteWinnerResponseEntity?>
     func uploadFinalVoteResults(body: [CreateVoteItemReqeuest]) -> Single<CreateVoteEntity?>
     func fetchAllVoteResults(query: VoteWinnerRequestQuery) -> Single<VoteAllReponseEntity?>
-    func fetchVoteReceiveItems() -> Single<VoteRecevieEntity?>
-    func fetchVoteSentItems() -> Single<VoteSentEntity?>
+    func fetchVoteReceiveItems(query: VoteReceiveRequestQuery) -> Single<VoteRecevieEntity?>
+    func fetchVoteSentItems(query: VoteSentRequestQuery) -> Single<VoteSentEntity?>
 }

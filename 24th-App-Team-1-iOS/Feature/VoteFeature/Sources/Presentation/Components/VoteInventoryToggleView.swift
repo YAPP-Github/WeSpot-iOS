@@ -11,12 +11,12 @@ import UIKit
 
 final class VoteInventoryToggleView: UIView {
     let receiveButton: UIButton = UIButton(type: .custom)
-    let sendButton: UIButton = UIButton(type: .custom)
+    let sentButton: UIButton = UIButton(type: .custom)
     
     
     var isSelected: InventoryType = .receive {
         didSet {
-            //TODO: 추후 로직 추가
+            updateToggleLayout(isSelected: isSelected)
         }
     }
     
@@ -33,7 +33,7 @@ final class VoteInventoryToggleView: UIView {
     
     
     private func setupUI() {
-        addSubviews(receiveButton, sendButton)
+        addSubviews(receiveButton, sentButton)
     }
     
     private func setupAutoLayout() {
@@ -44,7 +44,7 @@ final class VoteInventoryToggleView: UIView {
             $0.centerY.equalToSuperview()
         }
         
-        sendButton.snp.makeConstraints {
+        sentButton.snp.makeConstraints {
             $0.left.equalTo(receiveButton.snp.right).offset(12)
             $0.width.height.equalTo(receiveButton)
             $0.centerY.equalToSuperview()
@@ -60,11 +60,13 @@ final class VoteInventoryToggleView: UIView {
                 .font: WSFont.Body05.font()
             ]))
             $0.layer.cornerRadius = 15
+            $0.layer.borderWidth = 0
+            $0.layer.borderColor = DesignSystemAsset.Colors.gray400.color.cgColor
             $0.clipsToBounds = true
             
         }
         
-        sendButton.do {
+        sentButton.do {
             $0.configuration = .filled()
             $0.configuration?.baseBackgroundColor = .clear
             $0.configuration?.baseForegroundColor = DesignSystemAsset.Colors.gray400.color
@@ -79,6 +81,16 @@ final class VoteInventoryToggleView: UIView {
     }
     
     
+    private func updateToggleLayout(isSelected: InventoryType) {
+        receiveButton.configuration?.baseBackgroundColor = isSelected == .receive ? DesignSystemAsset.Colors.gray500.color : .clear
+        receiveButton.configuration?.baseForegroundColor = isSelected == .receive ? DesignSystemAsset.Colors.gray100.color : DesignSystemAsset.Colors.gray400.color
+        receiveButton.layer.borderWidth = isSelected  == .receive ? 0 : 1
+        
+        sentButton.configuration?.baseBackgroundColor = isSelected == .sent ? DesignSystemAsset.Colors.gray500.color : .clear
+        sentButton.configuration?.baseForegroundColor = isSelected == .sent ? DesignSystemAsset.Colors.gray100.color : DesignSystemAsset.Colors.gray400.color
+        sentButton.layer.borderWidth = isSelected == .sent ? 0 : 1
+        
+    }
     
     
 }

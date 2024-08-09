@@ -11,27 +11,45 @@ import VoteDomain
 
 public struct VoteSentResponseDTO: Decodable {
     public let response: [VoteSentItemResponseDTO]
+    public let isLastPage: Bool
     
+    private enum CodingKeys: String, CodingKey {
+        case response = "voteData"
+        case isLastPage = "hasNext"
+    }
 }
 
 extension VoteSentResponseDTO {
     public struct VoteSentItemResponseDTO: Decodable {
         public let date: String
         public let sentResponse: [VoteSentContentResponseDTO]
+        
+        private enum CodingKeys: String, CodingKey {
+            case date
+            case sentResponse = "sentVoteResults"
+        }
     }
 }
 
 extension VoteSentResponseDTO.VoteSentItemResponseDTO {
     public struct VoteSentContentResponseDTO: Decodable {
-        public let voteItems: VoteSentResultsResponseDTO
-        public let voteUser: VoteSentUserResponseDTO
+        public let voteContent: VoteSentResultsResponseDTO
+        
+        private enum CodingKeys: String, CodingKey {
+            case voteContent = "vote"
+        }
     }
 }
-
 
 extension VoteSentResponseDTO.VoteSentItemResponseDTO.VoteSentContentResponseDTO {
     public struct VoteSentResultsResponseDTO: Decodable {
         public let voteOption: VoteSentOptionsContentResponseDTO
+        public let voteUser: VoteSentUserResponseDTO
+        
+        private enum CodingKeys: String, CodingKey {
+            case voteOption
+            case voteUser = "user"
+        }
     }
     
     public struct VoteSentUserResponseDTO: Decodable {
@@ -58,9 +76,12 @@ extension VoteSentResponseDTO.VoteSentItemResponseDTO.VoteSentContentResponseDTO
 
 
 
+
+
+
 extension VoteSentResponseDTO {
     func toDomain() -> VoteSentEntity {
-        return .init(response: response.map { $0.toDomain() })
+        return .init(response: response.map { $0.toDomain() }, isLastPage: isLastPage)
     }
 }
 
@@ -72,16 +93,16 @@ extension VoteSentResponseDTO.VoteSentItemResponseDTO {
 
 extension VoteSentResponseDTO.VoteSentItemResponseDTO.VoteSentContentResponseDTO {
     func toDomain() -> VoteSentResponseEntity {
-        return .init(
-            voteContent: voteItems.toDomain(),
-            voteUser: voteUser.toDomain()
-        )
+        return .init(voteContent: voteContent.toDomain())
     }
 }
 
 extension VoteSentResponseDTO.VoteSentItemResponseDTO.VoteSentContentResponseDTO.VoteSentResultsResponseDTO {
     func toDomain() -> VoteSentContentResponseEntity {
-        return .init(voteOption: voteOption.toDomain())
+        return .init(
+            voteOption: voteOption.toDomain(),
+            voteUser: voteUser.toDomain()
+        )
     }
 }
 
