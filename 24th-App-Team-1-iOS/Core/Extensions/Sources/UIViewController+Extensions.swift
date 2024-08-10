@@ -21,4 +21,26 @@ public extension UIViewController {
     @objc func dismissKeyboard() {
         view.endEditing(true)
     }
+    
+    func shareToInstagramStory(to view: UIView) {
+        guard let url = URL(string: "instagram-stories://share?source_application="+"123444") else { return }
+        
+        view.setNeedsLayout()
+        let image = view.asImage()
+        var imageData = image.pngData()
+        
+        let pastboardItems: [String: Any] = ["com.instagram.sharedSticker.stickerImage": imageData]
+        let pastboardOptions = [UIPasteboard.OptionsKey.expirationDate: Date().addingTimeInterval(300)]
+        
+        UIPasteboard.general.setItems([pastboardItems], options: pastboardOptions)
+        
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url)
+        } else {
+            guard let instagramURL = URL(string: "https://apps.apple.com/kr/app/instagram/id389801252") else {
+                return
+            }
+            UIApplication.shared.open(instagramURL)
+        }
+    }
 }
