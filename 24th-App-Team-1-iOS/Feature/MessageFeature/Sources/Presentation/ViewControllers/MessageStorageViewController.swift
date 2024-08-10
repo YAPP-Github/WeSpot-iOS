@@ -87,7 +87,7 @@ public final class MessageStorageViewController: BaseViewController<MessageStora
         
         messageCollectionView.do {
             $0.backgroundColor = UIColor.clear
-            $0.register(MessageStorageCollectionViewCell.self, forCellWithReuseIdentifier: MessageStorageCollectionViewCell.identifier)
+//            $0.register(MessageStorageCollectionViewCell.self, forCellWithReuseIdentifier: MessageStorageCollectionViewCell.identifier)
         }
     }
     

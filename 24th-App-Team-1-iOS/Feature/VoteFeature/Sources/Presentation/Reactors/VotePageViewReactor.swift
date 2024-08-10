@@ -42,6 +42,8 @@ public final class VotePageViewReactor: Reactor {
                     return .empty()
                 case .didFetchVoteReponseItems(_):
                     return .empty()
+                case .didTappedResultButton:
+                    return .empty()
                 }
             }
         return .merge(mutation, setToggleStatus)

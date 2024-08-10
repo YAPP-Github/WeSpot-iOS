@@ -14,17 +14,17 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class MessagePageViewController: UIPageViewController, View {
+public final class MessagePageViewController: UIPageViewController, View {
 
     //MARK: - Properties
-    typealias Reactor = MessagePageViewReactor
+    public typealias Reactor = MessagePageViewReactor
     private lazy var messageViewControllers: [UIViewController] = [messageHomeViewController, messageStorageViewController]
-    private lazy var messageHomeViewController = MessageHomeViewController(reactor: MessageHomeViewReactor())
+    private lazy var messageHomeViewController = DependencyContainer.shared.injector.resolve(MessageHomeViewController.self)
     private lazy var messageStorageViewController = MessageStorageViewController(reactor: MessageStorageViewReactor())
-    var disposeBag: DisposeBag = DisposeBag()
+    public var disposeBag: DisposeBag = DisposeBag()
     
     //MARK: - Initialize
-    init(reactor: Reactor) {
+    public init(reactor: Reactor) {
         super.init(transitionStyle: .scroll, navigationOrientation: .horizontal)
         
         self.reactor = reactor
@@ -35,7 +35,7 @@ final class MessagePageViewController: UIPageViewController, View {
     }
     
     //MARK: - LifeCycle
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         
 
@@ -68,7 +68,7 @@ final class MessagePageViewController: UIPageViewController, View {
         }
     }
     
-    func bind(reactor: Reactor) {
+    public func bind(reactor: Reactor) {
         
         reactor.state
             .map { $0.pageTypes == .home ? 0 : 1 }
@@ -82,14 +82,14 @@ final class MessagePageViewController: UIPageViewController, View {
 
 extension MessagePageViewController: UIPageViewControllerDelegate, UIPageViewControllerDataSource  {
    
-    func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         guard let index = messageViewControllers.firstIndex(of: viewController), index > 0 else {
             return nil
         }
         return messageViewControllers[index - 1]
     }
     
-    func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         guard let index = messageViewControllers.firstIndex(of: viewController), index < messageViewControllers.count - 1 else {
             return nil
         }
