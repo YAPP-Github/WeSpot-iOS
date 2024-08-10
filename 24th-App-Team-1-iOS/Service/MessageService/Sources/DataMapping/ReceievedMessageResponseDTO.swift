@@ -38,7 +38,7 @@ public struct ReceievedMessageReceiverDTO: Decodable {
 
 public struct ReceievedMessageProfileDTO: Decodable {
     public let backgroundColor: String
-    public let iconUrl: String
+    public let iconUrl: URL
 }
 
 extension ReceievedMessageResponseDTO {

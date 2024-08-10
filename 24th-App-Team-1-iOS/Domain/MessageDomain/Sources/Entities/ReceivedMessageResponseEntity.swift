@@ -63,9 +63,9 @@ public struct ReceivedMessageReceiverEntity: Decodable {
 
 public struct ReceivedMessageProfileEntity: Decodable {
     public let backgroundColor: String
-    public let iconUrl: String
+    public let iconUrl: URL
     
-    public init(backgroundColor: String, iconUrl: String) {
+    public init(backgroundColor: String, iconUrl: URL) {
         self.backgroundColor = backgroundColor
         self.iconUrl = iconUrl
     }

@@ -62,9 +62,9 @@ public struct ReservedMessageReceiverEntity {
 // MARK: - Profile
 public struct ReservedMessageProfileEntity {
     public let backgroundColor: String
-    public let iconURL: String
+    public let iconURL: URL
     
-    public init(backgroundColor: String, iconURL: String) {
+    public init(backgroundColor: String, iconURL: URL) {
         self.backgroundColor = backgroundColor
         self.iconURL = iconURL
     }

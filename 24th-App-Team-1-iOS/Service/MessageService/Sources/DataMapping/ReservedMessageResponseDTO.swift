@@ -38,7 +38,7 @@ public struct ReservedMessageReceiverDTO: Decodable {
 // MARK: - Profile
 public struct ReservedMessageProfileDTO: Decodable {
     public let backgroundColor: String
-    public let iconURL: String
+    public let iconURL: URL
 }
 
 extension ReservedMessageResponseDTO {
