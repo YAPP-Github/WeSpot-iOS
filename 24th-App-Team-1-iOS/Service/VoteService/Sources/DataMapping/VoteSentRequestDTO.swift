@@ -9,9 +9,8 @@ import Foundation
 
 public struct VoteSentRequestDTO: Encodable {
     public let cursorId: String
-    public let limit: Int
-    public init(cursorId: String, limit: Int) {
+    
+    public init(cursorId: String) {
         self.cursorId = cursorId
-        self.limit = limit
     }
 }

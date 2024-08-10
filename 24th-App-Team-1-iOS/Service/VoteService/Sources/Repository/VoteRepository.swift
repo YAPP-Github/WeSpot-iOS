@@ -71,7 +71,7 @@ public final class VoteRepository: VoteRepositoryProtocol {
     }
     
     public func fetchVoteReceiveItems(query: VoteReceiveRequestQuery) -> Single<VoteRecevieEntity?> {
-        let query = VoteReceiveRequestDTO(cursorId: query.cursorId, limit: query.limit)
+        let query = VoteReceiveRequestDTO(cursorId: query.cursorId)
         let endPoint = VoteEndPoint.fetchReceivedVotes(query)
         
         return networkService.request(endPoint: endPoint)
@@ -83,7 +83,7 @@ public final class VoteRepository: VoteRepositoryProtocol {
     }
     
     public func fetchVoteSentItems(query: VoteSentRequestQuery) -> Single<VoteSentEntity?> {
-        let query = VoteSentRequestDTO(cursorId: query.cursorId, limit: query.limit)
+        let query = VoteSentRequestDTO(cursorId: query.cursorId)
         let endPoint = VoteEndPoint.fetchVoteSent(query)
         
         return networkService.request(endPoint: endPoint)

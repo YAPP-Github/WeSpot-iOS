@@ -10,10 +10,8 @@ import Foundation
 
 public struct VoteReceiveRequestQuery {
     public let cursorId: String
-    public let limit: Int
     
-    public init(cursorId: String, limit: Int = 10) {
+    public init(cursorId: String) {
         self.cursorId = cursorId
-        self.limit = limit
     }
 }

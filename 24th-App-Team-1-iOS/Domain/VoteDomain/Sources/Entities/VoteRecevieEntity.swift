@@ -10,10 +10,12 @@ import Foundation
 public struct VoteRecevieEntity {
     public let response: [VoteReceiveItemEntity]
     public let isLastPage: Bool
+    public let lastCursorId: Int
     
-    public init(response: [VoteReceiveItemEntity], isLastPage: Bool) {
+    public init(response: [VoteReceiveItemEntity], isLastPage: Bool, lastCursorId: Int) {
         self.response = response
         self.isLastPage = isLastPage
+        self.lastCursorId = lastCursorId
     }
 }
 

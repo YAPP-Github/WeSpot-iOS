@@ -191,13 +191,7 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
         
         inventoryTableView.rx
             .prefetchRows
-            .compactMap { indexPaths in
-                guard let lastIndexPath = indexPaths.last else {
-                    return nil
-                }
-                return (lastIndexPath.section, lastIndexPath.row)
-            }
-            .map { Reactor.Action.fetchMoreItems($0,$1)}
+            .map { _ in Reactor.Action.fetchMoreItems }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
        

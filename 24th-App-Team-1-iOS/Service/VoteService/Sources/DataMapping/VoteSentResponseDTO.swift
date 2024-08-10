@@ -12,10 +12,12 @@ import VoteDomain
 public struct VoteSentResponseDTO: Decodable {
     public let response: [VoteSentItemResponseDTO]
     public let isLastPage: Bool
+    public let lastCursorId: Int
     
     private enum CodingKeys: String, CodingKey {
         case response = "voteData"
         case isLastPage = "hasNext"
+        case lastCursorId
     }
 }
 
@@ -83,7 +85,11 @@ extension VoteSentResponseDTO.VoteSentItemResponseDTO.VoteSentContentResponseDTO
 
 extension VoteSentResponseDTO {
     func toDomain() -> VoteSentEntity {
-        return .init(response: response.map { $0.toDomain() }, isLastPage: isLastPage)
+        return .init(
+            response: response.map { $0.toDomain() },
+            isLastPage: isLastPage,
+            lastCursorId: lastCursorId
+        )
     }
 }
 

@@ -34,7 +34,7 @@ public final class VoteInventoryViewReactor: Reactor {
     public enum Action {
         case fetchReceiveItems
         case fetchSentItems
-        case fetchMoreItems(Int, Int)
+        case fetchMoreItems
         case didTappedItems(Int, Int)
     }
     
@@ -152,15 +152,80 @@ public final class VoteInventoryViewReactor: Reactor {
                         )
                     }
             }
-        case let .fetchMoreItems(section, index):
+        case .fetchMoreItems:
             //TODO: 추후 로직 추가
             switch currentState.inventoryType {
             case .receive:
-                let curosrId = currentState.receiveEntity?.response[section].receiveResponse[index].voteOption.id
+                let cursorId = String(currentState.receiveEntity?.lastCursorId ?? 0)
+                let receiveQuery = VoteReceiveRequestQuery(cursorId: cursorId)
                 
-                return .empty()
+                return fetchVoteReceiveItemUseCase
+                    .execute(query: receiveQuery)
+                    .asObservable()
+                    .filter { $0?.isLastPage == true }
+                    .compactMap{ $0 }
+                    .withUnretained(self)
+                    .flatMap { owner ,entity -> Observable<Mutation> in
+                    
+                        var originalSection = owner.currentState.inventorySection
+                        let receiveSection: [VoteInventorySection] = entity.response.map { response in
+                            let dateToString = response.date.toDate(with: .dashYyyyMMdd).toFormatRelative()
+                            
+                            let receiveItem: [VoteInventoryItem] = response.receiveResponse.map {
+                                return .voteReceiveItem(
+                                    VoteReceiveCellReactor(
+                                        isNew: $0.isNew,
+                                        title: $0.voteOption.content,
+                                        voteCount: $0.voteCount
+                                    )
+                                )
+                            }
+                            return .voteReceiveInfo(header: dateToString, items: receiveItem)
+                        }
+                        
+                        originalSection.append(contentsOf: receiveSection)
+                        return .concat(
+                            .just(.setInventoryType(.receive)),
+                            .just(.setInventorySection(originalSection)),
+                            .just(.setReceiveItems(entity))
+                        )
+                    }
+                
             case .sent:
-                return .empty()
+                let cursorId = String(currentState.sentEntity?.lastCursorId ?? 0)
+                let sentQuery = VoteSentRequestQuery(cursorId: cursorId)
+                
+                return fetchVoteSentItemUseCase
+                    .execute(query: sentQuery)
+                    .asObservable()
+                    .filter { $0?.isLastPage == true }
+                    .compactMap { $0 }
+                    .withUnretained(self)
+                    .flatMap { owner, entity -> Observable<Mutation> in
+                        
+                        var originalSection = owner.currentState.inventorySection
+                        let sentSection: [VoteInventorySection] = entity.response.map { response in
+                            let dateToString = response.date.toDate(with: .dashYyyyMMdd).toFormatRelative()
+                            let sentItem: [VoteInventoryItem] = response.sentResponse.map {
+                                return .voteSentItem(
+                                    VoteSentCellReactor(
+                                        title: $0.voteContent.voteOption.content,
+                                        userName: $0.voteContent.voteUser.name,
+                                        profileImage: $0.voteContent.voteUser.profile.iconUrl
+                                    )
+                                )
+                            }
+                            return .voteSentInfo(header: dateToString, items: sentItem)
+                        }
+                        
+                        originalSection.append(contentsOf: sentSection)
+                        
+                        return .concat(
+                            .just(.setInventoryType(.sent)),
+                            .just(.setInventorySection(originalSection)),
+                            .just(.setSentItems(entity))
+                        )
+                    }
             }
             
         case let .didTappedItems(index, section):
