@@ -164,8 +164,16 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        shareButton.rx
-            .tap
+        noticeButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToKakaoTalk()
+            }
+            .disposed(by: disposeBag)
+        
+        shareButton
+            .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.shareToInstagramStory(to: owner.completeCollectionView)
