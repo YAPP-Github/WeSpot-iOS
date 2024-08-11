@@ -116,6 +116,7 @@ public final class MessageReportViewController: BaseViewController<MessageReport
             $0.separatorStyle = .none
             $0.backgroundColor = .clear
             $0.showsVerticalScrollIndicator = false
+            $0.isScrollEnabled = false
         }
         
         confirmButton.do {

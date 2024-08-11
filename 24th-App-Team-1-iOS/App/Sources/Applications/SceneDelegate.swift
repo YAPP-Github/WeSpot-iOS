@@ -48,6 +48,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             MessageMainPresentationAssembly(),
             MessagePagePresentationAssembly(),
             MessageHomePresentationAssembly(),
+            MessageReportPresentationAssembly(),
             DataAssembly(),
             DomainAssembly()
         ])
