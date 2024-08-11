@@ -17,7 +17,6 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 import AuthenticationServices
-import VoteFeature
 
 public final class SignInViewController: BaseViewController<SignInViewReactor> {
     
@@ -41,7 +40,6 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        UserDefaultsManager.shared.isAccessed = true
         UserDefaultsManager.shared.accessToken = nil
     }
     
@@ -168,16 +166,7 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         reactor.state
             .filter { $0.accountResponse != nil }
             .bind(with: self) { owner, state in
-                let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
-                let voteNavigationContoller = UINavigationController(rootViewController: voteMainViewController)
-                
-                let messageNavigationContoller = UINavigationController(rootViewController: UIViewController())
-                
-                let allNavigationContoller = UINavigationController(rootViewController: UIViewController())
-                
-                let tabbarcontroller = WSTabBarViewController()
-                tabbarcontroller.viewControllers = [voteNavigationContoller,messageNavigationContoller, allNavigationContoller]
-                owner.navigationController?.setViewControllers([tabbarcontroller], animated: true)
+                NotificationCenter.default.post(name: .userDidLogin, object: nil)
             }
             .disposed(by: disposeBag)
     }
