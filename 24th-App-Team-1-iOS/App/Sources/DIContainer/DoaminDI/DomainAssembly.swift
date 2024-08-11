@@ -98,6 +98,7 @@ struct DomainAssembly: Assembly {
             let repository = resolver.resolve(VoteRepositoryProtocol.self)!
             
             return FetchIndividualItemUseCase(voteRepository: repository)
+        }
         // message
         container.register(FetchReservedMessageUseCaseProtocol.self) { resolver in
             let repository = resolver.resolve(MessageRepositoryProtocol.self)!
