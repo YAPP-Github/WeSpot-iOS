@@ -51,6 +51,11 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         super.viewDidLoad()
         
     }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.post(name: .hideTabBar, object: nil)
+    }
 
     //MARK: - Configure
     public override func setupUI() {
@@ -231,6 +236,13 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             .distinctUntilChanged()
             .bind(to: profileView.rx.backgroundColor)
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$reportEntity)
+            .filter { $0 != nil }
+            .bind(with: self) { owner, _ in
+                owner.showWSToast(image: .check, message: VoteProcessStr.voteToastText)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -245,7 +257,7 @@ extension VoteProcessViewController {
                 .setConfirm(text: VoteProcessStr.voteModalConfirmText)
                 .setCancel(text: VoteProcessStr.voteModalCancelText)
                 .action(.confirm) { [weak self] in
-                    self?.showWSToast(image: .check, message: VoteProcessStr.voteToastText)
+                    self?.reactor?.action.onNext(.didTappedReportButton)
                 }
                 .show()
         }

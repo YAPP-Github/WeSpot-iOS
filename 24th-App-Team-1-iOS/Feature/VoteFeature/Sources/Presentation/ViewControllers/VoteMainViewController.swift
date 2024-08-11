@@ -26,6 +26,11 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
         super.viewDidLoad()
     }
 
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.post(name: .showTabBar, object: nil)
+    }
+    
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()

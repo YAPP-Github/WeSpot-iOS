@@ -114,6 +114,10 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
     public override func setupAttributes() {
         super.setupAttributes()
         
+        self.do {
+            $0.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        }
+        
         navigationBar.do {
             $0.setNavigationBarUI(property: .rightIcon("처음으로"))
             $0.setNavigationBarAutoLayout(property: .rightIcon)
@@ -164,6 +168,22 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        noticeButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToKakaoTalk()
+            }
+            .disposed(by: disposeBag)
+        
+        shareButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToInstagramStory(to: owner.completeCollectionView)
+            }
+            .disposed(by: disposeBag)
+        
         reactor.state
             .map { $0.isLoading }
             .distinctUntilChanged()
@@ -184,6 +204,13 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             .map { $0.currentPage }
             .distinctUntilChanged()
             .bind(to: completePageControl.rx.currentPage)
+            .disposed(by: disposeBag)
+        
+        lendingView
+            .rx.swipeGestureRecognizer(direction: .right)
+            .bind(with: self) { owner, _ in
+                owner.fadeInOutLendigView()
+            }
             .disposed(by: disposeBag)
         
         
@@ -259,7 +286,6 @@ extension VoteCompleteViewController {
             self?.onboardingView.alpha = 0.0
         } completion: { [weak self] _ in
             self?.onboardingView.removeFromSuperview()
-            self?.fadeInOutLendigView()
         }
     }
 }
