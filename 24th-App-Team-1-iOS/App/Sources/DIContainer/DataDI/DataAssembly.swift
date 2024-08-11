@@ -12,6 +12,8 @@ import LoginDomain
 import LoginService
 import VoteDomain
 import VoteService
+import MessageDomain
+import MessageService
 import Networking
 
 import Swinject
@@ -30,6 +32,10 @@ struct DataAssembly: Assembly {
         
         container.register(LoginRepositoryProtocol.self) { _ in
             return LoginRepository()
+        }
+        
+        container.register(MessageRepositoryProtocol.self) { _ in
+            return messageRepository()
         }
     }
 }

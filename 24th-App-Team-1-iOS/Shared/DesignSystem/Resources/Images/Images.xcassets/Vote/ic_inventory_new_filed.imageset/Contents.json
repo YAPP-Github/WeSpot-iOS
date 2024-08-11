@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "ic_inventory_new_filed.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

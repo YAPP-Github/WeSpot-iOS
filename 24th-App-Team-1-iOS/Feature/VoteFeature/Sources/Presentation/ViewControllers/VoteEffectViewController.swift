@@ -62,6 +62,11 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
         super.viewDidLoad()
         
     }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.post(name: .hideTabBar, object: nil)
+    }
 
     //MARK: - Configure
     public override func setupUI() {
@@ -162,6 +167,22 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
             .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
             .map { Reactor.Action.fetchLatestAllVoteOption }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        noticeButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToKakaoTalk()
+            }
+            .disposed(by: disposeBag)
+        
+        shareButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToInstagramStory(to: owner.effectCollectionView)
+            }
             .disposed(by: disposeBag)
         
         reactor.state

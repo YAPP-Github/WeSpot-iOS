@@ -120,5 +120,13 @@ public final class VoteHomeViewController: BaseViewController<VoteHomeViewReacto
             .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        voteBannerView
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToKakaoTalk()
+            }
+            .disposed(by: disposeBag)
     }
 }

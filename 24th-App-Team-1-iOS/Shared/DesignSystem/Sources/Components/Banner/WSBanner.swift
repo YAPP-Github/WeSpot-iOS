@@ -107,4 +107,19 @@ public final class WSBanner: UIView {
     public func setSubLabelColor(_ color: UIColor) {
         subLabel.textColor = color
     }
+    
+    // titleLabel 업데이트 함수
+    public func setTitleText(_ text: String) {
+        titleLabel.text = text
+    }
+    
+    // subLabel 업데이트 함수
+    public func setSubTitleText(_ text: String) {
+        subLabel.text = text
+    }
+    
+    // image 업데이트 함수
+    public func setImageView(_ image: UIImage) {
+        imageView.image = image
+    }
 }

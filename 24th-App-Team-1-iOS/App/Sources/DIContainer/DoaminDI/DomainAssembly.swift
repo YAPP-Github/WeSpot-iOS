@@ -9,6 +9,7 @@ import Foundation
 import CommonDomain
 import VoteDomain
 import LoginDomain
+import MessageDomain
 
 import Swinject
 
@@ -30,6 +31,12 @@ struct DomainAssembly: Assembly {
             let repository = resolver.resolve(CommonRepositoryProtocol.self)!
             return FetchProfileBackgroundsUseCase(commonRepository: repository)
         }
+        
+        container.register(CreateReportUserUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(CommonRepositoryProtocol.self)!
+            return CreateReportUserUseCase(commonRepositroy: repository)
+        }
+        
         // login
         container.register(CreateAccountUseCaseProtocol.self) { resovler in
             let repository = resovler.resolve(LoginRepositoryProtocol.self)!
@@ -38,17 +45,17 @@ struct DomainAssembly: Assembly {
         
         container.register(CreateRefreshTokenUseCaseProtocol.self) { resovler in
             let repository = resovler.resolve(LoginRepositoryProtocol.self)!
-            return createRefreshTokenUseCase(loginRepository: repository)
+            return CreateRefreshTokenUseCase(loginRepository: repository)
         }
         
         container.register(CreateNewMemberUseCaseProtocol.self) { resovler in
             let repository = resovler.resolve(LoginRepositoryProtocol.self)!
-            return createSignUpTokenUseCase(loginRepository: repository)
+            return CreateSignUpTokenUseCase(loginRepository: repository)
         }
         
         container.register(CreateExistingMemberUseCaseProtocol.self) { resovler in
             let repository = resovler.resolve(LoginRepositoryProtocol.self)!
-            return createExistingMemberTokenUseCase(loginRepository: repository)
+            return CreateExistingMemberTokenUseCase(loginRepository: repository)
         }
         
         container.register(FetchSchoolListUseCaseProtocol.self) { resovler in
@@ -75,6 +82,36 @@ struct DomainAssembly: Assembly {
         container.register(FetchAllVoteOptionsUseCaseProtocol.self) { resovler in
             let repository = resovler.resolve(VoteRepositoryProtocol.self)!
             return FetchAllVoteOptionsUseCase(voteRepositroy: repository)
+        }
+        
+        container.register(FetchVoteReceiveItemUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(VoteRepositoryProtocol.self)!
+            return FetchVoteReceiveItemUseCase(voteRepository: repository)
+        }
+        
+        container.register(FetchVoteSentItemUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(VoteRepositoryProtocol.self)!
+            return FetchVoteSentItemUseCase(voteRepository: repository)
+        }
+        
+        container.register(FetchIndividualItemUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(VoteRepositoryProtocol.self)!
+            
+            return FetchIndividualItemUseCase(voteRepository: repository)
+        // message
+        container.register(FetchReservedMessageUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(MessageRepositoryProtocol.self)!
+            return FetchReservedMessageUseCase(repository: repository)
+        }
+        
+        container.register(FetchMessagesStatusUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(MessageRepositoryProtocol.self)!
+            return FetchMessagesStatusUseCase(repository: repository)
+        }
+        
+        container.register(FetchReceivedMessageUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(MessageRepositoryProtocol.self)!
+            return FetchReceivedMessageUseCase(repository: repository)
         }
     }
 }
