@@ -9,6 +9,7 @@ import UIKit
 import Util
 import Storage
 import DesignSystem
+import LoginDomain
 
 import Then
 import SnapKit
@@ -158,6 +159,7 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self)
+                    signUpSchoolViewController.reactor?.initialState.accountRequest = CreateAccountRequest()
                     owner.navigationController?.setViewControllers([signUpSchoolViewController], animated: true)
                 }
             }
