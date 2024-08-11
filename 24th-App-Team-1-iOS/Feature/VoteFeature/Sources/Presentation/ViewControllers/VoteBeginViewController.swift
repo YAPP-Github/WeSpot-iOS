@@ -34,6 +34,11 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
         view.addSubviews(beginInfoLabel, beginlottieView, inviteButton)
     }
     
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.post(name: .hideTabBar, object: nil)
+    }
+    
     public override func setupAutoLayout() {
         super.setupAutoLayout()
         beginInfoLabel.snp.makeConstraints {

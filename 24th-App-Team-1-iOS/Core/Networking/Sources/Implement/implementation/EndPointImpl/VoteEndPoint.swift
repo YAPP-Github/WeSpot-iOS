@@ -20,11 +20,11 @@ public enum VoteEndPoint: WSNetworkEndPoint {
     /// 투표 결과 전체 조회하기 (1등)
     case fetchWinnerVotes(Encodable)
     /// 내가 받은 투표 목록 조회
-    case fetchReceivedVotes
+    case fetchReceivedVotes(Encodable)
     /// 내가 받은 투표 개별 조회
-    case fetchIndividualVotes
+    case fetchIndividualVotes(Int, Encodable)
     /// 내가 받은 투표 목록 조회
-    case fetchVoteSent
+    case fetchVoteSent(Encodable)
     
     public var path: String {
         switch self {
@@ -38,8 +38,8 @@ public enum VoteEndPoint: WSNetworkEndPoint {
             return "/votes/tops"
         case .fetchReceivedVotes:
             return "/votes/received"
-        case .fetchIndividualVotes:
-            return "/votes/receive"
+        case let .fetchIndividualVotes(id, _):
+            return "/votes/received/options/\(id)"
         case .fetchVoteSent:
             return "/votes/sent"
         }
@@ -72,6 +72,12 @@ public enum VoteEndPoint: WSNetworkEndPoint {
             return .requestBody(body)
         case let .fetchResultVotes(allQuery):
             return .requestQuery(allQuery)
+        case let .fetchReceivedVotes(receivedQuery):
+            return .requestQuery(receivedQuery)
+        case let .fetchVoteSent(sentQuery):
+            return .requestQuery(sentQuery)
+        case let .fetchIndividualVotes(_, individualQuery):
+            return .requestQuery(individualQuery)
         default:
             return .none
         }

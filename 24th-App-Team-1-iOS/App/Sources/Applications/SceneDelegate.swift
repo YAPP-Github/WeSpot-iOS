@@ -43,6 +43,8 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             VotePagePresentationAssembly(),
             VoteResultPresentationAssembly(),
             VoteCompletePresentationAssembly(),
+            VoteInventoryPresentationAssembly(),
+            VoteInventoryDetailPresentationAssembly(),
             MessageMainPresentationAssembly(),
             MessagePagePresentationAssembly(),
             MessageHomePresentationAssembly(),

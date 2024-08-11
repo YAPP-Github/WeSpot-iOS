@@ -69,4 +69,40 @@ public final class VoteRepository: VoteRepositoryProtocol {
             .map { $0.toDomain() }
             .asSingle()
     }
+    
+    public func fetchVoteReceiveItems(query: VoteReceiveRequestQuery) -> Single<VoteRecevieEntity?> {
+        let query = VoteReceiveRequestDTO(cursorId: query.cursorId)
+        let endPoint = VoteEndPoint.fetchReceivedVotes(query)
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .logErrorIfDetected(category: Network.error)
+            .decodeMap(VoteReceiveResponseDTO.self)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
+    
+    public func fetchVoteSentItems(query: VoteSentRequestQuery) -> Single<VoteSentEntity?> {
+        let query = VoteSentRequestDTO(cursorId: query.cursorId)
+        let endPoint = VoteEndPoint.fetchVoteSent(query)
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .decodeMap(VoteSentResponseDTO.self)
+            .logErrorIfDetected(category: Network.error)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
+    
+    public func fetchVoteIndividualItem(id: Int, query: VoteIndividualQuery) -> Single<VoteIndividualEntity?> {
+        let query = VoteIndividualRequestDTO(date: query.date)
+        let endPoint = VoteEndPoint.fetchIndividualVotes(id, query)
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .decodeMap(VoteIndividualResponseDTO.self)
+            .logErrorIfDetected(category: Network.error)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
 }

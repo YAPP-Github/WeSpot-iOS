@@ -18,6 +18,15 @@ public extension Date {
         return toFormatString(with: format.type)
     }
     
+    func toFormatRelative() -> String {
+        let relativeDateformatter = RelativeDateTimeFormatter()
+        relativeDateformatter.unitsStyle = .short
+        relativeDateformatter.locale = Locale(identifier: "ko_KR")
+        relativeDateformatter.calendar = .autoupdatingCurrent
+        
+        let relativeString = relativeDateformatter.localizedString(for: self, relativeTo: .now)
+        return relativeString
+      
     func isSameDay(as otherDate: Date) -> Bool {
         let calendar = Calendar.current
         return calendar.isDate(self, inSameDayAs: otherDate)

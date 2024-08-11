@@ -8,12 +8,14 @@
 import Foundation
 import Util
 import VoteDomain
+import CommonDomain
 
 import ReactorKit
 
 public final class VoteProcessViewReactor: Reactor {
     
     private let createVoteUseCase: CreateVoteUseCaseProtocol
+    private let createUserReportUseCase: CreateReportUserUseCaseProtocol
     
     public struct State {
         @Pulse var questionSection: [VoteProcessSection]
@@ -21,6 +23,7 @@ public final class VoteProcessViewReactor: Reactor {
         @Pulse var voteUserEntity: VoteUserEntity?
         @Pulse var voteOptionsStub: [CreateVoteItemReqeuest]
         @Pulse var processCount: Int
+        @Pulse var reportEntity: CreateReportUserEntity?
         var isLoading: Bool
         var voteItemEntity: VoteItemEntity?
         var createVoteEntity: CreateVoteEntity?
@@ -30,6 +33,7 @@ public final class VoteProcessViewReactor: Reactor {
         case viewDidLoad
         case didTappedQuestionItem(Int)
         case didTappedResultButton
+        case didTappedReportButton
     }
     
     public enum Mutation {
@@ -41,12 +45,14 @@ public final class VoteProcessViewReactor: Reactor {
         case setVoteUserItems(VoteUserEntity)
         case setVoteResponseItems(VoteResponseEntity)
         case setCreateVoteItems(CreateVoteEntity)
+        case setReportItem(CreateReportUserEntity)
     }
     
     public let initialState: State
     
     public init(
         createVoteUseCase: CreateVoteUseCaseProtocol,
+        createUserReportUseCase: CreateReportUserUseCaseProtocol,
         voteResponseEntity: VoteResponseEntity,
         voteOptionStub: [CreateVoteItemReqeuest] = [],
         processCount: Int = 1
@@ -59,6 +65,7 @@ public final class VoteProcessViewReactor: Reactor {
                 isLoading: true
             )
             self.createVoteUseCase = createVoteUseCase
+            self.createUserReportUseCase = createUserReportUseCase
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
@@ -111,6 +118,17 @@ public final class VoteProcessViewReactor: Reactor {
                     guard let originalEntity = entity else { return .empty() }
                     return .just(.setCreateVoteItems(originalEntity))
                 }
+            
+        case .didTappedReportButton:
+            
+            let userReportQuery = CreateUserReportRequest(type: CreateUserReportType.message.rawValue, targetId: currentState.voteUserEntity?.id ?? 0)
+            return createUserReportUseCase
+                .execute(body: userReportQuery)
+                .asObservable()
+                .compactMap { $0}
+                .flatMap { entity -> Observable<Mutation> in
+                    return .just(.setReportItem(entity))
+                }
         }
     }
     
@@ -140,6 +158,8 @@ public final class VoteProcessViewReactor: Reactor {
             
         case let .setCreateVoteItems(createVoteEntity):
             newState.createVoteEntity = createVoteEntity
+        case let .setReportItem(reportEntity):
+            newState.reportEntity = reportEntity
         }
         return newState
     }

@@ -55,4 +55,16 @@ public final class CommonRepository: CommonRepositoryProtocol {
             .map { $0.toDomain() }
             .asSingle()
     }
+    
+    public func createReportUserItem(body: CreateUserReportRequest) -> Single<CreateReportUserEntity?> {
+        let body = CreateUserReportRequestDTO(type: body.type, targetId: body.targetId)
+        let endPoint = CommonEndPoint.createUserReport(body)
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .decodeMap(CreateReportUserResponseDTO.self)
+            .logErrorIfDetected(category: Network.error)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
 }
