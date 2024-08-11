@@ -46,7 +46,7 @@ extension ModulePaths {
 extension ModulePaths {
     public enum Feature: String, ModulePathProtocol {
         case LoginFeature
-        case ProfileFeature
+        case AllFeature
         case VoteFeature
         case MessageFeature
     }
@@ -56,7 +56,7 @@ extension ModulePaths {
     public enum Domain: String, ModulePathProtocol {
         case CommonDomain
         case LoginDomain
-        case ProfileDomain
+        case AllDomain
         case MessageDomain
         case VoteDomain
     }
@@ -67,7 +67,7 @@ extension ModulePaths {
         case CommonService
         case LoginService
         case VoteService
-        case ProfileService
+        case AlleService
         case MessageService
     }
 }
