@@ -160,7 +160,7 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpClassViewController = DependencyContainer.shared.injector.resolve(SignUpClassViewController.self)
+                let signUpClassViewController = DependencyContainer.shared.injector.resolve(SignUpClassViewController.self, argument: reactor.currentState.accountRequest)
                 owner.navigationController?.pushViewController(signUpClassViewController, animated: true)
             }
             .disposed(by: disposeBag)
