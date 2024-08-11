@@ -162,7 +162,7 @@ public final class VoteInventoryViewReactor: Reactor {
                 return fetchVoteReceiveItemUseCase
                     .execute(query: receiveQuery)
                     .asObservable()
-                    .filter { $0?.isLastPage == true }
+                    .filter { $0?.isLastPage == false }
                     .compactMap{ $0 }
                     .withUnretained(self)
                     .flatMap { owner ,entity -> Observable<Mutation> in
@@ -198,7 +198,7 @@ public final class VoteInventoryViewReactor: Reactor {
                 return fetchVoteSentItemUseCase
                     .execute(query: sentQuery)
                     .asObservable()
-                    .filter { $0?.isLastPage == true }
+                    .filter { $0?.isLastPage == false }
                     .compactMap { $0 }
                     .withUnretained(self)
                     .flatMap { owner, entity -> Observable<Mutation> in

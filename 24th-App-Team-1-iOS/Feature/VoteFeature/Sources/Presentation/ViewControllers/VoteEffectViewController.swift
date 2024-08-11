@@ -62,6 +62,11 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
         super.viewDidLoad()
         
     }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.post(name: .hideTabBar, object: nil)
+    }
 
     //MARK: - Configure
     public override func setupUI() {

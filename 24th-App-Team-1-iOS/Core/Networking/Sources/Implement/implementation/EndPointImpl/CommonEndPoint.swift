@@ -42,7 +42,7 @@ public enum CommonEndPoint: WSNetworkEndPoint {
         case .fetchBackgrounds:
             return .get
         case .createUserReport:
-            return .get
+            return .post
         }
     }
     
