@@ -26,6 +26,7 @@ public extension Date {
         
         let relativeString = relativeDateformatter.localizedString(for: self, relativeTo: .now)
         return relativeString
+    }
       
     func isSameDay(as otherDate: Date) -> Bool {
         let calendar = Calendar.current
