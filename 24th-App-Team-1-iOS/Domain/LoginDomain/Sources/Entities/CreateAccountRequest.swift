@@ -8,23 +8,23 @@
 import Foundation
 
 public struct ConsentsRequest {
-    public let marketing: Bool
+    public var marketing: Bool?
     
-    public init(marketing: Bool) {
+    public init(marketing: Bool? = nil) {
         self.marketing = marketing
     }
 }
 
 public struct CreateAccountRequest {
-    public let name: String
-    public let gender: String
-    public let schoolId: Int
-    public let grade: Int
-    public let classNumber: Int
-    public let consents: ConsentsRequest
-    public let signUpToken: String
+    public var name: String?
+    public var gender: String?
+    public var schoolId: Int?
+    public var grade: Int?
+    public var classNumber: Int?
+    public var consents: ConsentsRequest?
+    public var signUpToken: String?
     
-    public init(name: String, gender: String, schoolId: Int, grade: Int, classNumber: Int, consents: ConsentsRequest, signUpToken: String) {
+    public init(name: String? = nil, gender: String? = nil, schoolId: Int? = nil, grade: Int? = nil, classNumber: Int? = nil, consents: ConsentsRequest? = nil, signUpToken: String? = nil) {
         self.name = name
         self.gender = gender
         self.schoolId = schoolId
