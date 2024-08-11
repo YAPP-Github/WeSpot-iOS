@@ -38,7 +38,8 @@ extension InfoPlist {
             "LSApplicationQueriesSchemes": [
                 "kakaokompassauth",
                 "kakaolink",
-                "kakaoplus"
+                "kakaoplus",
+                "instagram-stories"
             ],
             "KAKAO_NATIVE_APP_KEY": .string("${KAKAO_NATIVE_APP_KEY}"),
             "CFBundleURLTypes": .array([

@@ -16,6 +16,13 @@ public extension UIView {
             addSubview($0)
         }
     }
+    
+    func asImage() -> UIImage {
+        let render = UIGraphicsImageRenderer(bounds: bounds)
+        return render.image { renderContext in
+            layer.render(in: renderContext.cgContext)
+        }
+    }
 }
 
 public extension Reactive where Base: UITapGestureRecognizer {

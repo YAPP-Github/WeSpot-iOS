@@ -169,6 +169,22 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        noticeButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToKakaoTalk()
+            }
+            .disposed(by: disposeBag)
+        
+        shareButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToInstagramStory(to: owner.effectCollectionView)
+            }
+            .disposed(by: disposeBag)
+        
         reactor.state
             .map { $0.toggleType }
             .distinctUntilChanged()
