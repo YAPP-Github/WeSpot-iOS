@@ -14,7 +14,7 @@ public protocol CreateRefreshTokenUseCaseProtocol {
     func execute(body: CreateRefreshTokenRequest) -> Single<CreateAccountResponseEntity?>
 }
 
-public final class createRefreshTokenUseCase: CreateRefreshTokenUseCaseProtocol {
+public final class CreateRefreshTokenUseCase: CreateRefreshTokenUseCaseProtocol {
 
     public let loginRepository: LoginRepositoryProtocol
     

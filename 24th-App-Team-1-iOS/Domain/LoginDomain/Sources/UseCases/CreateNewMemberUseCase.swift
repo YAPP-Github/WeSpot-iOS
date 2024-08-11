@@ -14,7 +14,7 @@ public protocol CreateNewMemberUseCaseProtocol {
     func execute(body: CreateSignUpTokenRequest) -> Single<CreateSignUpTokenResponseEntity?>
 }
 
-public final class createSignUpTokenUseCase: CreateNewMemberUseCaseProtocol {
+public final class CreateSignUpTokenUseCase: CreateNewMemberUseCaseProtocol {
 
     public let loginRepository: LoginRepositoryProtocol
     
