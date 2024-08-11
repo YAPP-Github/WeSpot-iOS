@@ -97,6 +97,7 @@ public final class SignUpClassViewController: BaseViewController<SignUpClassView
         
         nextButton.do {
             $0.setupButton(text: "다음")
+            $0.isEnabled = false 
         }
     }
     
@@ -111,14 +112,24 @@ public final class SignUpClassViewController: BaseViewController<SignUpClassView
         classTextField.rx.text.orEmpty
             .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
             .compactMap { Int($0) }
-            .map { $0 <= 20 }
+            .map { Reactor.Action.inputClass($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isEnabledButton }
             .bind(to: warningLabel.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isEnabledButton }
+            .bind(to: nextButton.rx.isEnabled)
             .disposed(by: disposeBag)
         
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpGenderViewController = DependencyContainer.shared.injector.resolve(SignUpGenderViewController.self)
+                let signUpGenderViewController = DependencyContainer.shared.injector.resolve(SignUpGenderViewController.self, argument: reactor.currentState.accountRequest)
                 owner.navigationController?.pushViewController(signUpGenderViewController, animated: true)
             }
             .disposed(by: disposeBag)
