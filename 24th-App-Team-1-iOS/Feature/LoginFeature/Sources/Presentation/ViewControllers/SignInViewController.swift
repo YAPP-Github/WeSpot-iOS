@@ -16,6 +16,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 import AuthenticationServices
+import VoteFeature
 
 public final class SignInViewController: BaseViewController<SignInViewReactor> {
     
@@ -157,7 +158,6 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self)
-                    signUpSchoolViewController.hidesBottomBarWhenPushed = true
                     owner.navigationController?.setViewControllers([signUpSchoolViewController], animated: true)
                 }
             }

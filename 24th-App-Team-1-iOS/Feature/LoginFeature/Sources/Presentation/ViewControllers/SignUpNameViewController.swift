@@ -11,6 +11,7 @@ import DesignSystem
 
 import Then
 import SnapKit
+import Swinject
 import RxSwift
 import RxCocoa
 import ReactorKit
@@ -143,7 +144,6 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 let signUpResultViewController = DependencyContainer.shared.injector.resolve(SignUpResultViewController.self)
-                signUpResultViewController.accountRequest = self.accountRequest
                 owner.navigationController?.pushViewController(signUpResultViewController, animated: true)
             }
             .disposed(by: disposeBag)
