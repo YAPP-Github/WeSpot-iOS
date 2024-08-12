@@ -167,18 +167,6 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             $0.image = DesignSystemAsset.Images.girl.image
         }
         
-        userNameTextField.do {
-            $0.isEnabled = false
-        }
-        
-        userGenderTextFiled.do {
-            $0.isEnabled = false
-        }
-        
-        userClassInfoTextField.do {
-            $0.isEnabled = false
-        }
-        
         scrollView.do {
             $0.canCancelContentTouches = true
         }
@@ -204,6 +192,28 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .compactMap { $0 }
             .map { Reactor.Action.didUpdateIntroduceProfile($0)}
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        
+        userNameTextField.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.showWSToast(image: .warning, message: "하단의 버튼을 눌러 변경 신청 해주세요")
+            }
+            .disposed(by: disposeBag)
+        
+        userGenderTextFiled.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.showWSToast(image: .warning, message: "하단의 버튼을 눌러 변경 신청 해주세요")
+            }
+            .disposed(by: disposeBag)
+        
+        userClassInfoTextField.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.showWSToast(image: .warning, message: "하단의 버튼을 눌러 변경 신청 해주세요")
+            }
             .disposed(by: disposeBag)
         
         userIntroduceTextField

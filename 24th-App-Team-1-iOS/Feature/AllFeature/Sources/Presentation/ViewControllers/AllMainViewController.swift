@@ -117,12 +117,8 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
         super.setupAttributes()
         
         navigationBar.do {
-            $0.setNavigationBarUI(property: .leftWithRightItem(
-                DesignSystemAsset.Images.arrow.image,
-                "",
-                DesignSystemAsset.Images.icNavigationBarSettingFiled.image
-            ))
-            $0.setNavigationBarAutoLayout(property: .leftWithRightItem)
+            $0.setNavigationBarUI(property: .rightIcon(DesignSystemAsset.Images.icNavigationBarSettingFiled.image))
+            $0.setNavigationBarAutoLayout(property: .rightIcon)
         }
         
         profileContainerView.do {

@@ -28,8 +28,8 @@ public final class CommonRepository: CommonRepositoryProtocol {
         
         return networkService.request(endPoint: endPoint)
             .asObservable() // Observable<Data>
-            .map{ _ in  false }
-            .catchAndReturn(true)
+            .map{ _ in  true }
+            .catchAndReturn(false)
             .logErrorIfDetected(category: Network.error)
             .asSingle()
     }
