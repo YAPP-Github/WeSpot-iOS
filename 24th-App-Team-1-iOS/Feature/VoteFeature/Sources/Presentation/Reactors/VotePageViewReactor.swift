@@ -40,8 +40,6 @@ public final class VotePageViewReactor: Reactor {
                     return .just(.setViewController(voteTypes))
                 default:
                     return .empty()
-                case .didTappedResultButton:
-                    return .empty()
                 }
             }
         return .merge(mutation, setToggleStatus)

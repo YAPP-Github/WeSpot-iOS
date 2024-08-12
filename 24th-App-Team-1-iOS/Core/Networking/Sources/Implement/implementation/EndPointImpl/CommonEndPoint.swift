@@ -23,7 +23,7 @@ public enum CommonEndPoint: WSNetworkEndPoint {
     public var path: String {
         switch self {
         case .createProfanityCheck:
-            return "/messages/check-profanity"
+            return "/check-profanity"
         case .fetchCharacters:
             return "/users/signup/characters"
         case .fetchBackgrounds:

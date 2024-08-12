@@ -16,6 +16,7 @@ import LoginService
 import VoteFeature
 import VoteDomain
 import VoteService
+import AllFeature
 import Swinject
 import SnapKit
 import ReactorKit
@@ -48,13 +49,15 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             MessageMainPresentationAssembly(),
             MessagePagePresentationAssembly(),
             MessageHomePresentationAssembly(),
+            AllMainPresentationAssembly(),
+            AllMainProfilePresentationAssembly(),
             MessageReportPresentationAssembly(),
             DataAssembly(),
             DomainAssembly()
         ])
         
         window = UIWindow(windowScene: scene)
-        if (UserDefaultsManager.shared.accessToken?.isEmpty ?? true) { // accessToken 값이 없으면 (회원가입 안됨)
+        if !(UserDefaultsManager.shared.accessToken?.isEmpty ?? true) { // accessToken 값이 없으면 (회원가입 안됨)
             let signInViewController = DependencyContainer.shared.injector.resolve(SignInViewController.self)
             window?.rootViewController = UINavigationController(rootViewController: signInViewController)
             
@@ -66,8 +69,9 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             let messageMainViewController = MessageMainViewController(reactor: messageMainViewReactor)
             let messageNavigationContoller = UINavigationController(rootViewController: messageMainViewController)
             
-            let allNavigationContoller = UINavigationController(rootViewController: UIViewController())
-            
+            let allMainViewController = DependencyContainer.shared.injector.resolve(AllMainViewController.self)
+            let allNavigationContoller = UINavigationController(rootViewController: allMainViewController)
+        
             let tabbarcontroller = WSTabBarViewController()
             tabbarcontroller.viewControllers = [voteNavigationContoller,messageNavigationContoller, allNavigationContoller]
             window?.rootViewController = tabbarcontroller

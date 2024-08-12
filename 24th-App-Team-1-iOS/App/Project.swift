@@ -7,13 +7,12 @@ let project = Project
         targets: [
             .app(module: .app, dependencies: [
                 .feature(module: .LoginFeature),
-                .feature(module: .ProfileFeature),
+                .feature(module: .AllFeature),
                 .feature(module: .VoteFeature),
                 .feature(module: .MessageFeature),
                 .shared(module: .DesignSystem),
                 .SPM.firebaseAnalytics,
-                .SPM.firebaseMessaging,
-                .SPM.firebaseCrashlytics
+                .SPM.firebaseMessaging
             ])
         ]
     )

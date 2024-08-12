@@ -28,8 +28,9 @@ public enum WSNavigationType: Equatable {
     case center(String)
     case leftIcon(UIImage)
     case leftWithCenterItem(UIImage, String)
-    case rightIcon(String? = "")
-    case leftWithRightItem(UIImage, String, UIColor)
+    case rightItem(String? = "")
+    case rightIcon(UIImage)
+    case leftWithRightItem(UIImage, String, UIImage)
     case all(UIImage, String?, String?, UIColor)
     
     var items: WSNavigationTypeProperty {
@@ -48,16 +49,19 @@ public enum WSNavigationType: Equatable {
                 leftItem: leftItem,
                 centerItem: centerItem
             )
-        case let .rightIcon(rightTextItem):
+        case let .rightItem(rightTextItem):
             return .init(
                 rightTextItem: rightTextItem
             )
-        case let .leftWithRightItem(leftItem, rightTextItem, rightTextItemColor):
+        case let .rightIcon(rightIcon):
+            return .init(
+                rightImageItem: rightIcon
+            )
+        case let .leftWithRightItem(leftItem, rightTextItem, rightItem):
             return .init(
                 leftItem: leftItem,
-                rightTextItem: rightTextItem,
-                rightTextItemColor: rightTextItemColor
-                
+                rightImageItem: rightItem,
+                rightTextItem: rightTextItem
             )
         case let .all(leftItem, rightTextItem, centerItem, rightTextItemColor):
             return .init(

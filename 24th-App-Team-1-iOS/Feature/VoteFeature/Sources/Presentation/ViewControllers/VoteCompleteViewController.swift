@@ -119,7 +119,7 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         }
         
         navigationBar.do {
-            $0.setNavigationBarUI(property: .rightIcon("처음으로"))
+            $0.setNavigationBarUI(property: .rightItem("처음으로"))
             $0.setNavigationBarAutoLayout(property: .rightIcon)
         }
     
