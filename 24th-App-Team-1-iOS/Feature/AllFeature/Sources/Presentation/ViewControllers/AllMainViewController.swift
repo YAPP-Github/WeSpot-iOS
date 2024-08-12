@@ -170,6 +170,15 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
             .drive(mainTableView.rx.items(dataSource: mainDataSources))
             .disposed(by: disposeBag)
         
+        profileEditButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                let profileSettingViewController = DependencyContainer.shared.injector.resolve(ProfileSettingViewController.self)
+                owner.navigationController?.pushViewController(profileSettingViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
         self.mainTableView
             .rx.setDelegate(self)
             .disposed(by: disposeBag)
