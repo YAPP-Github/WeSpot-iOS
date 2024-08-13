@@ -27,6 +27,6 @@ extension FetchProfileImagesResponseDTO {
 
 extension FetchProfileImagesItemDTO {
     func toDomain() -> FetchProfileImageItemEntity {
-        return .init(id: id, name: name, iconUrl: iconUrl)
+        return .init(id: id, name: name, iconUrl: URL(string: iconUrl) ?? URL(fileURLWithPath: ""))
     }
 }

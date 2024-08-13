@@ -18,9 +18,9 @@ public struct FetchProfileImageResponseEntity {
 public struct FetchProfileImageItemEntity {
     public let id: Int
     public let name: String
-    public let iconUrl: String
+    public let iconUrl: URL
     
-    public init(id: Int, name: String, iconUrl: String) {
+    public init(id: Int, name: String, iconUrl: URL) {
         self.id = id
         self.name = name
         self.iconUrl = iconUrl

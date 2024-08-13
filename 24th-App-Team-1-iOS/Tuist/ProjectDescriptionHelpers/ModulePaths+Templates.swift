@@ -67,7 +67,7 @@ extension ModulePaths {
         case CommonService
         case LoginService
         case VoteService
-        case AlleService
+        case AllService
         case MessageService
     }
 }

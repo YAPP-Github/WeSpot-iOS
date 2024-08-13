@@ -68,4 +68,7 @@ extension TargetDependency.SPM {
     public static let firebaseAnalytics: TargetDependency = .external(name: "FirebaseAnalytics")
     public static let firebaseMessaging: TargetDependency = .external(name: "FirebaseMessaging")
     public static let firebaseCrashlytics: TargetDependency = .external(name: "FirebaseCrashlytics")
+    
+    //MARK: Cache
+    public static let kingfisher: TargetDependency = .external(name: "Kingfisher")
 }

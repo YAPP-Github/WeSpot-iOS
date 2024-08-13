@@ -7,6 +7,7 @@
 
 import Foundation
 import CommonDomain
+import AllDomain
 
 import ReactorKit
 
@@ -16,6 +17,7 @@ public final class ProfileSettingViewReactor: Reactor {
     
     public struct State {
         @Pulse var isProfanity: Bool
+        @Pulse var userProfileEntity: UserProfileEntity
         var errorMessage: String
     }
     
@@ -30,10 +32,11 @@ public final class ProfileSettingViewReactor: Reactor {
     
     public let initialState: State
     
-    public init(createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol) {
+    public init(createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol, userProfileEntity: UserProfileEntity) {
         self.createCheckProfanityUseCase = createCheckProfanityUseCase
         self.initialState = State(
             isProfanity: false,
+            userProfileEntity: userProfileEntity,
             errorMessage: ""
         )
     }

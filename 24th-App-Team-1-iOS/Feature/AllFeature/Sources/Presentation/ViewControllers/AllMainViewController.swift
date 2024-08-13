@@ -166,6 +166,11 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        Observable.just(())
+            .map { Reactor.Action.viewDidLoad }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$mainAllSection)
             .asDriver(onErrorJustReturn: [])
             .drive(mainTableView.rx.items(dataSource: mainDataSources))
@@ -174,10 +179,29 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
         profileEditButton
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                let profileSettingViewController = DependencyContainer.shared.injector.resolve(ProfileSettingViewController.self)
+            .withLatestFrom( reactor.state.compactMap { $0.userProfileEntity})
+            .bind(with: self) { owner, entity in
+                let profileSettingViewController = DependencyContainer.shared.injector.resolve(ProfileSettingViewController.self, argument: entity)
                 owner.navigationController?.pushViewController(profileSettingViewController, animated: true)
             }
+            .disposed(by: disposeBag)
+        
+        reactor.state.compactMap { $0.userProfileEntity }
+            .map { UIColor(hex: $0.profile.backgroundColor) }
+            .distinctUntilChanged()
+            .bind(to: profileContainerView.rx.backgroundColor)
+            .disposed(by: disposeBag)
+
+        reactor.state.compactMap { $0.userProfileEntity }
+            .map { $0.name }
+            .distinctUntilChanged()
+            .bind(to: profileNameLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state.compactMap { $0.userProfileEntity }
+            .map { "\($0.schoolName) \($0.grade)학년 \($0.classNumber)반"}
+            .distinctUntilChanged()
+            .bind(to: profileClassLabel.rx.text)
             .disposed(by: disposeBag)
         
         self.mainTableView

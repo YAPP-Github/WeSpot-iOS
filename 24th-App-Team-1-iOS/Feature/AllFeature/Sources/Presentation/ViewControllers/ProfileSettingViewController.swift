@@ -187,13 +187,26 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             }
             .disposed(by: disposeBag)
         
+        
         userIntroduceTextField
             .rx.text.changed
+            .do(onNext: { [weak self] _ in
+                self?.userIntroduceTextField.updateBorder()
+            })
             .compactMap { $0 }
             .map { Reactor.Action.didUpdateIntroduceProfile($0)}
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        userProfileEditButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .withLatestFrom(reactor.state.compactMap { $0.userProfileEntity})
+            .bind(with: self) { owner, entity in
+                let profileEditViewController = DependencyContainer.shared.injector.resolve(ProfileEditViewController.self, argument: entity)
+                owner.navigationController?.pushViewController(profileEditViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
         
         userNameTextField.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
@@ -222,6 +235,7 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .bind(to: userIntroduceTextField.borderUpdateBinder)
             .disposed(by: disposeBag)
         
+        
         NotificationCenter.default
             .rx.notification(UIResponder.keyboardWillShowNotification, object: nil)
             .compactMap { $0.userInfo }
@@ -242,6 +256,37 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             }
             .disposed(by: disposeBag)
         
+        
+        reactor.state
+            .compactMap{ $0.userProfileEntity.name }
+            .distinctUntilChanged()
+            .bind(to: userNameTextField.rx.placeholderText)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap{ $0.userProfileEntity.gender }
+            .distinctUntilChanged()
+            .bind(to: userGenderTextFiled.rx.placeholderText)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.userProfileEntity }
+            .compactMap { "\($0.schoolName) \($0.grade)학년 \($0.classNumber)반"}
+            .distinctUntilChanged()
+            .bind(to: userClassInfoTextField.rx.placeholderText)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap{ $0.userProfileEntity.introduction }
+            .distinctUntilChanged()
+            .bind(to: userIntroduceTextField.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { "\($0.userProfileEntity.introduction.count)/20" }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: introduceCountLabel.rx.text)
+            .disposed(by: disposeBag)
         
         reactor.pulse(\.$isProfanity)
             .map { !$0 }

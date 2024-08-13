@@ -33,7 +33,12 @@ public final class WSTextField: UITextField {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    private var placeholderText: String = "Placeholder"
+    public var placeholderText: String = "Placeholder" {
+        didSet {
+            attributedPlaceholder = NSAttributedString(string: placeholderText, attributes: [NSAttributedString.Key.foregroundColor: DesignSystemAsset.Colors.gray400.color])
+        }
+    }
+    
     private var titleText: String?
     private var textFieldState: TextFieldState = .default
     
@@ -86,7 +91,7 @@ public final class WSTextField: UITextField {
     }
     
     
-    private func updateBorder() {
+    public func updateBorder() {
         if isEditing {
             layer.borderColor = DesignSystemAsset.Colors.primary400.color.cgColor
         } else {
