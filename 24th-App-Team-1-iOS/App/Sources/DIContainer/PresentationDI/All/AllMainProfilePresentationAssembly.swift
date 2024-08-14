@@ -18,7 +18,8 @@ struct AllMainProfilePresentationAssembly: Assembly {
     func assemble(container: Container) {
         container.register(ProfileSettingViewReactor.self) { (resolver, userProfileEntity: UserProfileEntity) in
             let createCheckProfanityUseCase = resolver.resolve(CreateCheckProfanityUseCaseProtocol.self)!
-            return ProfileSettingViewReactor(createCheckProfanityUseCase: createCheckProfanityUseCase, userProfileEntity: userProfileEntity)
+            let updateUserProfileUseCase = resolver.resolve(UpdateUserProfileUseCaseProtocol.self)!
+            return ProfileSettingViewReactor(createCheckProfanityUseCase: createCheckProfanityUseCase, updateUserProfileUseCase: updateUserProfileUseCase, userProfileEntity: userProfileEntity)
         }
         
         container.register(ProfileSettingViewController.self) { (resolver, userProfileEntity: UserProfileEntity) in
