@@ -7,6 +7,7 @@
 
 import Foundation
 import AllFeature
+import AllDomain
 import CommonDomain
 
 import Swinject
@@ -15,13 +16,13 @@ import Swinject
 struct AllMainProfilePresentationAssembly: Assembly {
     
     func assemble(container: Container) {
-        container.register(ProfileSettingViewReactor.self) { resolver in
+        container.register(ProfileSettingViewReactor.self) { (resolver, userProfileEntity: UserProfileEntity) in
             let createCheckProfanityUseCase = resolver.resolve(CreateCheckProfanityUseCaseProtocol.self)!
-            return ProfileSettingViewReactor(createCheckProfanityUseCase: createCheckProfanityUseCase)
+            return ProfileSettingViewReactor(createCheckProfanityUseCase: createCheckProfanityUseCase, userProfileEntity: userProfileEntity)
         }
         
-        container.register(ProfileSettingViewController.self) { resolver in
-            let reactor = resolver.resolve(ProfileSettingViewReactor.self)!
+        container.register(ProfileSettingViewController.self) { (resolver, userProfileEntity: UserProfileEntity) in
+            let reactor = resolver.resolve(ProfileSettingViewReactor.self, argument: userProfileEntity)!
             
             return ProfileSettingViewController(reactor: reactor)
         }

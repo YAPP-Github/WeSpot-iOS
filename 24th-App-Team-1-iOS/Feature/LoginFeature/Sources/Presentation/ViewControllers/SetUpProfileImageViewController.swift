@@ -23,8 +23,8 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
     //MARK: - Properties
     private let titleLabel = WSLabel(wsFont: .Header01)
     private let collectionViewStateLabel = WSLabel(wsFont: .Body06)
-    private let characterButton = ToggleProfileTableViewButton(profileButtonType: .character)
-    private let backgroundButton = ToggleProfileTableViewButton(profileButtonType: .background)
+    private let characterButton = WSToggleProfileTableViewButton(profileButtonType: .character)
+    private let backgroundButton = WSToggleProfileTableViewButton(profileButtonType: .background)
     private let characterCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
     private let backgroundCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
     private let userCharacterImageView = UIImageView()

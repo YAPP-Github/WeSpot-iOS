@@ -17,6 +17,8 @@ let allFeature = Project.makeProject(
             dependencies: [
                 .core(module: .Util),
                 .domain(module: .CommonDomain),
+                .domain(module: .AllDomain),
+                .service(module: .AllService),
                 .shared(module: .ThirdPartyLib),
                 .shared(module: .DesignSystem)
             ])

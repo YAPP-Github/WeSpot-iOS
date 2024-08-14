@@ -1,15 +1,15 @@
 //
-//  ToggleProfileTableViewButton.swift
-//  LoginFeature
+//  WSToggleProfileTableViewButton.swift
+//  DesignSystem
 //
-//  Created by eunseou on 8/6/24.
+//  Created by Kim dohyun on 8/13/24.
 //
 
 import UIKit
-import DesignSystem
 import SnapKit
 
-public final class ToggleProfileTableViewButton: UIButton {
+
+public final class WSToggleProfileTableViewButton: UIButton {
     
     public enum ProfileButtonType {
         case character

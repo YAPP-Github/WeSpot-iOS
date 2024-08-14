@@ -14,6 +14,9 @@ import VoteDomain
 import VoteService
 import MessageDomain
 import MessageService
+import AllDomain
+import AllService
+
 import Networking
 
 import Swinject
@@ -36,6 +39,10 @@ struct DataAssembly: Assembly {
         
         container.register(MessageRepositoryProtocol.self) { _ in
             return messageRepository()
+        }
+        
+        container.register(ProfileRepositoryProtocol.self) { _ in
+            return ProfileRepository()
         }
     }
 }

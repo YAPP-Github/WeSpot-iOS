@@ -119,17 +119,16 @@ extension VoteAllCollectionViewCell: ReactorKit.View {
 
 extension VoteAllCollectionViewCell {
     private func createRankerHorizontalSection() -> NSCollectionLayoutSection {
-        let itemWidth: CGFloat = 108
         let itemHeight: CGFloat = 172
         let spacing: CGFloat = 10
         let xOffset: CGFloat = 16
         let yOffset: CGFloat = 0
         let yOffsetIncreased: CGFloat = -36
+        let itemWidth: CGFloat = (contentView.frame.width - ((xOffset * 2) + (spacing * 2))) / 3
         
         let rankerHorizontalItem = (0...2).map { index -> NSCollectionLayoutGroupCustomItem in
             let xPosition = CGFloat(index) * (itemWidth + spacing) + xOffset
             let yPosition = index == 1 ? yOffsetIncreased : yOffset
-             
             return NSCollectionLayoutGroupCustomItem(
                 frame: CGRect(x: xPosition, y: yPosition, width: itemWidth, height: itemHeight)
             )

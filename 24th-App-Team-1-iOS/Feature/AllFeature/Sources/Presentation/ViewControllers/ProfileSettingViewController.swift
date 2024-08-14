@@ -27,6 +27,7 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
     private let userGenderTextFiled: WSTextField = WSTextField(state: .withRightItem(DesignSystemAsset.Images.lock.image), placeholder: "여", title: "성별")
     private let userClassInfoTextField: WSTextField = WSTextField(state: .withRightItem(DesignSystemAsset.Images.lock.image), placeholder: "역삼중학교 1학년 6반", title: "학적 정보")
     private let userIntroduceTextField: WSTextField = WSTextField(state: .default, placeholder: "안녕 난 선희다", title: "한줄 소개")
+    private let privacyButton: WSButton = WSButton(wsButtonType: .default(12))
     private let editButton: WSButton = WSButton(wsButtonType: .default(12))
     private let errorLabel: WSLabel = WSLabel(wsFont: .Body07)
     private let introduceCountLabel: WSLabel = WSLabel(wsFont: .Body07)
@@ -48,7 +49,7 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         userContainerView.addSubview(userImageView)
         containerView.addSubviews(userContainerView, userProfileEditButton, userNameTextField, userGenderTextFiled, userClassInfoTextField, userIntroduceTextField, errorLabel, introduceCountLabel)
         scrollView.addSubview(containerView)
-        view.addSubviews(scrollView, editButton)
+        view.addSubviews(scrollView, editButton, privacyButton)
     }
     
     public override func setupAutoLayout() {
@@ -120,6 +121,12 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             $0.horizontalEdges.equalToSuperview().inset(20)
             $0.height.equalTo(52)
         }
+        
+        privacyButton.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.height.equalTo(52)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(12)
+        }
     }
     
     public override func setupAttributes() {
@@ -133,6 +140,13 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         }
 
         editButton.do {
+            $0.setupFont(font: .Body03)
+            $0.setupButton(text: "수정 완료")
+            $0.isEnabled = false
+            $0.isHidden = true
+        }
+        
+        privacyButton.do {
             $0.setupFont(font: .Body03)
             $0.setupButton(text: "개인정보 변경 신청")
         }
@@ -187,13 +201,26 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             }
             .disposed(by: disposeBag)
         
+        
         userIntroduceTextField
             .rx.text.changed
+            .do(onNext: { [weak self] _ in
+                self?.userIntroduceTextField.updateBorder()
+            })
             .compactMap { $0 }
             .map { Reactor.Action.didUpdateIntroduceProfile($0)}
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        userProfileEditButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .withLatestFrom(reactor.state.compactMap { $0.userProfileEntity})
+            .bind(with: self) { owner, entity in
+                let profileEditViewController = DependencyContainer.shared.injector.resolve(ProfileEditViewController.self, argument: entity)
+                owner.navigationController?.pushViewController(profileEditViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
         
         userNameTextField.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
@@ -222,6 +249,7 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .bind(to: userIntroduceTextField.borderUpdateBinder)
             .disposed(by: disposeBag)
         
+        
         NotificationCenter.default
             .rx.notification(UIResponder.keyboardWillShowNotification, object: nil)
             .compactMap { $0.userInfo }
@@ -231,6 +259,7 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .bind(with: self) { owner, height in
                 if owner.userIntroduceTextField.isEditing {
                     owner.containerView.frame.origin.y -= (height - 52)
+                    owner.didChangeButton(true)
                 }
             }
             .disposed(by: disposeBag)
@@ -239,9 +268,41 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .rx.notification(UIResponder.keyboardWillHideNotification, object: nil)
             .bind(with: self) { owner, _ in
                 owner.containerView.frame.origin.y = 0
+                owner.didChangeButton(false)
             }
             .disposed(by: disposeBag)
         
+        
+        reactor.state
+            .compactMap{ $0.userProfileEntity.name }
+            .distinctUntilChanged()
+            .bind(to: userNameTextField.rx.placeholderText)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap{ $0.userProfileEntity.gender }
+            .distinctUntilChanged()
+            .bind(to: userGenderTextFiled.rx.placeholderText)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.userProfileEntity }
+            .compactMap { "\($0.schoolName) \($0.grade)학년 \($0.classNumber)반"}
+            .distinctUntilChanged()
+            .bind(to: userClassInfoTextField.rx.placeholderText)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap{ $0.userProfileEntity.introduction }
+            .distinctUntilChanged()
+            .bind(to: userIntroduceTextField.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { "\($0.userProfileEntity.introduction.count)/20" }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: introduceCountLabel.rx.text)
+            .disposed(by: disposeBag)
         
         reactor.pulse(\.$isProfanity)
             .map { !$0 }
@@ -261,5 +322,15 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .disposed(by: disposeBag)
         
         
+    }
+}
+
+extension ProfileSettingViewController {
+    private func didChangeButton(_ isChange: Bool) {
+        self.privacyButton.isEnabled = !isChange
+        self.privacyButton.isHidden = isChange
+        
+        self.editButton.isHidden = !isChange
+        self.editButton.isEnabled = isChange
     }
 }

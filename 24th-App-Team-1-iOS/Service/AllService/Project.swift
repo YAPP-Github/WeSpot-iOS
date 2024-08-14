@@ -10,10 +10,10 @@ import ProjectDescriptionHelpers
 
 
 let appService = Project.makeProject(
-    module: .service(.AlleService),
+    module: .service(.AllService),
     targets: [
         .service(
-            module: .AlleService,
+            module: .AllService,
             dependencies: [
                 .core(module: .Networking),
                 .shared(module: .ThirdPartyLib)

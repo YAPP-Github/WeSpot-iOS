@@ -21,6 +21,7 @@ let project = Project
                 .SPM.then,
                 .SPM.alamofire,
                 .SPM.swinject,
+                .SPM.kingfisher,
                 .SPM.kakaoSDKCommon,
                 .SPM.rxKakaoSDKCommon,
                 .SPM.kakaoSDKAuth,

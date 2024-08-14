@@ -10,6 +10,7 @@ import CommonDomain
 import VoteDomain
 import LoginDomain
 import MessageDomain
+import AllDomain
 
 import Swinject
 
@@ -113,6 +114,17 @@ struct DomainAssembly: Assembly {
         container.register(FetchReceivedMessageUseCaseProtocol.self) { resolver in
             let repository = resolver.resolve(MessageRepositoryProtocol.self)!
             return FetchReceivedMessageUseCase(repository: repository)
+        }
+        
+        // Profile
+        container.register(FetchUserProfileUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(ProfileRepositoryProtocol.self)!
+            return FetchUserProfileUseCase(profileRepository: repository)
+        }
+        
+        container.register(UpdateUserProfileUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(ProfileRepositoryProtocol.self)!
+            return UpdateUserProfileUseCase(profileRepository: repository)
         }
     }
 }
