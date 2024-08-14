@@ -11,9 +11,11 @@ import DesignSystem
 
 import Then
 import SnapKit
+import Swinject
 import RxSwift
 import RxCocoa
 import ReactorKit
+import LoginDomain
 
 public final class SignUpClassViewController: BaseViewController<SignUpClassViewReactor> {
 
@@ -23,6 +25,7 @@ public final class SignUpClassViewController: BaseViewController<SignUpClassView
     private let classTextField = WSTextField(state: .default, placeholder: "숫자로 입력해 주세요")
     private let warningLabel = WSLabel(wsFont: .Body07, text: "정확한 반을 입력해 주세요")
     private let nextButton = WSButton(wsButtonType: .default(12))
+    private let accountInjector: Injector = DependencyInjector(container: Container())
     
     //MARK: - LifeCycle
     public override func viewWillAppear(_ animated: Bool) {
@@ -94,6 +97,7 @@ public final class SignUpClassViewController: BaseViewController<SignUpClassView
         
         nextButton.do {
             $0.setupButton(text: "다음")
+            $0.isEnabled = false 
         }
     }
     
@@ -108,15 +112,24 @@ public final class SignUpClassViewController: BaseViewController<SignUpClassView
         classTextField.rx.text.orEmpty
             .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
             .compactMap { Int($0) }
-            .map { $0 <= 20 }
+            .map { Reactor.Action.inputClass($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isEnabledButton }
             .bind(to: warningLabel.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isEnabledButton }
+            .bind(to: nextButton.rx.isEnabled)
             .disposed(by: disposeBag)
         
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpGenderViewReactor = SignUpGenderViewReactor()
-                let signUpGenderViewController = SignUpGenderViewController(reactor: signUpGenderViewReactor)
+                let signUpGenderViewController = DependencyContainer.shared.injector.resolve(SignUpGenderViewController.self, argument: reactor.currentState.accountRequest)
                 owner.navigationController?.pushViewController(signUpGenderViewController, animated: true)
             }
             .disposed(by: disposeBag)

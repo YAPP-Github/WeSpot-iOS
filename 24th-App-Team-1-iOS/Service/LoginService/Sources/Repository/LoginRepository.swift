@@ -48,7 +48,7 @@ public final class LoginRepository: LoginRepositoryProtocol {
     
     
     public func createAccount(body: CreateAccountRequest) -> Single<CreateAccountResponseEntity?> {
-        let consents = ConsentsRequestDTO(marketing: body.consents.marketing)
+        let consents = ConsentsRequestDTO(marketing: body.consents?.marketing)
         let body = CreateAccountRequestDTO(name: body.name, gender: body.gender, schoolId: body.schoolId, grade: body.grade, classNumber: body.classNumber, consents: consents, signUpToken: body.signUpToken)
         let endPoint = LoginEndPoint.createAccount(body)
         

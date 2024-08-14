@@ -35,6 +35,11 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             SignInPresentationAssembly(),
             SignUpNamePresentationAssembly(),
             SetUpProfilePresntationAssembly(),
+            SignUpClassPresentationAssembly(),
+            SignUpGenderPresentationAssembly(),
+            SignUpResultPresentationAssembly(),
+            SignUpGradePresentationAssembly(),
+            SignUpCompletePresentationAssembly(),
             SignUpSchoolPresentationAssembly(),
             VotePresentationAssembly(),
             VoteEffectPresentationAssembly(),
@@ -58,6 +63,8 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         ])
         
         window = UIWindow(windowScene: scene)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleUserDidLogin), name: .userDidLogin, object: nil)
+        
         if !(UserDefaultsManager.shared.accessToken?.isEmpty ?? true) { // accessToken 값이 없으면 (회원가입 안됨)
             let signInViewController = DependencyContainer.shared.injector.resolve(SignInViewController.self)
             window?.rootViewController = UINavigationController(rootViewController: signInViewController)
@@ -77,7 +84,23 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             tabbarcontroller.viewControllers = [voteNavigationContoller,messageNavigationContoller, allNavigationContoller]
             window?.rootViewController = tabbarcontroller
         }
+        window?.rootViewController = UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self))
         window?.makeKeyAndVisible()
+    }
+    
+    @objc private func handleUserDidLogin() {
+        let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
+        let voteNavigationContoller = UINavigationController(rootViewController: voteMainViewController)
+        
+        let messageMainViewReactor = MessageMainViewReactor()
+        let messageMainViewController = MessageMainViewController(reactor: messageMainViewReactor)
+        let messageNavigationContoller = UINavigationController(rootViewController: messageMainViewController)
+        
+        let allNavigationContoller = UINavigationController(rootViewController: UIViewController())
+        
+        let tabbarcontroller = WSTabBarViewController()
+        tabbarcontroller.viewControllers = [voteNavigationContoller,messageNavigationContoller, allNavigationContoller]
+        window?.rootViewController = tabbarcontroller
     }
     
     // kakao login

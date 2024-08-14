@@ -9,6 +9,7 @@ import Foundation
 import CommonDomain
 import ReactorKit
 import RxSwift
+import LoginDomain
 
 public final class SignUpNameViewReactor: Reactor {
     
@@ -20,6 +21,7 @@ public final class SignUpNameViewReactor: Reactor {
         var errorMessage: String?
         var isButtonEnabled: Bool = false
         var isWarningHidden: Bool = true
+        var accountRequest: CreateAccountRequest
     }
     
     public enum Action {
@@ -33,9 +35,12 @@ public final class SignUpNameViewReactor: Reactor {
         case setWarningHidden(Bool)
     }
     
-    public init(createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol) {
+    public init(
+        createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol,
+        accountRequest: CreateAccountRequest
+    ) {
         self.createCheckProfanityUseCase = createCheckProfanityUseCase
-        self.initialState = State()
+        self.initialState = State(accountRequest: accountRequest)
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
@@ -78,6 +83,7 @@ public final class SignUpNameViewReactor: Reactor {
         switch mutation {
         case .setName(let name):
             newState.name = name
+            newState.accountRequest.name = name
             
         case .setErrorMessage(let errorMessage):
             newState.errorMessage = errorMessage

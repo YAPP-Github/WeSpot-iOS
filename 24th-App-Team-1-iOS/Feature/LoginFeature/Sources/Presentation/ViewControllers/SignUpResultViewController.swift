@@ -11,6 +11,7 @@ import DesignSystem
 
 import Then
 import SnapKit
+import Swinject
 import RxSwift
 import RxCocoa
 import ReactorKit
@@ -33,6 +34,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
     private let policyAgreementBottomSheetView = PolicyAgreementBottomSheetView()
     private let dimView = UIView()
     private let nextButton = WSButton(wsButtonType: .default(12))
+    private let accountInjector: Injector = DependencyInjector(container: Container())
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -46,7 +48,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
     public override func setupUI() {
         super.setupUI()
         
-        view.addSubviews(nameTextField, genderTextField, classTextField, gradeTextField, schoolTextField, nextButton, dimView,         comfirmInfoBottomSheetView, policyAgreementBottomSheetView)
+        view.addSubviews(nameTextField, genderTextField, classTextField, gradeTextField, schoolTextField, nextButton, dimView, comfirmInfoBottomSheetView, policyAgreementBottomSheetView)
         nameTextField.addGestureRecognizer(nameTextFieldTapGesture)
         genderTextField.addGestureRecognizer(genderTextFieldTapGesture)
         classTextField.addGestureRecognizer(classTextFieldTapGesture)
@@ -100,19 +102,10 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         
         view.backgroundColor = DesignSystemAsset.Colors.gray900.color
         
-        navigationBar
-            .setNavigationBarUI(property: .leftWithCenterItem(DesignSystemAsset.Images.arrow.image, "회원가입"))
-            .setNavigationBarAutoLayout(property: .leftWithCenterItem)
-        
-        nameTextField.text = "NO DATA"
-        
-        genderTextField.text = "NO DATA"
-        
-        classTextField.text = "NO DATA"
-        
-        gradeTextField.text = "NO DATA"
-        
-        schoolTextField.text = "NO DATA"
+        navigationBar.do {
+            $0.setNavigationBarUI(property: .leftWithCenterItem(DesignSystemAsset.Images.arrow.image, "회원가입"))
+            $0.setNavigationBarAutoLayout(property: .leftWithCenterItem)
+        }
         
         dimView.do{
             $0.backgroundColor = UIColor.black.withAlphaComponent(0.6)
@@ -126,6 +119,31 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        reactor.state
+            .map { $0.accountRequest.name }
+            .bind(to: nameTextField.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.accountRequest.gender }
+            .bind(to: genderTextField.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { "\($0.accountRequest.classNumber)" }
+            .bind(to: classTextField.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { "\($0.accountRequest.grade)" }
+            .bind(to: gradeTextField.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.accountRequest.schoolId?.description }
+            .bind(to: schoolTextField.rx.text)
+            .disposed(by: disposeBag)
+        
         nameTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
@@ -137,8 +155,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         genderTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpGenderViewReactor = SignUpGenderViewReactor()
-                let signUpGenderViewController = SignUpGenderViewController(reactor: signUpGenderViewReactor)
+                let signUpGenderViewController = DependencyContainer.shared.injector.resolve(SignUpGenderViewController.self)
                 owner.navigationController?.pushViewController(signUpGenderViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -146,8 +163,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         classTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpClassViewReactor = SignUpClassViewReactor()
-                let signUpClassViewController = SignUpClassViewController(reactor: signUpClassViewReactor)
+                let signUpClassViewController = DependencyContainer.shared.injector.resolve(SignUpGradeViewController.self)
                 owner.navigationController?.pushViewController(signUpClassViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -155,8 +171,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         gradeTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpGradeViewReactor = SignUpGradeViewReactor()
-                let signUpGradeViewController = SignUpGradeViewController(reactor: signUpGradeViewReactor)
+                let signUpGradeViewController = DependencyContainer.shared.injector.resolve(SignUpGradeViewController.self)
                 owner.navigationController?.pushViewController(signUpGradeViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -187,9 +202,13 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         policyAgreementBottomSheetView.confirmButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpCompleteViewReactor = SignUpCompleteViewReactor()
-                let signUpCompleteViewController = SignUpCompleteViewController(reactor: signUpCompleteViewReactor)
-                owner.navigationController?.pushViewController(signUpCompleteViewController, animated: true)
+                owner.reactor?.action.onNext(.createAccount)
+            }
+            .disposed(by: disposeBag)
+        
+        policyAgreementBottomSheetView.marketingAgreementButton.isCheckedObservable
+            .bind(with: self) { owner, isChecked in
+                owner.reactor?.action.onNext(.setMarketingAgreement(isChecked))
             }
             .disposed(by: disposeBag)
         
@@ -198,6 +217,15 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .bind(with: self) { owner, _ in
                 owner.hideComfirmInfoBottomSheet()
                 owner.showPolicyAgreementBottomSheet()
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isAccountCreationCompleted }
+            .filter { $0 }
+            .bind(with: self) { owner, _ in
+                let signUpCompleteViewController = DependencyContainer.shared.injector.resolve(SignUpCompleteViewController.self)
+                owner.navigationController?.pushViewController(signUpCompleteViewController, animated: true)
             }
             .disposed(by: disposeBag)
     }

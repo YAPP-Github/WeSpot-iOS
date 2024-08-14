@@ -11,9 +11,11 @@ import DesignSystem
 
 import Then
 import SnapKit
+import Swinject
 import RxSwift
 import RxCocoa
 import ReactorKit
+import LoginDomain
 
 public final class SignUpGradeViewController: BaseViewController<SignUpGradeViewReactor> {
     
@@ -26,6 +28,7 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
     private let bottomSheetView = SelectGradeBottomSheetView()
     private let dimView = UIView()
     private let dimTapGesture = UITapGestureRecognizer()
+    private let accountInjector: Injector = DependencyInjector(container: Container())
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -97,8 +100,9 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
         }
         
         nextButton.do {
-           $0.setupButton(text: "다음")
-       }
+            $0.setupButton(text: "다음")
+            $0.isEnabled = false
+        }
         
         dimView.do {
             $0.backgroundColor = UIColor.black.withAlphaComponent(0.6)
@@ -107,6 +111,11 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
     
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
+        
+        reactor.state
+            .map { $0.isGradeSelected }
+            .bind(to: nextButton.rx.isEnabled)
+            .disposed(by: disposeBag)
         
         gradeTextFieldtapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
@@ -131,7 +140,9 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
         bottomSheetView.secondGradeButton.checkButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                owner.gradeTextField.text = "2학년"
+                let selectedGrade = "2학년"
+                owner.gradeTextField.text = selectedGrade
+                owner.reactor?.action.onNext(.selectGrade(2))
                 owner.hideBottomSheet()
             }
             .disposed(by: disposeBag)
@@ -139,7 +150,9 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
         bottomSheetView.thirdGradeButton.checkButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                owner.gradeTextField.text = "3학년"
+                let selectedGrade = "3학년"
+                owner.gradeTextField.text = selectedGrade
+                owner.reactor?.action.onNext(.selectGrade(3))
                 owner.hideBottomSheet()
             }
             .disposed(by: disposeBag)
@@ -147,8 +160,7 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpClassViewReactor = SignUpClassViewReactor()
-                let signUpClassViewController = SignUpClassViewController(reactor: signUpClassViewReactor)
+                let signUpClassViewController = DependencyContainer.shared.injector.resolve(SignUpClassViewController.self, argument: reactor.currentState.accountRequest)
                 owner.navigationController?.pushViewController(signUpClassViewController, animated: true)
             }
             .disposed(by: disposeBag)

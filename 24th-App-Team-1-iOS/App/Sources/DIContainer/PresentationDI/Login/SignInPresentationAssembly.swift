@@ -23,7 +23,7 @@ struct SignInPresentationAssembly: Assembly {
         
         container.register(SignInViewController.self) { resolver in
             let reactor = resolver.resolve(SignInViewReactor.self)!
-        
+    
             return SignInViewController(reactor: reactor)
         }
         

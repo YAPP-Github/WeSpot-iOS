@@ -11,9 +11,11 @@ import DesignSystem
 
 import Then
 import SnapKit
+import Swinject
 import RxSwift
 import RxCocoa
 import ReactorKit
+import LoginDomain
 
 public final class SignUpGenderViewController: BaseViewController<SignUpGenderViewReactor> {
 
@@ -22,6 +24,7 @@ public final class SignUpGenderViewController: BaseViewController<SignUpGenderVi
     private let subTitleLabel = WSLabel(wsFont: .Body06, text: "회원가입 이후에는 이름을 변경할 수 없어요")
     private let boyCardButton = GenderCardButton(type: .boy)
     private let girlCardButton = GenderCardButton(type: .girl)
+    private let accountInjector: Injector = DependencyInjector(container: Container())
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -86,7 +89,8 @@ public final class SignUpGenderViewController: BaseViewController<SignUpGenderVi
         boyCardButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self)
+                owner.reactor?.action.onNext(.selectGender("male"))
+                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self, argument: reactor.currentState.accountRequest)
                 owner.navigationController?.pushViewController(signUpNameViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -94,7 +98,8 @@ public final class SignUpGenderViewController: BaseViewController<SignUpGenderVi
         girlCardButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self)
+                owner.reactor?.action.onNext(.selectGender("female"))
+                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self, argument: reactor.currentState.accountRequest)
                 owner.navigationController?.pushViewController(signUpNameViewController, animated: true)
             }
             .disposed(by: disposeBag)

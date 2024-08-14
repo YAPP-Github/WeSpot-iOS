@@ -9,6 +9,7 @@ import UIKit
 import Util
 import Storage
 import DesignSystem
+import LoginDomain
 
 import Then
 import SnapKit
@@ -39,7 +40,6 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        UserDefaultsManager.shared.isAccessed = true
         UserDefaultsManager.shared.accessToken = nil
     }
     
@@ -157,8 +157,8 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self)
-                    signUpSchoolViewController.hidesBottomBarWhenPushed = true
-                    owner.navigationController?.pushViewController(signUpSchoolViewController, animated: true)
+                    signUpSchoolViewController.reactor?.initialState.accountRequest = CreateAccountRequest()
+                    owner.navigationController?.setViewControllers([signUpSchoolViewController], animated: true)
                 }
             }
             .disposed(by: disposeBag)
@@ -166,14 +166,7 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         reactor.state
             .filter { $0.accountResponse != nil }
             .bind(with: self) { owner, state in
-                // 메인 스레드에서 UI 업데이트
-                DispatchQueue.main.async {
-                    owner.updateUI()
-                }
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    // 다음 화면으로 이동 처리
-                }
+                NotificationCenter.default.post(name: .userDidLogin, object: nil)
             }
             .disposed(by: disposeBag)
     }
