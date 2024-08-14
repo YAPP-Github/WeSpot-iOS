@@ -17,13 +17,14 @@ import Swinject
 struct SignUpSchoolPresentationAssembly: Assembly {
     func assemble(container: Container) {
         
-        container.register(SignUpSchoolViewReactor.self) { (resolver, accountRequest: CreateAccountRequest) in
+        container.register(SignUpSchoolViewReactor.self) { resolver in
             let fetchSchoolListUseCase = resolver.resolve(FetchSchoolListUseCaseProtocol.self)!
+            let accountRequest = CreateAccountRequest()
             return SignUpSchoolViewReactor(fetchSchoolListUseCase: fetchSchoolListUseCase, accountRequest: accountRequest)
         }
 
-        container.register(SignUpSchoolViewController.self) { (resolver, argument: CreateAccountRequest) in
-            let reactor = resolver.resolve(SignUpSchoolViewReactor.self, argument: argument)!
+        container.register(SignUpSchoolViewController.self) { resolver in
+            let reactor = resolver.resolve(SignUpSchoolViewReactor.self)!
             
             return SignUpSchoolViewController(reactor: reactor)
         }
@@ -102,7 +103,8 @@ struct SignUpResultPresentationAssembly: Assembly {
     func assemble(container: Container) {
 
         container.register(SignUpResultViewReactor.self) { (resolver, accountRequest: CreateAccountRequest) in
-            return SignUpResultViewReactor(accountRequest: accountRequest)
+            let createAccountUseCase = resolver.resolve(CreateAccountUseCaseProtocol.self)!
+            return SignUpResultViewReactor(accountRequest: accountRequest, createAccountUseCase: createAccountUseCase)
         }
 
         container.register(SignUpResultViewController.self) { (resolver, argument: CreateAccountRequest) in
