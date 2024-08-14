@@ -27,13 +27,10 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
     private let confirmButton: WSButton = WSButton(wsButtonType: .default(12))
     private let descrptionLabel: WSLabel = WSLabel(wsFont: .Body06)
     private lazy var editCollectionViewLayout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-    private lazy var editCollectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: editCollectionViewLayout)
-    private lazy var editCollectionViewDataSources: RxCollectionViewSectionedReloadDataSource<ProfileEditSection> = .init { dataSources, collectionView, indexPath, sectionItem in
+    private lazy var backgroundCollectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: editCollectionViewLayout)
+    private lazy var characterCollectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: editCollectionViewLayout)
+    private lazy var backgroundDataSources: RxCollectionViewSectionedReloadDataSource<BackgroundEditSection> = .init { dataSources, collectionView, indexPath, sectionItem in
         switch sectionItem {
-        case let .profileCharacterItem(cellReactor):
-            guard let characterCell = collectionView.dequeueReusableCell(withReuseIdentifier: "ProfileCharacterCollectionViewCell", for: indexPath) as? ProfileCharacterCollectionViewCell else { return UICollectionViewCell() }
-            characterCell.reactor = cellReactor
-            return characterCell
         case let .profileBackgroundItem(cellReactor):
             guard let backgroundCell = collectionView.dequeueReusableCell(withReuseIdentifier: "ProfileBackgroundCollectionViewCell", for: indexPath) as? ProfileBackgroundCollectionViewCell else { return UICollectionViewCell() }
             backgroundCell.reactor = cellReactor
@@ -41,6 +38,15 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
         }
     }
     
+    private lazy var characterDataSouces: RxCollectionViewSectionedReloadDataSource<CharacterEditSection> = .init { dataSources, collectionView, indexPath, sectionItem in
+        
+        switch sectionItem {
+        case let .profileCharacterItem(cellReactor):
+            guard let characterCell = collectionView.dequeueReusableCell(withReuseIdentifier: "ProfileCharacterCollectionViewCell", for: indexPath) as? ProfileCharacterCollectionViewCell else { return UICollectionViewCell() }
+            characterCell.reactor = cellReactor
+            return characterCell
+        }
+    }
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -53,7 +59,7 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
         super.setupUI()
         
         profileContainerView.addSubview(profileImageView)
-        view.addSubviews(userDescrptionLabel, profileContainerView, characterEditButton, backgroundEditButton, editCollectionView, descrptionLabel ,confirmButton)
+        view.addSubviews(userDescrptionLabel, profileContainerView, characterEditButton, backgroundEditButton, backgroundCollectionView, characterCollectionView, descrptionLabel ,confirmButton)
     }
     
     public override func setupAutoLayout() {
@@ -97,7 +103,12 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
             $0.height.equalTo(21)
         }
         
-        editCollectionView.snp.makeConstraints {
+        characterCollectionView.snp.makeConstraints {
+            $0.left.right.bottom.equalToSuperview()
+            $0.top.equalTo(backgroundEditButton.snp.bottom).offset(24)
+        }
+        
+        backgroundCollectionView.snp.makeConstraints {
             $0.left.right.bottom.equalToSuperview()
             $0.top.equalTo(backgroundEditButton.snp.bottom).offset(24)
         }
@@ -130,13 +141,19 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
             $0.image = DesignSystemAsset.Images.girl.image
         }
         
-        editCollectionView.do {
+        characterCollectionView.do {
             $0.backgroundColor = DesignSystemAsset.Colors.gray600.color
-            $0.register(ProfileBackgroundCollectionViewCell.self, forCellWithReuseIdentifier: "ProfileBackgroundCollectionViewCell")
             $0.register(ProfileCharacterCollectionViewCell.self, forCellWithReuseIdentifier: "ProfileCharacterCollectionViewCell")
         }
         
+        backgroundCollectionView.do {
+            $0.backgroundColor = DesignSystemAsset.Colors.gray600.color
+            $0.register(ProfileBackgroundCollectionViewCell.self, forCellWithReuseIdentifier: "ProfileBackgroundCollectionViewCell")
+            $0.isHidden = true
+        }
+        
         descrptionLabel.do {
+            $0.text = "캐릭터 고르기"
             $0.textColor = DesignSystemAsset.Colors.gray100.color
         }
         
@@ -171,38 +188,45 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        editCollectionView
+        Observable.just(())
+            .map { Reactor.Action.fetchProfileBackgrounItem }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        backgroundCollectionView
             .rx.itemSelected
-            .map { Reactor.Action.didTappedEditItem($0.item) }
+            .map { Reactor.Action.didTappedBackgroundItem($0.item) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+ 
+        characterCollectionView
+            .rx.itemSelected
+            .map { Reactor.Action.didTappedCharacterItem($0.item) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         backgroundEditButton
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .map { Reactor.Action.fetchProfileBackgrounItem }
-            .bind(to: reactor.action)
+            .bind(with: self) { owner, _ in
+                owner.toggleCollections(showCharacter: false)
+            }
             .disposed(by: disposeBag)
         
         characterEditButton
             .rx.tap
-            .throttle(.microseconds(300), scheduler: MainScheduler.instance)
-            .map { Reactor.Action.fetchProfileImageItem }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        
-        reactor.state
-            .map { $0.isToggle }
-            .distinctUntilChanged()
-            .bind(with: self) { owner, isSelected in
-                let descrptionText = isSelected == true ? "캐릭터 고르기" : "배경색 고르기"
-                owner.characterEditButton.setSelectedState(isSelected)
-                owner.backgroundEditButton.setSelectedState(!isSelected)
-                owner.descrptionLabel.text = descrptionText
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.toggleCollections(showCharacter: true)
             }
             .disposed(by: disposeBag)
-
+        
+        confirmButton
+            .rx.tap
+            .throttle(.microseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTappedUpdateButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
 
         reactor.state
             .compactMap { "\($0.userProfileEntity.name)잘 나타낼 수 있는\n프로필을 선택해 주세요"}
@@ -217,10 +241,32 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
             .bind(to: profileContainerView.rx.backgroundColor)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$profileEditSection)
-            .observe(on: MainScheduler.asyncInstance)
-            .asDriver(onErrorJustReturn: [])
-            .drive(editCollectionView.rx.items(dataSource: editCollectionViewDataSources))
+        
+        reactor.pulse(\.$isUpdate)
+            .filter { $0 == true }
+            .bind(with: self) { owner, _ in
+                owner.showWSToast(image: .check, message: "수정 완료")
+            }
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$backgroundSection)
+            .asDriver(onErrorJustReturn: [])
+            .drive(backgroundCollectionView.rx.items(dataSource: backgroundDataSources))
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$characterSection)
+            .asDriver(onErrorJustReturn: [])
+            .drive(characterCollectionView.rx.items(dataSource: characterDataSouces))
+            .disposed(by: disposeBag)
+    }
+}
+
+extension ProfileEditViewController {
+    private func toggleCollections(showCharacter: Bool) {
+        characterCollectionView.isHidden = !showCharacter
+        backgroundCollectionView.isHidden = showCharacter
+        characterEditButton.setSelectedState(showCharacter)
+        backgroundEditButton.setSelectedState(!showCharacter)
+        descrptionLabel.text = showCharacter ? "캐릭터 고르기" : "배경색 고르기"
     }
 }

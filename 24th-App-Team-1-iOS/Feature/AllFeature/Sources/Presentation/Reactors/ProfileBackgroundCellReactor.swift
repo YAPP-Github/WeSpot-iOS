@@ -30,7 +30,7 @@ public final class ProfileBackgroundCellReactor: Reactor {
         let didSelectedItem = globalService.event
             .flatMap { event -> Observable<Mutation> in
                 switch event {
-                case let .didTappedEditItem(item):
+                case let .didTappedBackgroundItem(item):
                     return .just(.setSelectedItem(item))
                 default:
                     return .empty()
@@ -49,7 +49,6 @@ public final class ProfileBackgroundCellReactor: Reactor {
         
         switch mutation {
         case let .setSelectedItem(selectedItem):
-            print("selectedItem Test: \(selectedItem)")
             newState.selectedItem = selectedItem
         }
         

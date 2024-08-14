@@ -11,6 +11,11 @@ import Foundation
 public struct UpdateUserProfileRequest {
     public let introduction: String
     public let profile: UpdateUserProfileItemRequest
+    
+    public init(introduction: String, profile: UpdateUserProfileItemRequest) {
+        self.introduction = introduction
+        self.profile = profile
+    }
 }
 
 public struct UpdateUserProfileItemRequest {

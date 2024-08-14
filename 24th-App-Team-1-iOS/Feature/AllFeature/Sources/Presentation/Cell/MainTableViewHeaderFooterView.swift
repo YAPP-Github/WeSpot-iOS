@@ -15,7 +15,6 @@ final class MainTableViewHeaderFooterView: UITableViewHeaderFooterView {
     
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
-        print("mainHeader Footer view")
         setupUI()
         setupAttributeds()
         setupAutoLayout()

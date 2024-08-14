@@ -26,5 +26,6 @@ public enum WSGlobalStateType {
     case didTappedResultButton
     case didFetchVoteReponseItems(VoteResponseEntity)
     case toogleMessageType(_ type: MessageTypes)
-    case didTappedEditItem(_ item: Int)
+    case didTappedCharacterItem(_ item: Int)
+    case didTappedBackgroundItem(_ item: Int)
 }

@@ -13,31 +13,44 @@ import ReactorKit
 
 public final class ProfileSettingViewReactor: Reactor {
     private let createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol
+    private let updateUserProfileUseCase: UpdateUserProfileUseCaseProtocol
     
     
     public struct State {
         @Pulse var isProfanity: Bool
         @Pulse var userProfileEntity: UserProfileEntity
+        var isUpdate: Bool
         var errorMessage: String
+        var introudce: String
     }
     
     public enum Action {
         case didUpdateIntroduceProfile(String)
+        case didTapUpdateUserButton
     }
     
     public enum Mutation {
         case setCheckProfanityValidation(Bool)
         case setErrorDescriptionMessage(String)
+        case setUpdateIntroduce(String)
+        case setUpdateUserProfile(Bool)
     }
     
     public let initialState: State
     
-    public init(createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol, userProfileEntity: UserProfileEntity) {
+    public init(
+        createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol,
+        updateUserProfileUseCase: UpdateUserProfileUseCaseProtocol,
+        userProfileEntity: UserProfileEntity
+    ) {
         self.createCheckProfanityUseCase = createCheckProfanityUseCase
+        self.updateUserProfileUseCase = updateUserProfileUseCase
         self.initialState = State(
             isProfanity: false,
             userProfileEntity: userProfileEntity,
-            errorMessage: ""
+            isUpdate: false,
+            errorMessage: "",
+            introudce: ""
         )
     }
     
@@ -60,10 +73,19 @@ public final class ProfileSettingViewReactor: Reactor {
                         let errorMessage = isValid ? "" : "20자 이내로 입력 가능해요"
                         return .concat(
                             .just(.setCheckProfanityValidation(isProfanity)),
+                            .just(.setUpdateIntroduce(introduce)),
                             .just(.setErrorDescriptionMessage(errorMessage))
                         )
                     }
                 }
+        case .didTapUpdateUserButton:
+            
+            //TODO: UserDefaults 로 데이터를 저장해야함
+//            let iconURL = currentState.userProfileEntity.profile.iconUrl
+//            let updateUserProfileItemBody = UpdateUserProfileItemRequest(backgroundColor: <#T##String#>, iconUrl: <#T##String#>)
+//            let updateUserProfileBody = UpdateUserProfileRequest(introduction: currentState.introudce, profile: <#T##UpdateUserProfileItemRequest#>)
+//            return updateUserProfileUseCase.execute(body: <#T##UpdateUserProfileRequest#>)
+            return .empty()
         }
     }
     
@@ -74,6 +96,10 @@ public final class ProfileSettingViewReactor: Reactor {
             newState.isProfanity = isProfanity
         case let .setErrorDescriptionMessage(errorMessage):
             newState.errorMessage = errorMessage
+        case let .setUpdateIntroduce(introduce):
+            newState.introudce = introduce
+        case let .setUpdateUserProfile(isUpdate):
+            newState.isUpdate = isUpdate
         }
         
         return newState

@@ -23,22 +23,31 @@ public final class ProfileEditViewReactor: Reactor {
         @Pulse var userProfileEntity: UserProfileEntity
         @Pulse var fetchProfileBackgroundsResponseEntity: FetchProfileBackgroundsResponseEntity?
         @Pulse var fetchProfileImageResponseEntity: FetchProfileImageResponseEntity?
-        @Pulse var profileEditSection: [ProfileEditSection]
-        var isToggle: Bool
+        @Pulse var backgroundSection: [BackgroundEditSection]
+        @Pulse var characterSection: [CharacterEditSection]
+        @Pulse var isUpdate: Bool
+        var backgroundColor: String
+        var iconURL: String
+        var isError: Bool
     }
     
     public enum Action {
         case fetchProfileImageItem
         case fetchProfileBackgrounItem
-        case didTappedEditItem(Int)
+        case didTappedCharacterItem(Int)
+        case didTappedBackgroundItem(Int)
+        case didTappedUpdateButton
     }
     
     public enum Mutation {
         case setBackgroundResponseItems(FetchProfileBackgroundsResponseEntity)
         case setBackgroundImageResponseItems(FetchProfileImageResponseEntity)
-        case setProfileImageSectionItem([ProfileEditItem])
-        case setToggleButton(Bool)
-        case setProfileBackgroundSectionItem([ProfileEditItem])
+        case setProfileImageSectionItem([CharacterEditItem])
+        case setProfileBackgroundSectionItem([BackgroundEditItem])
+        case setUserUpdate(Bool)
+        case setSelctedBackgroundColor(String)
+        case setSelectedIconURL(String)
+        case setError(Bool)
     }
     
     public let initialState: State
@@ -51,8 +60,14 @@ public final class ProfileEditViewReactor: Reactor {
     ) {
         self.initialState = State(
             userProfileEntity: userProfileEntity,
-            profileEditSection: [],
-            isToggle: false
+            backgroundSection: [
+                .profileBackgroundInfo([])
+            ],
+            characterSection: [],
+            isUpdate: false,
+            backgroundColor: "",
+            iconURL: "",
+            isError: false
         )
         self.updateUserProfileUseCase = updateUserProfileUseCase
         self.fetchProfileBackgroundUseCase = fetchProfileBackgroundUseCase
@@ -67,10 +82,10 @@ public final class ProfileEditViewReactor: Reactor {
                 .compactMap { $0 }
                 .withUnretained(self)
                 .flatMap { owner, entity -> Observable<Mutation> in
-                    var imageSectionItem: [ProfileEditItem] = []
+                    var characterSectionItem: [CharacterEditItem] = []
                     
                     entity.characters.enumerated().forEach {
-                        imageSectionItem.append(
+                        characterSectionItem.append(
                             .profileCharacterItem(
                                 ProfileCharacterCellReactor(
                                     iconURL: $0.element.iconUrl,
@@ -81,8 +96,7 @@ public final class ProfileEditViewReactor: Reactor {
                     }
                     
                     return .concat(
-                        .just(.setProfileImageSectionItem(imageSectionItem)),
-                        .just(.setToggleButton(!owner.currentState.isToggle)),
+                        .just(.setProfileImageSectionItem(characterSectionItem)),
                         .just(.setBackgroundImageResponseItems(entity))
                     )
                 }
@@ -93,7 +107,7 @@ public final class ProfileEditViewReactor: Reactor {
                 .compactMap { $0 }
                 .withUnretained(self)
                 .flatMap { owner, entity -> Observable<Mutation> in
-                    var backgroundSectionItem: [ProfileEditItem] = []
+                    var backgroundSectionItem: [BackgroundEditItem] = []
                     
                     entity.backgrounds.enumerated().forEach {
                         backgroundSectionItem.append(
@@ -105,16 +119,39 @@ public final class ProfileEditViewReactor: Reactor {
                             )
                         )
                     }
-                    
                     return .concat(
                         .just(.setProfileBackgroundSectionItem(backgroundSectionItem)),
-                        .just(.setToggleButton(!owner.currentState.isToggle)),
                         .just(.setBackgroundResponseItems(entity))
                     )
                 }
-        case let .didTappedEditItem(item):
-            globalService.event.onNext(.didTappedEditItem(item))
-            return .empty()
+        case let .didTappedCharacterItem(item):
+            globalService.event.onNext(.didTappedCharacterItem(item))
+            let iconURL = currentState.fetchProfileImageResponseEntity?.characters[item].iconUrl.absoluteString
+            return .just(.setSelectedIconURL(iconURL ?? ""))
+            
+        case let .didTappedBackgroundItem(item):
+            globalService.event.onNext(.didTappedBackgroundItem(item))
+            let backgroundColor = currentState.fetchProfileBackgroundsResponseEntity?.backgrounds[item].color
+            return .just(.setSelctedBackgroundColor(backgroundColor ?? ""))
+        case .didTappedUpdateButton:
+            
+            let updateUserProfileBody = UpdateUserProfileItemRequest(backgroundColor: currentState.backgroundColor, iconUrl: currentState.iconURL)
+            let updateUserBody = UpdateUserProfileRequest(introduction: currentState.userProfileEntity.introduction, profile: updateUserProfileBody)
+            return updateUserProfileUseCase
+                .execute(body: updateUserBody)
+                .asObservable()
+                .flatMap { isUpdate -> Observable<Mutation> in
+                    if isUpdate {
+                        return .concat(
+                            //TODO: Error 예외 처리 추가
+                            .just(.setError(false)),
+                            .just(.setUserUpdate(isUpdate))
+                        )
+                    } else {
+                        return .just(.setError(true))
+                    }
+                    
+                }
         }
     }
     
@@ -126,11 +163,17 @@ public final class ProfileEditViewReactor: Reactor {
         case let .setBackgroundImageResponseItems(fetchProfileImageResponseEntity):
             newState.fetchProfileImageResponseEntity = fetchProfileImageResponseEntity
         case let .setProfileImageSectionItem(items):
-            newState.profileEditSection = [.profileCharacterInfo(items)]
+            newState.characterSection = [.profileCharacterInfo(items)]
         case let .setProfileBackgroundSectionItem(items):
-            newState.profileEditSection = [.profileBackgroundInfo(items)]
-        case let .setToggleButton(isToggle):
-            newState.isToggle = isToggle
+            newState.backgroundSection = [.profileBackgroundInfo(items)]
+        case let .setUserUpdate(isUpdate):
+            newState.isUpdate = isUpdate
+        case let .setSelectedIconURL(iconURL):
+            newState.iconURL = iconURL
+        case let .setSelctedBackgroundColor(backgroundColor):
+            newState.backgroundColor = backgroundColor
+        case let .setError(isErorr):
+            newState.isError = isErorr
         }
         
         return newState

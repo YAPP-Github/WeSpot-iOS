@@ -32,7 +32,7 @@ public final class ProfileCharacterCellReactor: Reactor {
         let didSelectedItem = globalService.event
             .flatMap { event -> Observable<Mutation> in
                 switch event {
-                case let .didTappedEditItem(item):
+                case let .didTappedCharacterItem(item):
                     return .just(.setSelectedItem(item))
                 default:
                     return .empty()
