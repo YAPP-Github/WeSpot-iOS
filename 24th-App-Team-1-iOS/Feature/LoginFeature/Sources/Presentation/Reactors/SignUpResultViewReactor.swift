@@ -8,34 +8,61 @@
 import Foundation
 
 import ReactorKit
+import LoginDomain
 
 public final class SignUpResultViewReactor: Reactor {
     
+    private let createAccountUseCase: CreateAccountUseCaseProtocol
+    public var initialState: State
+    
     public struct State {
-        
+        var accountRequest: CreateAccountRequest
+        var isAccountCreationCompleted: Bool = false
+        var isMarketingAgreed: Bool = false
     }
     
     public enum Action {
-        
+        case createAccount
+        case setMarketingAgreement(Bool)
     }
     
     public enum Mutation {
-        
+        case isCompletedAccount(Bool)
+        case setMarketingAgreement(Bool)
     }
     
-    public var initialState: State 
-    
-    public init() {
-        self.initialState = State()
+    public init(
+        accountRequest: CreateAccountRequest,
+        createAccountUseCase: CreateAccountUseCaseProtocol
+    ) {
+        self.initialState = State(accountRequest: accountRequest)
+        self.createAccountUseCase = createAccountUseCase
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
-        
-        return .empty()
+        switch action {
+        case .createAccount:
+            
+            return createAccountUseCase
+                .execute(body: initialState.accountRequest)
+                .asObservable()
+                .flatMap { entity -> Observable<Mutation> in
+                    return .just(.isCompletedAccount(true))
+                }
+                .catchAndReturn(.isCompletedAccount(false))
+        case .setMarketingAgreement(let isAgreed):
+            return .just(.setMarketingAgreement(isAgreed))
+        }
     }
     
     public func reduce(state: State, mutation: Mutation) -> State {
-        
-        return state
+        var newState = state
+        switch mutation {
+        case .isCompletedAccount(let isCompleted):
+            newState.isAccountCreationCompleted = isCompleted
+        case .setMarketingAgreement(let isAgreed):
+            newState.accountRequest.consents?.marketing = isAgreed
+        }
+        return newState
     }
 }

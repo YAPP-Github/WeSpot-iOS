@@ -31,24 +31,7 @@ struct SignUpSchoolPresentationAssembly: Assembly {
     }
 }
 
-/// SignUpClass DIContainer
-struct SignUpClassPresentationAssembly: Assembly {
-    func assemble(container: Container) {
-
-        container.register(SignUpClassViewReactor.self) {(resolver, accountRequest: CreateAccountRequest) in
-            return SignUpClassViewReactor(accountRequest: accountRequest)
-        }
-
-        container.register(SignUpClassViewController.self) { (resolver, argument: CreateAccountRequest) in
-            let reactor = resolver.resolve(SignUpClassViewReactor.self, argument: argument)!
-
-            return SignUpClassViewController(reactor: reactor)
-        }
-
-    }
-}
-
-/// SignUpClass DIContainer
+/// SignUpGrade DIContainer
 struct SignUpGradePresentationAssembly: Assembly {
     func assemble(container: Container) {
 
@@ -59,6 +42,22 @@ struct SignUpGradePresentationAssembly: Assembly {
         container.register(SignUpGradeViewController.self) { (resolver, accountRequest: CreateAccountRequest) in
             let reactor = resolver.resolve(SignUpGradeViewReactor.self, argument: accountRequest)!
             return SignUpGradeViewController(reactor: reactor)
+        }
+
+    }
+}
+
+/// SignUpClass DIContainer
+struct SignUpClassPresentationAssembly: Assembly {
+    func assemble(container: Container) {
+
+        container.register(SignUpClassViewReactor.self) {(resolver, accountRequest: CreateAccountRequest) in
+            return SignUpClassViewReactor(accountRequest: accountRequest)
+        }
+
+        container.register(SignUpClassViewController.self) { (resolver, argument: CreateAccountRequest) in
+            let reactor = resolver.resolve(SignUpClassViewReactor.self, argument: argument)!
+            return SignUpClassViewController(reactor: reactor)
         }
 
     }

@@ -11,20 +11,23 @@ import DesignSystem
 
 import Then
 import SnapKit
+import RxSwift
+import RxCocoa
 
 public final class PolicyAgreementBottomSheetView: UIView {
     
     //MARK: - Properties
     private let titleLabel = WSLabel(wsFont: .Body01, text: "서비스 사용을 위한\n약관에 동의해 주세요")
-    
     public let confirmButton = WSButton(wsButtonType: .default(12)).then {
-        $0.setupButton(text: "동의하고 시작하기")
+        $0.setupButton(text: "동의하고 시작하기") 
+        $0.isEnabled = false
     }
     private let subView = UIView()
     private let allAggreementButton = SelectPolicyAgreementView(text: "전체 동의하기", font: .Body04, isHiddenDetailButton: true)
     private let serviceAgreementButton = SelectPolicyAgreementView(text: "(필수) 서비스 이용약관")
     private let privacyAgreementButton = SelectPolicyAgreementView(text: "(필수) 개인정보 수집 및 이용 안내")
-    private let marketingAgreementButton = SelectPolicyAgreementView(text: "(선택) 이벤트 및 마케팇 수신 동의")
+    public let marketingAgreementButton = SelectPolicyAgreementView(text: "(선택) 이벤트 및 마케팇 수신 동의")
+    private let disposeBag = DisposeBag()
     
     //MARK: - Initializer
     public init() {
@@ -33,6 +36,7 @@ public final class PolicyAgreementBottomSheetView: UIView {
         setupUI()
         setupAutoLayout()
         setupAttributes()
+        bindUI()
     }
     
     required init?(coder: NSCoder) {
@@ -96,6 +100,23 @@ public final class PolicyAgreementBottomSheetView: UIView {
         layer.cornerRadius = 25
         layer.masksToBounds = true
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+    }
+    
+    private func bindUI() {
+        
+        Observable
+            .combineLatest(serviceAgreementButton.isCheckedObservable, privacyAgreementButton.isCheckedObservable)
+            .map { $0 && $1 }
+            .bind(to: confirmButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        allAggreementButton.isCheckedObservable
+            .filter { $0 }  // 전체동의가 체크될때만
+            .bind(with: self) { owner, isChecked in
+                owner.serviceAgreementButton.setCheckedState(isChecked)
+                owner.privacyAgreementButton.setCheckedState(isChecked)
+            }
+            .disposed(by: disposeBag)
     }
     
 }
