@@ -24,7 +24,7 @@ public final class SignInViewReactor: Reactor {
     public struct State {
         var signUpTokenResponse: CreateSignUpTokenResponseEntity?
         var accountResponse: CreateAccountResponseEntity?
-        
+        var accountRequest: CreateAccountRequest
     }
     
     public enum Action {
@@ -41,7 +41,7 @@ public final class SignInViewReactor: Reactor {
                 createExistingUseCase: CreateExistingMemberUseCaseProtocol) {
         self.createNewMemberUseCase = createNewMemberUseCase
         self.createExistingUseCase = createExistingUseCase
-        self.initialState = State()
+        self.initialState = State(accountRequest: CreateAccountRequest())
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
@@ -99,7 +99,7 @@ public final class SignInViewReactor: Reactor {
                                             identityToken: identityToken,
                                             fcmToken: fcmToken)
         
-        if UserDefaultsManager.shared.accessToken == nil {
+        if (UserDefaultsManager.shared.accessToken?.isEmpty ?? true) {
             return createNewMemberUseCase
                 .execute(body: body)
                 .asObservable()
@@ -120,6 +120,7 @@ public final class SignInViewReactor: Reactor {
         switch mutation {
         case .setSignUpTokenResponse(let signUpTokenResponse):
             newState.signUpTokenResponse = signUpTokenResponse
+            newState.accountRequest.signUpToken = signUpTokenResponse.signUpToken
         case .setAccountResponse(let accountResponse):
             newState.accountResponse = accountResponse
         }

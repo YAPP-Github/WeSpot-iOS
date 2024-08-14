@@ -21,6 +21,7 @@ public final class SignUpSchoolViewReactor: Reactor {
         var selectedSchool: SchoolListEntity?
         var cursorId: Int
         var isLoading: Bool
+        var accountRequest: CreateAccountRequest
     }
     
     public enum Action {
@@ -37,12 +38,16 @@ public final class SignUpSchoolViewReactor: Reactor {
         case setLoading(Bool)
     }
     
-    public init(fetchSchoolListUseCase: FetchSchoolListUseCaseProtocol) {
+    public init(
+        fetchSchoolListUseCase: FetchSchoolListUseCaseProtocol,
+        accountRequest: CreateAccountRequest
+    ) {
         self.initialState = State(
             schoolName: "",
             schoolList: SchoolListResponseEntity(schools: []),
             cursorId: 0,
-            isLoading: false
+            isLoading: false,
+            accountRequest: accountRequest
         )
         self.fetchSchoolListUseCase = fetchSchoolListUseCase
     }
@@ -101,6 +106,7 @@ public final class SignUpSchoolViewReactor: Reactor {
             newState.cursorId = results.schools.last?.id ?? newState.cursorId
             
         case .setSelectedSchool(let school):
+            newState.accountRequest.schoolId = school?.id
             newState.selectedSchool = school
             
         case .setCursorId(let cursorId):
