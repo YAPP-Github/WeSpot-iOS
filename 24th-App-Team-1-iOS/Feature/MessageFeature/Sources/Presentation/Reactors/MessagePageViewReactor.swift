@@ -41,9 +41,7 @@ public final class MessagePageViewReactor: Reactor {
                     return .empty()
                 case let .toogleMessageType(messsageTypes):
                     return .just(.setViewController(messsageTypes))
-                case .didFetchVoteReponseItems(_):
-                    return .empty()
-                case .didTappedResultButton:
+                default :
                     return .empty()
                 }
             }
