@@ -29,7 +29,7 @@ public final class ProfileAppSettingViewReactor: Reactor {
     public init() {
         self.initialState = State(profileAppSection: [
             .alarmInfo([
-                .accountItem("알림 설정")
+                .alarmItem("알림 설정")
             ]),
             .privacyInfo([
                 .privacyItem("개인정보처리 방침"),

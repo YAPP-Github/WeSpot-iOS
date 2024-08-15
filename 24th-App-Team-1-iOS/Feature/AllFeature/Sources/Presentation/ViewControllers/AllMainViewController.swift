@@ -8,12 +8,14 @@
 import DesignSystem
 import UIKit
 import Util
+import Storage
 
 import Then
 import SnapKit
 import RxSwift
 import RxCocoa
 import ReactorKit
+import Kingfisher
 import RxDataSources
 
 public final class AllMainViewController: BaseViewController<AllMainViewReactor> {
@@ -128,16 +130,21 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
         }
         
         profileImageView.do {
-            $0.image = DesignSystemAsset.Images.girl.image
+            guard let profileImage = URL(string: UserDefaultsManager.shared.userProfile?.profileImages.profileImage ?? "") else { return }
+            $0.kf.setImage(with: profileImage)
         }
         
         profileNameLabel.do {
-            $0.text = "박주현"
+            guard let name = UserDefaultsManager.shared.userProfile?.name else { return }
+            $0.text = name
             $0.textAlignment = .left
         }
         
         profileClassLabel.do {
-            $0.text = "역삼중학교 1학년 6반"
+            guard let schoolName = UserDefaultsManager.shared.userProfile?.schoolName,
+                  let grade = UserDefaultsManager.shared.userProfile?.grade,
+                  let classNumber = UserDefaultsManager.shared.userProfile?.classNumber else { return }
+            $0.text = "\(schoolName) \(grade)학년 \(classNumber)반"
             $0.textAlignment = .left
             $0.lineBreakMode = .byTruncatingTail
         }
@@ -187,12 +194,13 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
         profileEditButton
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .withLatestFrom( reactor.state.compactMap { $0.userProfileEntity})
             .bind(with: self) { owner, entity in
-                let profileSettingViewController = DependencyContainer.shared.injector.resolve(ProfileSettingViewController.self, argument: entity)
+                let profileSettingViewController = DependencyContainer.shared.injector.resolve(ProfileSettingViewController.self)
                 owner.navigationController?.pushViewController(profileSettingViewController, animated: true)
             }
             .disposed(by: disposeBag)
+        
+        
         
         voteAddBanner
             .rx.tap
@@ -238,24 +246,6 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
                     owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                 }
             }
-            .disposed(by: disposeBag)
-        
-        reactor.state.compactMap { $0.userProfileEntity }
-            .map { UIColor(hex: $0.profile.backgroundColor) }
-            .distinctUntilChanged()
-            .bind(to: profileContainerView.rx.backgroundColor)
-            .disposed(by: disposeBag)
-
-        reactor.state.compactMap { $0.userProfileEntity }
-            .map { $0.name }
-            .distinctUntilChanged()
-            .bind(to: profileNameLabel.rx.text)
-            .disposed(by: disposeBag)
-        
-        reactor.state.compactMap { $0.userProfileEntity }
-            .map { "\($0.schoolName) \($0.grade)학년 \($0.classNumber)반"}
-            .distinctUntilChanged()
-            .bind(to: profileClassLabel.rx.text)
             .disposed(by: disposeBag)
         
         mainTableView

@@ -89,7 +89,8 @@ public final class ProfileAppSettingViewController: BaseViewController<ProfileAp
             .bind(with: self) { owner, indexPath in
                 switch owner.appSettingDataSources[indexPath] {
                 case .alarmItem:
-                    break
+                    let alarmViewController = DependencyContainer.shared.injector.resolve(ProfileAlarmSettingViewController.self)
+                    owner.navigationController?.pushViewController(alarmViewController, animated: true)
                 case .privacyItem:
                     if indexPath.item == 0 {
                         let privacyInfoURL = URL(string: "https://www.notion.so/2fa1c3002e14460f91462204b0daefbf")!
