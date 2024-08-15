@@ -35,14 +35,14 @@ final class MainTableViewCell: UITableViewCell {
         }
         
         contentLabel.snp.makeConstraints {
-            $0.left.equalToSuperview().inset(20)
+            $0.left.equalToSuperview()
             $0.centerY.equalToSuperview()
             $0.height.equalTo(24)
         }
         
         contentAccessoryView.snp.makeConstraints {
             $0.size.equalTo(24)
-            $0.right.equalToSuperview().inset(25)
+            $0.right.equalToSuperview()
             $0.centerY.equalToSuperview()
         }
     }
