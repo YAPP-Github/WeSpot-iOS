@@ -74,7 +74,7 @@ public final class ProfileCharacterImageViewCollectionViewCell: UICollectionView
     }
     
     public func configureCell(image: URL) {
-        //TODO: 실제 이미지 URL을 받아올 떄 적용 
+        //TODO: 실제 이미지 URL을 받아올 떄 적용
     }
     
     public func selectedCell() {

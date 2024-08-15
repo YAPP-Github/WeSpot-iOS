@@ -22,7 +22,8 @@ struct AllMainProfilePresentationAssembly: Assembly {
             return ProfileSettingViewReactor(
                 createCheckProfanityUseCase: createCheckProfanityUseCase,
                 updateUserProfileUseCase: updateUserProfileUseCase,
-                userProfileEntity: userProfileEntity)
+                userProfileEntity: userProfileEntity
+            )
         }
         
         container.register(ProfileSettingViewController.self) { (resolver, userProfileEntity: UserProfileEntity) in

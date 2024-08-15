@@ -86,7 +86,6 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             tabbarcontroller.viewControllers = [voteNavigationContoller,messageNavigationContoller, allNavigationContoller]
             window?.rootViewController = tabbarcontroller
         }
-        window?.rootViewController = UINavigationController(rootViewController: DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self))
         window?.makeKeyAndVisible()
     }
     
