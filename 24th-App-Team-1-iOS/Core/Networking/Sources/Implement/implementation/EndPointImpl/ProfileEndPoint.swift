@@ -16,7 +16,7 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
     /// 사용자 프로필 수정 API
     case updateUserProfile(Encodable)
     /// 알람 설정 API
-    case updateNotification
+    case updateNotification(Encodable)
     /// 알람 설정 조회 API
     case fetchNotification
     
@@ -50,6 +50,8 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
     public var parameters: WSRequestParameters {
         switch self {
         case let .updateUserProfile(body):
+            return .requestBody(body)
+        case let .updateNotification(body):
             return .requestBody(body)
         default:
             return .none

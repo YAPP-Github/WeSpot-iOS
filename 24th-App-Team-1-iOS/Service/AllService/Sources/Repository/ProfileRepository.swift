@@ -17,6 +17,7 @@ import RxCocoa
 
 public final class ProfileRepository: ProfileRepositoryProtocol {
     
+        
     private let networkService: WSNetworkServiceProtocol = WSNetworkService()
     
     public init() { }
@@ -45,5 +46,29 @@ public final class ProfileRepository: ProfileRepositoryProtocol {
             .asSingle()
     }
     
+    public func fetchUserAlarmItems() -> Single<UserAlarmEntity?> {
+        let endPoint = ProfileEndPoint.fetchNotification
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .decodeMap(UserAlarmResponseDTO.self)
+            .logErrorIfDetected(category: Network.error)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
+    
+    public func updateUserAlarmItem(body: UpdateUserProfileAlarmRequest) -> RxSwift.Single<Bool> {
+        let body = UpdateUserProfileAlarmRequestDTO(
+            isEnableVoteNotification: body.isEnableVoteNotification,
+            isEnableMessageNotification: body.isEnableMessageNotification,
+            isEnableMarketingNotification: body.isEnableMarketingNotification
+        )
+        let endPoint = ProfileEndPoint.updateNotification(body)
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .map { _ in true }
+            .catchAndReturn(false)
+            .logErrorIfDetected(category: Network.error)
+            .asSingle()
+    }
     
 }
