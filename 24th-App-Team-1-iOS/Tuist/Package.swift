@@ -10,7 +10,8 @@ import PackageDescription
         // Default is .staticFramework
         // productTypes: ["Alamofire": .framework,] 
         productTypes: [
-            "Lottie"  : .framework
+            "Lottie"  : .framework,
+            "Kingfisher" : .framework
         ],
         baseSettings: .settings(configurations: [
             .debug(name: .configuration("DEV")),
@@ -33,6 +34,7 @@ let package = Package(
         .package(url: "https://github.com/kakao/kakao-ios-sdk-rx", branch: "master"),
         .package(url: "https://github.com/airbnb/lottie-ios", from: "4.5.0"),
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "10.24.0"),
-        .package(url: "https://github.com/onevcat/Kingfisher", from: "7.12.0")
+        .package(url: "https://github.com/onevcat/Kingfisher", from: "7.12.0"),
+        .package(url: "https://github.com/evgenyneu/keychain-swift", from: "24.0.0")
     ]
 )

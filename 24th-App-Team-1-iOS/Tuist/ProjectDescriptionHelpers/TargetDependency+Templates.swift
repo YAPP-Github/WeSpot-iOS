@@ -71,4 +71,7 @@ extension TargetDependency.SPM {
     
     //MARK: Cache
     public static let kingfisher: TargetDependency = .external(name: "Kingfisher")
+    
+    //MARK: KeyChain
+    public static let keychain: TargetDependency = .external(name: "KeychainSwift")
 }
