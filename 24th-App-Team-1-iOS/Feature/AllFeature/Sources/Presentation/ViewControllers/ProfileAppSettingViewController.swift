@@ -104,7 +104,12 @@ public final class ProfileAppSettingViewController: BaseViewController<ProfileAp
                         // TODO 최신 버전 링크 여쭤보기
                     }
                 case .accountItem:
-                    break
+                    if indexPath.item == 0 {
+                        let profileUserBlockViewController = DependencyContainer.shared.injector.resolve(ProfileUserBlockViewController.self)
+                        owner.navigationController?.pushViewController(profileUserBlockViewController, animated: true)
+                    } else {
+                        
+                    }
                 }
             }
             .disposed(by: disposeBag)

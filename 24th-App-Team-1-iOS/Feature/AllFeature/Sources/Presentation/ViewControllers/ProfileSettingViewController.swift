@@ -158,7 +158,6 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         }
         
         introduceCountLabel.do {
-            $0.text = "0/20"
             $0.textColor = DesignSystemAsset.Colors.gray400.color
             $0.textAlignment = .right
         }
@@ -313,7 +312,8 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.userProfileEntity }
-            .compactMap { "\($0?.schoolName) \($0?.grade)학년 \($0?.classNumber)반"}
+            .compactMap { $0 }
+            .compactMap { "\($0.schoolName) \($0.grade)학년 \($0.classNumber)반"}
             .distinctUntilChanged()
             .bind(to: userClassInfoTextField.rx.placeholderText)
             .disposed(by: disposeBag)
@@ -325,7 +325,8 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .disposed(by: disposeBag)
         
         reactor.state
-            .compactMap { "\($0.userProfileEntity?.introduction.count)/20" }
+            .compactMap { $0.userProfileEntity }
+            .compactMap { "\($0.introduction.count)/20" }
             .distinctUntilChanged()
             .observe(on: MainScheduler.asyncInstance)
             .bind(to: introduceCountLabel.rx.text)
@@ -348,6 +349,20 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .bind(to: introduceCountLabel.rx.text)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isUpdate)
+            .filter{ $0 == true }
+            .bind(with: self) { owner, _ in
+                owner.showWSToast(image: .check, message: "수정 완료")
+            }
+            .disposed(by: disposeBag)
+        
+        
+        editButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTapUpdateUserButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
         
     }
 }

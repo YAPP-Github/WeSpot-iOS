@@ -71,4 +71,15 @@ public final class ProfileRepository: ProfileRepositoryProtocol {
             .asSingle()
     }
     
+    public func fetchUserBlockItems(query: UserBlockRequestQuery) -> Single<UserBlockEntity?> {
+        let query = UserBlockRequestDTO(cursorId: query.cursorId)
+        let endPoint = ProfileEndPoint.fetchUserBlock(query)
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .decodeMap(UserBlockResponseDTO.self)
+            .logErrorIfDetected(category: Network.error)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
+    
 }

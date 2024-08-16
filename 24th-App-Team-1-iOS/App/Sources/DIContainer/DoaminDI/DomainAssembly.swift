@@ -132,5 +132,15 @@ struct DomainAssembly: Assembly {
             let repository = resolver.resolve(ProfileRepositoryProtocol.self)!
             return FetchUserAlarmSettingUseCase(profileRepository: repository)
         }
+        
+        container.register(UpdateUserAlarmSettingUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(ProfileRepositoryProtocol.self)!
+            return UpdateUserAlarmSettingUseCase(profileRepository: repository)
+        }
+        
+        container.register(FetchUserBlockUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(ProfileRepositoryProtocol.self)!
+            return FetchUserBlockUseCase(profileRepository: repository)
+        }
     }
 }

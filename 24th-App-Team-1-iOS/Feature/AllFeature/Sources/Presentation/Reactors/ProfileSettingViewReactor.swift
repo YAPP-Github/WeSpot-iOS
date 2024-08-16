@@ -20,7 +20,7 @@ public final class ProfileSettingViewReactor: Reactor {
     public struct State {
         @Pulse var isProfanity: Bool
         @Pulse var userProfileEntity: UserProfileEntity?
-        var isUpdate: Bool
+        @Pulse var isUpdate: Bool
         var errorMessage: String
         var isEnabled: Bool
         var introudce: String
@@ -99,11 +99,16 @@ public final class ProfileSettingViewReactor: Reactor {
         case .didTapUpdateUserButton:
             
             //TODO: UserDefaults 로 데이터를 저장해야함
-//            let iconURL = currentState.userProfileEntity.profile.iconUrl
-//            let updateUserProfileItemBody = UpdateUserProfileItemRequest(backgroundColor: <#T##String#>, iconUrl: <#T##String#>)
-//            let updateUserProfileBody = UpdateUserProfileRequest(introduction: currentState.introudce, profile: <#T##UpdateUserProfileItemRequest#>)
-//            return updateUserProfileUseCase.execute(body: <#T##UpdateUserProfileRequest#>)
-            return .empty()
+            guard let iconURL = currentState.userProfileEntity?.profile.iconUrl.absoluteString,
+                  let backgroundColor = currentState.userProfileEntity?.profile.backgroundColor else { return .empty() }
+            
+            let updateUserProfileItemBody = UpdateUserProfileItemRequest(backgroundColor: backgroundColor, iconUrl: iconURL)
+            let updateUserProfileBody = UpdateUserProfileRequest(introduction: currentState.introudce, profile: updateUserProfileItemBody)
+            return updateUserProfileUseCase.execute(body: updateUserProfileBody)
+                .asObservable()
+                .flatMap { isUpdate -> Observable<Mutation> in
+                    return .just(.setUpdateUserProfile(isUpdate))
+                }
         }
     }
     

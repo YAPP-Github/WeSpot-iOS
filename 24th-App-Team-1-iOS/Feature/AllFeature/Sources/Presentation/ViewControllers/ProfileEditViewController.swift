@@ -250,11 +250,13 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$backgroundSection)
+            .observe(on: MainScheduler.instance)
             .asDriver(onErrorJustReturn: [])
             .drive(backgroundCollectionView.rx.items(dataSource: backgroundDataSources))
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$characterSection)
+            .observe(on: MainScheduler.instance)
             .asDriver(onErrorJustReturn: [])
             .drive(characterCollectionView.rx.items(dataSource: characterDataSouces))
             .disposed(by: disposeBag)
