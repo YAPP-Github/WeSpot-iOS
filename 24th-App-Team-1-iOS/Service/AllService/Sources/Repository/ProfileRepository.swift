@@ -82,4 +82,15 @@ public final class ProfileRepository: ProfileRepositoryProtocol {
             .asSingle()
     }
     
+    public func updateUserBlockItem(path: String) -> Single<Bool> {
+        let endPoint = ProfileEndPoint.updateUserBlock(path)
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .map { _ in true }
+            .catchAndReturn(false)
+            .logErrorIfDetected(category: Network.error)
+            .asSingle()
+    }
+    
 }

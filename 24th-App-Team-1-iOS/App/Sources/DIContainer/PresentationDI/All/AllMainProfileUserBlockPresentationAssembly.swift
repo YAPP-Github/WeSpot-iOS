@@ -16,7 +16,11 @@ struct AllMainProfileUserBlockPresentationAssembly: Assembly {
     func assemble(container: Container) {
         container.register(ProfileUserBlockViewReactor.self) { resolver in
             let fetchUserBlockUseCase = resolver.resolve(FetchUserBlockUseCaseProtocol.self)!
-            return ProfileUserBlockViewReactor(fetchUserBlockUseCase: fetchUserBlockUseCase)
+            let updateUserBlockUseCase = resolver.resolve(UpdateUserBlockUseCaseProtocol.self)!
+            return ProfileUserBlockViewReactor(
+                fetchUserBlockUseCase: fetchUserBlockUseCase,
+                updateUserBlockUseCase: updateUserBlockUseCase
+            )
         }
         
         container.register(ProfileUserBlockViewController.self) { resolver in

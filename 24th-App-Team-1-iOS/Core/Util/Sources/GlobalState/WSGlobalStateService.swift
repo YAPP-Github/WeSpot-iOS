@@ -29,4 +29,6 @@ public enum WSGlobalStateType {
     case didTappedCharacterItem(_ item: Int)
     case didTappedBackgroundItem(_ item: Int)
     case didChangedAlarmStatus(_ isOn: Bool)
+    case didTappedBlockButton(_ id: Int)
+    case didUpdateUserBlockButton(id: String)
 }

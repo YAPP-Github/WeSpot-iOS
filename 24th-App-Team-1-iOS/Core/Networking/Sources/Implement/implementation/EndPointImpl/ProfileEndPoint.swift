@@ -19,8 +19,10 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
     case updateNotification(Encodable)
     /// 알람 설정 조회 API
     case fetchNotification
-    
-    
+    /// 사용자 차단 목록 API
+    case fetchUserBlock(Encodable)
+    /// 사용자 차단 해체 API
+    case updateUserBlock(String)
     public var path: String {
         switch self {
         case .fetchUserProfile:
@@ -31,6 +33,10 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
             return "/users/settings"
         case .fetchNotification:
             return "/users/settings"
+        case .fetchUserBlock:
+            return "/messages/blocked"
+        case let .updateUserBlock(messageId):
+            return "/messages/\(messageId)/unblock"
         }
     }
     
@@ -44,6 +50,10 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
             return .put
         case .fetchNotification:
             return .get
+        case .fetchUserBlock:
+            return .get
+        case .updateUserBlock:
+            return .post
         }
     }
     
@@ -53,6 +63,8 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
             return .requestBody(body)
         case let .updateNotification(body):
             return .requestBody(body)
+        case let .fetchUserBlock(query):
+            return .requestQuery(query)
         default:
             return .none
         }

@@ -7,6 +7,11 @@
 
 import UIKit
 
+public enum AlertType {
+    case message
+    case titleWithMeesage
+}
+
 
 //MARK: WSAlertView에 모든 구성요소를 설정하는 모듈
 public final class WSAlertBuilder {
@@ -16,6 +21,7 @@ public final class WSAlertBuilder {
     private let alertViewController: WSAlertView = WSAlertView()
     private var builderAction: WSAlertActionProperty?
     
+    private var alertType: AlertType = .titleWithMeesage
     private var alertTitle: String?
     private var alertMessage: String?
     private var confirmText: String?
@@ -28,6 +34,11 @@ public final class WSAlertBuilder {
     /// WSAlert의 타이틀을 설정하기 위한 메서드
     public func setTitle(title: String) -> Self {
         self.alertTitle = title
+        return self
+    }
+    
+    public func setAlertType(type: AlertType) -> Self {
+        self.alertType = type
         return self
     }
     
@@ -57,6 +68,7 @@ public final class WSAlertBuilder {
         alertViewController.modalPresentationStyle = .overFullScreen
         alertViewController.modalTransitionStyle = .crossDissolve
         
+        alertViewController.alertType = alertType
         alertViewController.titleLabel.text = alertTitle
         alertViewController.messageLabel.text = alertMessage
         alertViewController.confirmButton.setupButton(text: confirmText ?? "")

@@ -119,6 +119,14 @@ final class ProfileBlockTableViewCell: UITableViewCell {
 
 extension ProfileBlockTableViewCell: ReactorKit.View {
     func bind(reactor: ProfileUserBlockCellReactor) {
+        
+        blockButton.rx.tap
+            .throttle(.milliseconds(100), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTappedUserBlockButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        
         reactor.state
             .map { $0.senderName }
             .distinctUntilChanged()
@@ -137,6 +145,18 @@ extension ProfileBlockTableViewCell: ReactorKit.View {
             .bind(with: self) { owner, image in
                 owner.profileImageView.kf.setImage(with: image)
             }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isUpdate == true ? "해체 완료" : "차단 해체" }
+            .distinctUntilChanged()
+            .bind(to: blockButton.rx.title())
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { !$0.isUpdate }
+            .distinctUntilChanged()
+            .bind(to: blockButton.rx.isEnabled)
             .disposed(by: disposeBag)
     }
 }

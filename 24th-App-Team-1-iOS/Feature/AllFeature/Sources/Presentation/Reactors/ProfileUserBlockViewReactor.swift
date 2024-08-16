@@ -7,32 +7,60 @@
 
 import Foundation
 import AllDomain
+import Util
 
 import ReactorKit
 
 public final class ProfileUserBlockViewReactor: Reactor {
     
     private let fetchUserBlockUseCase: FetchUserBlockUseCaseProtocol
+    private let updateUserBlockUseCase: UpdateUserBlockUseCaseProtocol
+    private let globalState: WSGlobalServiceProtocol = WSGlobalStateService.shared
     
     public struct State {
         @Pulse var userBlockSection: [ProfileUserBlockSection]
         @Pulse var userBlockEntity: UserBlockEntity?
+        @Pulse var userBlockId: String
     }
     
     public enum Action {
         case viewDidLoad
+        case didTappedUserBlockButton
     }
     
     public enum Mutation {
         case setUserBlockProfileItems([ProfileUserBlockItem])
         case setUserBlockItems(UserBlockEntity)
+        case setUserBlockId(String)
+        
     }
     
     public let initialState: State
     
-    public init(fetchUserBlockUseCase: FetchUserBlockUseCaseProtocol) {
-        self.initialState = State(userBlockSection: [])
+    public init(
+        fetchUserBlockUseCase: FetchUserBlockUseCaseProtocol,
+        updateUserBlockUseCase: UpdateUserBlockUseCaseProtocol
+    ) {
+        self.initialState = State(
+            userBlockSection: [],
+            userBlockId: ""
+        )
         self.fetchUserBlockUseCase = fetchUserBlockUseCase
+        self.updateUserBlockUseCase = updateUserBlockUseCase
+    }
+    
+    public func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
+        let didTappedBlockButton = globalState.event
+            .withUnretained(self)
+            .flatMap { owner,event -> Observable<Mutation> in
+                switch event {
+                case let .didTappedBlockButton(messageId):
+                    return .just(.setUserBlockId("\(messageId)"))
+                default:
+                    return .empty()
+                }
+            }
+        return .merge(mutation, didTappedBlockButton)
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
@@ -64,6 +92,16 @@ public final class ProfileUserBlockViewReactor: Reactor {
                         .just(.setUserBlockItems(entity))
                     )
             }
+        case .didTappedUserBlockButton:
+            return updateUserBlockUseCase
+                .execute(path: currentState.userBlockId)
+                .asObservable()
+                .withUnretained(self)
+                .flatMap { owner, isUpdate -> Observable<Mutation> in
+                    guard isUpdate else { return .empty() }
+                    owner.globalState.event.onNext(.didUpdateUserBlockButton(id: owner.currentState.userBlockId))
+                    return .empty()
+                }
         }
     }
     
@@ -74,6 +112,8 @@ public final class ProfileUserBlockViewReactor: Reactor {
             newState.userBlockSection = [.blockInfo(items)]
         case let .setUserBlockItems(userBlockEntity):
             newState.userBlockEntity = userBlockEntity
+        case let .setUserBlockId(userBlockId):
+            newState.userBlockId = userBlockId
         }
         
         return newState
