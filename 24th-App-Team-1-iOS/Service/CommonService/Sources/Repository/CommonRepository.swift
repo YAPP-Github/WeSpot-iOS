@@ -67,4 +67,16 @@ public final class CommonRepository: CommonRepositoryProtocol {
             .map { $0.toDomain() }
             .asSingle()
     }
+    
+    public func createRefreshToken(body: CreateRefreshTokenRequest) -> Single<CreateAccountResponseEntity?> {
+        let body = CreateRefreshTokenRequestDTO(token: body.token)
+        let endPoint = LoginEndPoint.createRefreshToken(body)
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .logErrorIfDetected(category: Network.error)
+            .decodeMap(CreateAccountResponseDTO.self)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
 }

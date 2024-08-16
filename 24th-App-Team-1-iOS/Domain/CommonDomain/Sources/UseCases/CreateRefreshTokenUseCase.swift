@@ -16,13 +16,13 @@ public protocol CreateRefreshTokenUseCaseProtocol {
 
 public final class CreateRefreshTokenUseCase: CreateRefreshTokenUseCaseProtocol {
 
-    public let loginRepository: LoginRepositoryProtocol
+    public let commonRepository: CommonRepositoryProtocol
     
-    public init(loginRepository: LoginRepositoryProtocol) {
-        self.loginRepository = loginRepository
+    public init(commonRepository: CommonRepositoryProtocol) {
+        self.commonRepository = commonRepository
     }
 
     public func execute(body: CreateRefreshTokenRequest) -> Single<CreateAccountResponseEntity?> {
-        return loginRepository.createRefreshToken(body: body)
+        return commonRepository.createRefreshToken(body: body)
     }
 }

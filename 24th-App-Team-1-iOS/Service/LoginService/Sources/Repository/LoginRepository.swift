@@ -37,6 +37,8 @@ public final class LoginRepository: LoginRepositoryProtocol {
         let body = CreateSignUpTokenRequestDTO(socialType: body.socialType, authorizationCode: body.authorizationCode, identityToken: body.identityToken, fcmToken: body.fcmToken)
         let endPoint = LoginEndPoint.createSocialLogin(body)
         
+        dump(body)
+        
         return networkService.request(endPoint: endPoint)
             .asObservable()
             .logErrorIfDetected(category: Network.error)
@@ -51,18 +53,6 @@ public final class LoginRepository: LoginRepositoryProtocol {
         let consents = ConsentsRequestDTO(marketing: body.consents?.marketing)
         let body = CreateAccountRequestDTO(name: body.name, gender: body.gender, schoolId: body.schoolId, grade: body.grade, classNumber: body.classNumber, consents: consents, signUpToken: body.signUpToken)
         let endPoint = LoginEndPoint.createAccount(body)
-        
-        return networkService.request(endPoint: endPoint)
-            .asObservable()
-            .logErrorIfDetected(category: Network.error)
-            .decodeMap(CreateAccountResponseDTO.self)
-            .map { $0.toDomain() }
-            .asSingle()
-    }
-    
-    public func createRefreshToken(body: CreateRefreshTokenRequest) -> Single<CreateAccountResponseEntity?> {
-        let body = CreateRefreshTokenRequestDTO(token: body.token)
-        let endPoint = LoginEndPoint.createRefreshToken(body)
         
         return networkService.request(endPoint: endPoint)
             .asObservable()
