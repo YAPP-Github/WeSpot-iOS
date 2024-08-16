@@ -20,12 +20,14 @@ public final class ProfileUserBlockViewReactor: Reactor {
     public struct State {
         @Pulse var userBlockSection: [ProfileUserBlockSection]
         @Pulse var userBlockEntity: UserBlockEntity?
+        var userPageBlockItems: [ProfileUserBlockItem]
         @Pulse var userBlockId: String
     }
     
     public enum Action {
         case viewDidLoad
         case didTappedUserBlockButton
+        case fetchMoreUserBlockItems
     }
     
     public enum Mutation {
@@ -43,6 +45,7 @@ public final class ProfileUserBlockViewReactor: Reactor {
     ) {
         self.initialState = State(
             userBlockSection: [],
+            userPageBlockItems: [],
             userBlockId: ""
         )
         self.fetchUserBlockUseCase = fetchUserBlockUseCase
@@ -102,6 +105,37 @@ public final class ProfileUserBlockViewReactor: Reactor {
                     owner.globalState.event.onNext(.didUpdateUserBlockButton(id: owner.currentState.userBlockId))
                     return .empty()
                 }
+        case .fetchMoreUserBlockItems:
+            let cursorId = currentState.userBlockEntity?.lastCursorId ?? 0
+            let query = UserBlockRequestQuery(cursorId: cursorId)
+            return fetchUserBlockUseCase.execute(query: query)
+                .asObservable()
+                .filter { $0?.hasNext == false }
+                .compactMap { $0 }
+                .withUnretained(self)
+                .flatMap { owner, entity -> Observable<Mutation> in
+                    var originalBlockItems: [ProfileUserBlockItem] = owner.currentState.userPageBlockItems
+                    var currentPageBlcokItems: [ProfileUserBlockItem] = []
+                    entity.message.forEach {
+                        currentPageBlcokItems.append(
+                            .userBlockItem(
+                                ProfileUserBlockCellReactor(
+                                    messageId: $0.id,
+                                    senderName: $0.senderName,
+                                    backgoundColor: $0.senderProfile.backgroundColor,
+                                    iconURL: $0.senderProfile.iconUrl
+                                )
+                            )
+                        )
+                    }
+                    
+                    originalBlockItems.append(contentsOf: currentPageBlcokItems)
+                    
+                    return .concat(
+                        .just(.setUserBlockProfileItems(originalBlockItems)),
+                        .just(.setUserBlockItems(entity))
+                    )
+                }
         }
     }
     
@@ -109,6 +143,7 @@ public final class ProfileUserBlockViewReactor: Reactor {
         var newState = state
         switch mutation {
         case let .setUserBlockProfileItems(items):
+            newState.userPageBlockItems = items
             newState.userBlockSection = [.blockInfo(items)]
         case let .setUserBlockItems(userBlockEntity):
             newState.userBlockEntity = userBlockEntity

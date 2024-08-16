@@ -108,7 +108,8 @@ public final class ProfileAppSettingViewController: BaseViewController<ProfileAp
                         let profileUserBlockViewController = DependencyContainer.shared.injector.resolve(ProfileUserBlockViewController.self)
                         owner.navigationController?.pushViewController(profileUserBlockViewController, animated: true)
                     } else {
-                        
+                        let profileAccountSettingViewController = DependencyContainer.shared.injector.resolve(ProfileAccountSettingViewController.self)
+                        owner.navigationController?.pushViewController(profileAccountSettingViewController, animated: true)
                     }
                 }
             }

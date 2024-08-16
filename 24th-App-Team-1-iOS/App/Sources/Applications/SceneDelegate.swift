@@ -61,6 +61,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             AllMainProfileSettingPresentationAssembly(),
             AllMainProfileAlarmSettingPresentationAssembly(),
             AllMainProfileUserBlockPresentationAssembly(),
+            AllMainProfileAccountSettingPresentationAssembly(),
             MessageReportPresentationAssembly(),
             DataAssembly(),
             DomainAssembly()
