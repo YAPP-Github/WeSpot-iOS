@@ -9,6 +9,7 @@ import Foundation
 
 import Alamofire
 import RxSwift
+import CommonDomain
 
 public final class WSNetworkService: WSNetworkServiceProtocol {
     
@@ -18,6 +19,7 @@ public final class WSNetworkService: WSNetworkServiceProtocol {
         let networkConfigure: URLSessionConfiguration = URLSessionConfiguration.af.default
         let networkSession: Session = Session(
             configuration: networkConfigure,
+            interceptor: WSNetworkInterceptor(),
             eventMonitors: [networkMonitor]
         )
         return networkSession
