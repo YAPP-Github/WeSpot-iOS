@@ -15,11 +15,11 @@ import RxCocoa
 
 public final class WSNetworkInterceptor: RequestInterceptor {
     
-    private let networkService: WSNetworkService
     private let commonRepository: CommonRepositoryProtocol
     private let disposeBag = DisposeBag()
     
-    init() {
+    public init(commonRepository: CommonRepositoryProtocol) {
+        self.commonRepository = commonRepository
     }
     
     public func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, any Error>) -> Void) {
@@ -49,10 +49,17 @@ public final class WSNetworkInterceptor: RequestInterceptor {
         commonRepository
             .createRefreshToken(body: body)
             .asObservable()
-            .bind(with: self) { owner, entity in
+            .subscribe(onNext: {[weak self] entity in
+                guard let self = self else { return }
+                
                 KeychainManager.shared.set(value: entity?.accessToken ?? "", type: .accessToken)
                 KeychainManager.shared.set(value: entity?.refreshToken ?? "", type: .refreshToken)
-            }
+                
+                let retry = RetryResult.retry
+                completion(retry)
+            }, onError: { error in
+                completion(.doNotRetryWithError(WSNetworkError.default(message: error.localizedDescription)))
+            })
             .disposed(by: disposeBag)
         
     }
