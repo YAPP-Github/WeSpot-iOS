@@ -16,7 +16,7 @@ public struct CharacterSection: SectionModelType {
         self.items = items
     }
     
-    public init(original: CharacterSection, items: [Item]) {
+    public init(original: CharacterSection, items: [FetchProfileImageItemEntity]) {
         self = original
         self.items = items
     }
@@ -29,7 +29,7 @@ public struct BackgroundSection: SectionModelType {
         self.items = items
     }
 
-    public init(original: BackgroundSection, items: [Item]) {
+    public init(original: BackgroundSection, items: [FetchProfileBackgroundsItemEntity]) {
         self = original
         self.items = items
     }

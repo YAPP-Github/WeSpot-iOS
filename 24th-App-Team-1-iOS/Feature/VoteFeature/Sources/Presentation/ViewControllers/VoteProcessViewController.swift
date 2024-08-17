@@ -252,6 +252,7 @@ extension VoteProcessViewController {
         let processAlertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let reportAction = UIAlertAction(title: VoteProcessStr.voteReportAlertText, style: .default) { _ in
             WSAlertBuilder(showViewController: self)
+                .setAlertType(type: .titleWithMeesage)
                 .setTitle(title: VoteProcessStr.voteModalTitleText)
                 .setMessage(message: VoteProcessStr.voteModalMessageText)
                 .setConfirm(text: VoteProcessStr.voteModalConfirmText)

@@ -23,6 +23,7 @@ import ReactorKit
 import RxKakaoSDKAuth
 import KakaoSDKAuth
 import MessageFeature
+import KeychainSwift
 
 public class SceneDelegate: UIResponder, UISceneDelegate {
     
@@ -57,7 +58,14 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             AllMainPresentationAssembly(),
             AllMainProfilePresentationAssembly(),
             AllMainProfileEditPresentationAssembly(),
+            AllMainProfileWebPresentationAssembly(),
+            AllMainProfileSettingPresentationAssembly(),
+            AllMainProfileAlarmSettingPresentationAssembly(),
+            AllMainProfileUserBlockPresentationAssembly(),
+            AllMainProfileAccountSettingPresentationAssembly(),
+            AllMainProfileResignNotePresentationAssembly(),
             MessageReportPresentationAssembly(),
+            AllMainProfileResignPresentationAssembly(),
             DataAssembly(),
             DomainAssembly()
         ])
@@ -65,7 +73,9 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         window = UIWindow(windowScene: scene)
         NotificationCenter.default.addObserver(self, selector: #selector(handleUserDidLogin), name: .userDidLogin, object: nil)
         
-        if !(UserDefaultsManager.shared.accessToken?.isEmpty ?? true) { // accessToken 값이 없으면 (회원가입 안됨)
+        let accessToken = KeychainManager.shared.get(type: .accessToken) 
+        
+        if accessToken?.isEmpty ?? true { // accessToken 값이 없으면 (회원가입 안됨)
             let signInViewController = DependencyContainer.shared.injector.resolve(SignInViewController.self)
             window?.rootViewController = UINavigationController(rootViewController: signInViewController)
             

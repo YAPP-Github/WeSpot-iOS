@@ -102,5 +102,6 @@ public final class WSTabBarButton: UIButton {
     public func updateState(isSelected: Bool) {
         let image = isSelected ? type.selectedImage : type.unSelectedImage
         tabImageView.image = image
+        tabLabel.textColor = isSelected ? DesignSystemAsset.Colors.gray100.color : DesignSystemAsset.Colors.gray400.color
     }
 }
