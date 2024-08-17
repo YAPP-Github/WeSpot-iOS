@@ -19,6 +19,7 @@ public final class SignInViewReactor: Reactor {
     
     private let createNewMemberUseCase: CreateNewMemberUseCaseProtocol
     private let createExistingUseCase: CreateExistingMemberUseCaseProtocol
+    private let keychain = KeychainSwift()
     public var initialState: State
     
     public struct State {
@@ -99,7 +100,9 @@ public final class SignInViewReactor: Reactor {
                                             identityToken: identityToken,
                                             fcmToken: fcmToken)
         
-        if (UserDefaultsManager.shared.accessToken?.isEmpty ?? true) {
+        let accessToken = KeychainManager.shared.get(type: .accessToken)
+        
+        if (accessToken?.isEmpty ?? true) {
             return createNewMemberUseCase
                 .execute(body: body)
                 .asObservable()
