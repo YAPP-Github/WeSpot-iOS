@@ -8,6 +8,7 @@
 import DesignSystem
 import UIKit
 import Util
+import Storage
 
 import Then
 import SnapKit
@@ -25,6 +26,7 @@ public final class ProfileAccountSettingViewController: BaseViewController<Profi
         case let .accountItem(title):
             guard let accountCell = tableView.dequeueReusableCell(withIdentifier: "ProfileAccountTableViewCell", for: indexPath) as? ProfileAccountTableViewCell else { return UITableViewCell() }
             accountCell.bind(title)
+            accountCell.selectionStyle = .none
             return accountCell
         }
     }
@@ -75,6 +77,31 @@ public final class ProfileAccountSettingViewController: BaseViewController<Profi
         reactor.pulse(\.$accountSection)
             .asDriver(onErrorJustReturn: [])
             .drive(accountTableView.rx.items(dataSource: accountDataSources))
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLogout)
+            .filter { $0 == true }
+            .bind(with: self) { owner, _ in
+                //TODO: 화면 전환 코드 추가
+            }
+            .disposed(by: disposeBag)
+        
+        accountTableView
+            .rx.itemSelected
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, indexPath in
+                if indexPath.item == 0 {
+                    WSAlertBuilder(showViewController: self)
+                        .setAlertType(type: .message)
+                        .setTitle(title: "로그아웃 하시나요?")
+                        .setConfirm(text: "닫기")
+                        .setCancel(text: "로그 아웃")
+                        .show()
+                } else {
+                    let profileResignNoteViewController = DependencyContainer.shared.injector.resolve(ProfileResignNoteViewController.self)
+                    owner.navigationController?.pushViewController(profileResignNoteViewController, animated: true)
+                }
+            }
             .disposed(by: disposeBag)
         
     }

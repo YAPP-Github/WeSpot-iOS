@@ -31,4 +31,5 @@ public enum WSGlobalStateType {
     case didChangedAlarmStatus(_ isOn: Bool)
     case didTappedBlockButton(_ id: Int)
     case didUpdateUserBlockButton(id: String)
+    case didTappedResignButton(_ isStatus: Bool)
 }
