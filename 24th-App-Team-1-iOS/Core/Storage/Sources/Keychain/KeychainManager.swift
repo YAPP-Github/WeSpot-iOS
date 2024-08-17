@@ -23,7 +23,7 @@ public class KeychainManager {
     private init() {}
     
     // 데이터 저장하기
-    public func set(value: String, type: keychainType) -> Bool {
+    public func set(value: String, type: keychainType) {
         return keychain.set(value, forKey: type.rawValue)
     }
     
