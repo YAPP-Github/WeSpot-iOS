@@ -28,4 +28,8 @@ public enum WSGlobalStateType {
     case toogleMessageType(_ type: MessageTypes)
     case didTappedCharacterItem(_ item: Int)
     case didTappedBackgroundItem(_ item: Int)
+    case didChangedAlarmStatus(_ isOn: Bool)
+    case didTappedBlockButton(_ id: Int)
+    case didUpdateUserBlockButton(id: String)
+    case didTappedResignButton(_ isStatus: Bool)
 }

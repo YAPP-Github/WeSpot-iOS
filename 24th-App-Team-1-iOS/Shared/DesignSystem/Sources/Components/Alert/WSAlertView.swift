@@ -21,7 +21,7 @@ public final class WSAlertView: UIViewController {
     var cancelButton: WSButton = WSButton(wsButtonType: .secondaryButton)
     var alertAction: WSAlertActionProperty?
     
-    
+    var alertType: AlertType = .titleWithMeesage
     private var titleText: String?
     private var messageText: String?
     private var confirmText: String?
@@ -38,41 +38,78 @@ public final class WSAlertView: UIViewController {
     //MARK: Configure
     private func setupUI() {
         view.addSubview(containerView)
-        containerView.addSubviews(titleLabel, messageLabel, confirmButton, cancelButton)
+        switch alertType {
+        case .message:
+            containerView.addSubviews(titleLabel, confirmButton, cancelButton)
+        case .titleWithMeesage:
+            containerView.addSubviews(titleLabel, messageLabel, confirmButton, cancelButton)
+        }
     }
     
     
     private func setupAutoLayout() {
         
-        containerView.snp.makeConstraints {
-            $0.height.equalTo(208)
-            $0.width.equalTo(310)
-            $0.center.equalToSuperview()
-        }
-        
-        titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(32)
-            $0.height.equalTo(32)
-            $0.centerX.equalToSuperview()
-        }
-        
-        messageLabel.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().offset(20)
-            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
-        }
-        
-        confirmButton.snp.makeConstraints {
-            $0.right.equalToSuperview().offset(-20)
-            $0.height.equalTo(52)
-            $0.bottom.equalToSuperview().offset(-20)
-            $0.width.equalTo(131)
-        }
-        
-        cancelButton.snp.makeConstraints {
-            $0.left.equalToSuperview().offset(20)
-            $0.height.equalTo(52)
-            $0.bottom.equalToSuperview().offset(-20)
-            $0.width.equalTo(131)
+        switch alertType {
+        case .message:
+            containerView.snp.makeConstraints {
+                $0.height.equalTo(158)
+                $0.width.equalTo(310)
+                $0.center.equalToSuperview()
+            }
+            
+            titleLabel.snp.makeConstraints {
+                $0.top.equalToSuperview().inset(32)
+                $0.horizontalEdges.equalToSuperview().inset(20)
+                $0.height.equalTo(30)
+            }
+            
+            confirmButton.snp.makeConstraints {
+                $0.right.equalToSuperview().offset(-20)
+                $0.height.equalTo(52)
+                $0.bottom.equalToSuperview().offset(-20)
+                $0.width.equalTo(131)
+            }
+            
+            cancelButton.snp.makeConstraints {
+                $0.left.equalToSuperview().offset(20)
+                $0.height.equalTo(52)
+                $0.bottom.equalToSuperview().offset(-20)
+                $0.width.equalTo(131)
+            }
+            
+            
+        case .titleWithMeesage:
+            //HACK: 추후 리펙토링
+            containerView.snp.makeConstraints {
+                $0.height.equalTo(208)
+                $0.width.equalTo(310)
+                $0.center.equalToSuperview()
+            }
+            
+            titleLabel.snp.makeConstraints {
+                $0.top.equalToSuperview().offset(32)
+                $0.height.equalTo(32)
+                $0.centerX.equalToSuperview()
+            }
+            
+            messageLabel.snp.makeConstraints {
+                $0.horizontalEdges.equalToSuperview().offset(20)
+                $0.top.equalTo(titleLabel.snp.bottom).offset(8)
+            }
+            
+            confirmButton.snp.makeConstraints {
+                $0.right.equalToSuperview().offset(-20)
+                $0.height.equalTo(52)
+                $0.bottom.equalToSuperview().offset(-20)
+                $0.width.equalTo(131)
+            }
+            
+            cancelButton.snp.makeConstraints {
+                $0.left.equalToSuperview().offset(20)
+                $0.height.equalTo(52)
+                $0.bottom.equalToSuperview().offset(-20)
+                $0.width.equalTo(131)
+            }
         }
         
     }
@@ -90,7 +127,7 @@ public final class WSAlertView: UIViewController {
         
         titleLabel.do {
             $0.textColor = DesignSystemAsset.Colors.gray100.color
-            $0.textAlignment = .center
+            $0.textAlignment = alertType == .message ? .left : .center
         }
         
         messageLabel.do {

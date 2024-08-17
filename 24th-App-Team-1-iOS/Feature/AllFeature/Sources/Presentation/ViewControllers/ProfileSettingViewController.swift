@@ -158,7 +158,6 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         }
         
         introduceCountLabel.do {
-            $0.text = "0/20"
             $0.textColor = DesignSystemAsset.Colors.gray400.color
             $0.textAlignment = .right
         }
@@ -192,6 +191,10 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        self.rx.viewWillAppear
+            .map { _ in Reactor.Action.viewWillAppear }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
         
         containerView
             .rx.tap
@@ -204,12 +207,25 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         
         userIntroduceTextField
             .rx.text.changed
+            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
             .do(onNext: { [weak self] _ in
                 self?.userIntroduceTextField.updateBorder()
             })
             .compactMap { $0 }
             .map { Reactor.Action.didUpdateIntroduceProfile($0)}
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        userIntroduceTextField.rx
+            .text.orEmpty
+            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
+            .scan("") { previous, new -> String in
+                if new.count > 20 {
+                  return previous
+                } else {
+                  return new
+                }
+            }.bind(to: userIntroduceTextField.rx.text)
             .disposed(by: disposeBag)
         
         userProfileEditButton
@@ -219,6 +235,16 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .bind(with: self) { owner, entity in
                 let profileEditViewController = DependencyContainer.shared.injector.resolve(ProfileEditViewController.self, argument: entity)
                 owner.navigationController?.pushViewController(profileEditViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        privacyButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                let accountURL = URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSdFlTCYbGL4QDYJlzt8jeeeA-E3ITWIBeYS2B5cAZs2j8wosQ/viewform")!
+                let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: accountURL)
+                owner.navigationController?.pushViewController(profileWebViewController, animated: true)
             }
             .disposed(by: disposeBag)
         
@@ -274,31 +300,33 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         
         
         reactor.state
-            .compactMap{ $0.userProfileEntity.name }
+            .compactMap{ $0.userProfileEntity?.name }
             .distinctUntilChanged()
             .bind(to: userNameTextField.rx.placeholderText)
             .disposed(by: disposeBag)
         
         reactor.state
-            .compactMap{ $0.userProfileEntity.gender }
+            .compactMap{ $0.userProfileEntity?.gender }
             .distinctUntilChanged()
             .bind(to: userGenderTextFiled.rx.placeholderText)
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.userProfileEntity }
+            .compactMap { $0 }
             .compactMap { "\($0.schoolName) \($0.grade)학년 \($0.classNumber)반"}
             .distinctUntilChanged()
             .bind(to: userClassInfoTextField.rx.placeholderText)
             .disposed(by: disposeBag)
         
         reactor.state
-            .compactMap{ $0.userProfileEntity.introduction }
+            .compactMap{ $0.userProfileEntity?.introduction }
             .distinctUntilChanged()
             .bind(to: userIntroduceTextField.rx.text)
             .disposed(by: disposeBag)
         
         reactor.state
-            .compactMap { "\($0.userProfileEntity.introduction.count)/20" }
+            .compactMap { $0.userProfileEntity }
+            .compactMap { "\($0.introduction.count)/20" }
             .distinctUntilChanged()
             .observe(on: MainScheduler.asyncInstance)
             .bind(to: introduceCountLabel.rx.text)
@@ -321,6 +349,20 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .bind(to: introduceCountLabel.rx.text)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isUpdate)
+            .filter{ $0 == true }
+            .bind(with: self) { owner, _ in
+                owner.showWSToast(image: .check, message: "수정 완료")
+            }
+            .disposed(by: disposeBag)
+        
+        
+        editButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTapUpdateUserButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
         
     }
 }
