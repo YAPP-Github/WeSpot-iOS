@@ -93,7 +93,7 @@ public final class ProfileAccountSettingViewController: BaseViewController<Profi
                 if indexPath.item == 0 {
                     WSAlertBuilder(showViewController: self)
                         .setAlertType(type: .message)
-                        .setTitle(title: "로그아웃 하시나요?")
+                        .setTitle(title: "로그 아웃 하시나요?")
                         .setConfirm(text: "닫기")
                         .setCancel(text: "로그 아웃")
                         .show()

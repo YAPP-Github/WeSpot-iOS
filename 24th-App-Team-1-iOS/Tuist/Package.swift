@@ -10,7 +10,8 @@ import PackageDescription
         // Default is .staticFramework
         // productTypes: ["Alamofire": .framework,] 
         productTypes: [
-            "Lottie"  : .framework
+            "Lottie"  : .framework,
+            "Kingfisher": .framework
         ],
         baseSettings: .settings(configurations: [
             .debug(name: .configuration("DEV")),
