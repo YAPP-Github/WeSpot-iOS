@@ -18,11 +18,11 @@ public final class NotificationCellReactor: Reactor {
     public struct State {
         var content: String
         var date: String
-        var type: String
         var isNew: Bool
+        var isEnabled: Bool
     }
     
-    public init(content: String, date: String, type: String, isNew: Bool) {
-        self.initialState = State(content: content, date: date, type: type, isNew: isNew)
+    public init(content: String, date: String, isNew: Bool, isEnabled: Bool) {
+        self.initialState = State(content: content, date: date, isNew: isNew, isEnabled: isEnabled)
     }
 }

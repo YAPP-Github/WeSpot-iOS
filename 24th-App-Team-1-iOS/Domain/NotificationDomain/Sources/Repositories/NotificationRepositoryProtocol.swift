@@ -12,4 +12,5 @@ import RxSwift
 
 public protocol NotificationRepositoryProtocol {
     func fetchUserNotificationItems(query: NotificationReqeustQuery) -> Single<NotificationEntity?>
+    func updateUserNotificationItem(path: String) -> Single<Bool>
 }

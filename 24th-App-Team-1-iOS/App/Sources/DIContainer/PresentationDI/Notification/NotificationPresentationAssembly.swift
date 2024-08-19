@@ -17,7 +17,11 @@ struct NotificationPresentationAssembly: Assembly {
     func assemble(container: Container) {
         container.register(NotificationViewReactor.self) { resolver in
             let fetchUserNotificationItemUseCase = resolver.resolve(FetchUserNotificationItemUseCaseProtocol.self)!
-            return NotificationViewReactor(fetchUserNotificationItemsUseCase: fetchUserNotificationItemUseCase)
+            let updateUserNotificationItemUseCase = resolver.resolve(UpdateUserNotificationItemUseCaseProtocol.self)!
+            return NotificationViewReactor(
+                fetchUserNotificationItemsUseCase: fetchUserNotificationItemUseCase,
+                updateUserNotifcationItemUseCase: updateUserNotificationItemUseCase
+            )
         }
         
         container.register(NotificationViewController.self) { resolver in

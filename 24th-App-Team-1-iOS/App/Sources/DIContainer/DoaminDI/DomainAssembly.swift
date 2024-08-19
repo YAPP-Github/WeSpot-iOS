@@ -153,5 +153,10 @@ struct DomainAssembly: Assembly {
             let repository = resolver.resolve(NotificationRepositoryProtocol.self)!
             return FetchUserNotificationItemUseCase(notificationRepository: repository)
         }
+        
+        container.register(UpdateUserNotificationItemUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(NotificationRepositoryProtocol.self)!
+            return UpdateUserNotificationItemUseCase(notificationRepository: repository)
+        }
     }
 }

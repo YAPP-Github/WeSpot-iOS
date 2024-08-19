@@ -46,7 +46,7 @@ extension NotificationResponseDTO.NotificationItemResponseDTO {
     func toDomain() -> NotificationItemEntity {
         return .init(
             id: id,
-            type: type,
+            type: NotificationType(rawValue: type) ?? .none,
             date: date,
             targetId: targetId,
             content: content,

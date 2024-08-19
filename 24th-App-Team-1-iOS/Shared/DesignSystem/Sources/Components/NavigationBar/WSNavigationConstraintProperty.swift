@@ -43,7 +43,7 @@ public enum WSNavigationPropertyType: Equatable {
     case center
     case leftIcon
     case leftWithCenterItem
-    case rightIcon
+    case rightIcon(CGFloat = 40.0, CGFloat = 40.0)
     case leftWithRightItem
     case all
     
@@ -69,10 +69,12 @@ public enum WSNavigationPropertyType: Equatable {
             )
         case .leftWithCenterItem:
             return .init()
-        case .rightIcon:
+        case let .rightIcon(widthScale, heightScale):
             return .init(
                 rightBarButtonItemRightSpacing: 16,
-                rightBarButtonItemTopSpacing: 10
+                rightBarButtonItemTopSpacing: 10,
+                rightWidthScale: widthScale,
+                rightHeightScale: heightScale
             )
         case .leftWithRightItem:
             return .init(
@@ -80,7 +82,10 @@ public enum WSNavigationPropertyType: Equatable {
             )
         case .all:
             return .init(
-                rightBarButtonItemTopSpacing: 18
+                rightBarButtonItemRightSpacing: 18,
+                rightBarButtonItemTopSpacing: 18,
+                rightWidthScale: 56,
+                rightHeightScale: 24
             )
         }
     }

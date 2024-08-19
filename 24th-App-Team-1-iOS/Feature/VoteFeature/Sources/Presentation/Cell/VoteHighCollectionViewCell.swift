@@ -101,7 +101,7 @@ final class VoteHighCollectionViewCell: UICollectionViewCell {
         
         voteCountLabel.do {
             $0.text = "10표"
-            $0.textColor = DesignSystemAsset.Colors.primary300.color
+            $0.textColor = DesignSystemAsset.Colors.gray100.color
         }
         
         profileContainerView.do {
@@ -157,6 +157,12 @@ extension VoteHighCollectionViewCell: ReactorKit.View {
             .map { "\($0.voteCount)표" }
             .distinctUntilChanged()
             .bind(to: voteCountLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .filter { $0.ranker == 1}
+            .map { _ in DesignSystemAsset.Colors.primary300.color}
+            .bind(to: voteCountLabel.rx.textColor)
             .disposed(by: disposeBag)
         
         reactor.state

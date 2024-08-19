@@ -90,5 +90,31 @@ public final class NotificationViewController: BaseViewController<NotificationVi
             .asDriver(onErrorJustReturn: [])
             .drive(notificationTableView.rx.items(dataSource: notificationDataSources))
             .disposed(by: disposeBag)
+        
+        
+        notificationTableView
+            .rx.itemSelected
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTappedNotificationItem($0.item) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isSelected)
+            .filter { $0 == true }
+            .withLatestFrom(reactor.pulse(\.$selectedType))
+            .bind(with: self) { owner, type in
+                switch type {
+                case .vote:
+                    NotificationCenter.default.post(name: .showVoteProccessController, object: nil)
+                case .voteRecevied:
+                    NotificationCenter.default.post(name: .showVoteCompleteViewController, object: nil)
+                case .voteResults:
+                    NotificationCenter.default.post(name: .showVoteCompleteViewController, object: nil)
+                default:
+                    break
+                }
+            }
+            .disposed(by: disposeBag)
+        
     }
 }

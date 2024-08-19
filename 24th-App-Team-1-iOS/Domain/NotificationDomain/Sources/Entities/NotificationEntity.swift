@@ -7,6 +7,12 @@
 
 import Foundation
 
+public enum NotificationType: String {
+    case vote = "VOTE"
+    case voteResults = "VoteResults"
+    case voteRecevied = "VOTE_RECEIVED"
+    case none
+}
 
 public struct NotificationEntity {
     public let notifications: [NotificationItemEntity]
@@ -22,7 +28,7 @@ public struct NotificationEntity {
 
 public struct NotificationItemEntity: Identifiable {
     public let id: Int
-    public let type: String
+    public let type: NotificationType
     public let date: String
     public let targetId: Int
     public let content: String
@@ -30,7 +36,7 @@ public struct NotificationItemEntity: Identifiable {
     public let isEnable: Bool
     public let createdAt: String
     
-    public init(id: Int, type: String, date: String, targetId: Int, content: String, isNew: Bool, isEnable: Bool, createdAt: String) {
+    public init(id: Int, type: NotificationType, date: String, targetId: Int, content: String, isNew: Bool, isEnable: Bool, createdAt: String) {
         self.id = id
         self.type = type
         self.date = date

@@ -32,4 +32,16 @@ public final class NotificationRepository: NotificationRepositoryProtocol {
             .asSingle()
     }
     
+    
+    public func updateUserNotificationItem(path: String) -> Single<Bool> {
+        let endPoint = NotificationEndPoint.updateNotification(path)
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .debug("notifiaction patch api")
+            .map { _ in true }
+            .catchAndReturn(false)
+            .logErrorIfDetected(category: Network.error)
+            .asSingle()
+    }
 }
