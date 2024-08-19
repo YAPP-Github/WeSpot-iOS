@@ -78,6 +78,14 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        navigationBar.rightBarButton
+            .rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                NotificationCenter.default.post(name: .showNotifcationViewController, object: nil)
+            }
+            .disposed(by: disposeBag)
+        
         reactor.state
             .map { $0.voteTypes == .main ? true : false }
             .distinctUntilChanged()

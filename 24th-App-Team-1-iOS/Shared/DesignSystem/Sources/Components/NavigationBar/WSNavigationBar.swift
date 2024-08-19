@@ -68,8 +68,8 @@ public final class WSNavigationBar: UIView {
         leftBarButton.snp.makeConstraints {
             $0.left.equalToSuperview().offset(property.constraints.leftBarButtonItemLeftSpacing)
             $0.top.equalToSuperview().offset(property.constraints.leftBarButtonItemTopSpacing)
-            $0.width.equalTo(property.constraints.widthScale)
-            $0.height.equalTo(property.constraints.heightScale)
+            $0.width.equalTo(property.constraints.leftWidthScale)
+            $0.height.equalTo(property.constraints.leftHeightScale)
         }
         
         navigationTitleLabel.snp.makeConstraints {
@@ -79,7 +79,8 @@ public final class WSNavigationBar: UIView {
         rightBarButton.snp.makeConstraints {
             $0.top.equalToSuperview().offset(property.constraints.rightBarButtonItemTopSpacing)
             $0.right.equalToSuperview().offset(-property.constraints.rightBarButtonItemRightSpacing)
-            $0.centerY.equalToSuperview()
+            $0.width.equalTo(property.constraints.rightWidthScale)
+            $0.height.equalTo(property.constraints.rightHeightScale)
         }
     }
     

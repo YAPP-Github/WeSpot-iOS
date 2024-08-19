@@ -52,4 +52,17 @@ public extension UIViewController {
         shareViewController.excludedActivityTypes = [.copyToPasteboard, .assignToContact]
         self.present(shareViewController, animated: true)
     }
+    
+    func topMostViewController() -> UIViewController? {
+        if let presentedViewController = self.presentedViewController {
+            return presentedViewController.topMostViewController()
+        }
+        if let navigationController = self as? UINavigationController {
+            return navigationController.topViewController?.topMostViewController()
+        }
+        if let tabBarController = self as? UITabBarController {
+            return tabBarController.selectedViewController?.topMostViewController()
+        }
+        return self
+    }
 }
