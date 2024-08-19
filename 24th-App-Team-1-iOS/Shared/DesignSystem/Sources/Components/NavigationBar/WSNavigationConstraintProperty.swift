@@ -65,7 +65,7 @@ public enum WSNavigationPropertyType: Equatable {
             return .init()
         case .rightIcon:
             return .init(
-                rightBarButtonItemRightSpacing: 18,
+                rightBarButtonItemRightSpacing: 16,
                 rightBarButtonItemTopSpacing: 18
             )
         case .leftWithRightItem:

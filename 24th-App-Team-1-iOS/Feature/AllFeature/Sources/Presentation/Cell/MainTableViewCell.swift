@@ -49,8 +49,7 @@ final class MainTableViewCell: UITableViewCell {
     
     private func setupAttributes() {
         contentAccessoryView.do {
-            $0.image = DesignSystemAsset.Images.arrowRight.image
-            $0.contentMode = .scaleToFill
+            $0.image = DesignSystemAsset.Images.icProfileArrowFiled.image
         }
         
         contentLabel.do {

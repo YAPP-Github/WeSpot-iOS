@@ -26,7 +26,7 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
     private let profileNameLabel: WSLabel = WSLabel(wsFont: .Body02)
     private let profileClassLabel: WSLabel = WSLabel(wsFont: .Body06)
     private let profileEditButton: WSButton = WSButton(wsButtonType: .secondaryButton)
-    private let voteAddBanner: WSBanner = WSBanner(image: DesignSystemAsset.Images.imgBannerAddFiled.image, titleText: "선택지 추가하기", subText: "다양한 선택지로 더 재밌게 투표해 보세요")
+    private let voteAddBanner: WSBanner = WSBanner(image: DesignSystemAsset.Images.icProfileVoteFiled.image, titleText: "선택지 추가하기", subText: "다양한 선택지로 더 재밌게 투표해 보세요")
     private let mainTableView: UITableView = UITableView()
     private let mainDataSources: RxTableViewSectionedReloadDataSource<AllMainSection> = .init { dataSources, tableView, indexPath, sectionItem in
         
@@ -110,7 +110,7 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
         
         mainTableView.snp.makeConstraints {
             $0.top.equalTo(voteAddBanner.snp.bottom).offset(30)
-            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.horizontalEdges.equalToSuperview().inset(24)
             $0.bottom.equalToSuperview()
         }
     }

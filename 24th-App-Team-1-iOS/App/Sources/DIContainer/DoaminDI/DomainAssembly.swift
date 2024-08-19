@@ -147,5 +147,10 @@ struct DomainAssembly: Assembly {
             let repository = resolver.resolve(ProfileRepositoryProtocol.self)!
             return UpdateUserBlockUseCase(profileRepository: repository)
         }
+        
+        container.register(CreateUserResignUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(ProfileRepositoryProtocol.self)!
+            return CreateUserResignUseCase(profileRepository: repository)
+        }
     }
 }
