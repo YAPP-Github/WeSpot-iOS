@@ -18,6 +18,7 @@ public final class NotificationViewReactor: Reactor {
     
     public struct State {
         @Pulse var notificationSection: [NotificationSection]
+        var notificationItems: [NotificationItem]
         @Pulse var notificationEntity: NotificationEntity?
         @Pulse var isSelected: Bool
         @Pulse var selectedType: NotificationType
@@ -26,6 +27,7 @@ public final class NotificationViewReactor: Reactor {
     public enum Action {
         case viewDidLoad
         case didTappedNotificationItem(Int)
+        case fetchMoreItems
     }
     
     public enum Mutation {
@@ -43,6 +45,7 @@ public final class NotificationViewReactor: Reactor {
     ) {
         self.initialState = State(
             notificationSection: [],
+            notificationItems: [],
             isSelected: false,
             selectedType: .vote
         )
@@ -88,12 +91,44 @@ public final class NotificationViewReactor: Reactor {
                 .execute(path: path)
                 .asObservable()
                 .flatMap { isSelected -> Observable<Mutation> in
-                    print("notification isSelected: \(isSelected)")
                     guard isSelected else { return .empty() }
                     
                     return .concat(
                         .just(.setSelectedNotificationItem(isSelected)),
                         .just(.setSelectedType(type))
+                    )
+                }
+        case .fetchMoreItems:
+            let cursorId = currentState.notificationEntity?.lastCursorId ?? 0
+            let query = NotificationReqeustQuery(cursorId: cursorId)
+            return fetchUserNotificationItemsUseCase
+                .execute(query: query)
+                .asObservable()
+                .filter { $0?.hasNext == false }
+                .withUnretained(self)
+                .flatMap { owner ,entity -> Observable<Mutation> in
+                    guard let entity else { return .empty() }
+                    var displaySectionItem: [NotificationItem] = owner.currentState.notificationItems
+                    var originalSectionItem: [NotificationItem] = []
+                    
+                    entity.notifications.forEach {
+                        originalSectionItem.append(
+                            .userNotificationItem(
+                                NotificationCellReactor(
+                                    content: $0.content,
+                                    date: $0.date,
+                                    isNew: $0.isNew,
+                                    isEnabled: $0.isEnable
+                                )
+                            )
+                        )
+                    }
+                    
+                    displaySectionItem.append(contentsOf: originalSectionItem)
+                    
+                    return .concat(
+                        .just(.setNotificationSectionItems(displaySectionItem)),
+                        .just(.setNotificationItems(entity))
                     )
                 }
         }
@@ -106,6 +141,7 @@ public final class NotificationViewReactor: Reactor {
         case let .setNotificationItems(notificationEntity):
             newState.notificationEntity = notificationEntity
         case let .setNotificationSectionItems(items):
+            newState.notificationItems = items
             newState.notificationSection = [.notificationInfo(items)]
         case let .setSelectedType(selectedType):
             newState.selectedType = selectedType

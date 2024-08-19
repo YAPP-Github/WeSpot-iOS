@@ -99,6 +99,12 @@ public final class NotificationViewController: BaseViewController<NotificationVi
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        notificationTableView
+            .rx.prefetchRows
+            .map { _ in Reactor.Action.fetchMoreItems }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$isSelected)
             .filter { $0 == true }
             .withLatestFrom(reactor.pulse(\.$selectedType))
