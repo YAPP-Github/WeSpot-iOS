@@ -7,6 +7,7 @@
 
 import Foundation
 import AllFeature
+import AllDomain
 
 import Swinject
 
@@ -23,8 +24,9 @@ struct AllMainProfileResignPresentationAssembly: Assembly {
         }
         
         
-        container.register(ProfileResignViewReactor.self) { _ in
-            return ProfileResignViewReactor()
+        container.register(ProfileResignViewReactor.self) { resolver in
+            let createUserResignUseCase = resolver.resolve(CreateUserResignUseCaseProtocol.self)!
+            return ProfileResignViewReactor(createUserResignUseCase: createUserResignUseCase)
         }
         
         container.register(ProfileResignViewController.self) { resolver in

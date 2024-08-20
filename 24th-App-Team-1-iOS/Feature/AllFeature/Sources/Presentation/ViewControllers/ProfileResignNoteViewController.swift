@@ -119,7 +119,7 @@ public final class ProfileResignNoteViewController: BaseViewController<ProfileRe
         
         confirmButton.do {
             $0.setupFont(font: .Body03)
-            $0.setupButton(text: "추억 보내기")
+            $0.setupButton(text: "추억 떠나보내기")
         }
         
     }

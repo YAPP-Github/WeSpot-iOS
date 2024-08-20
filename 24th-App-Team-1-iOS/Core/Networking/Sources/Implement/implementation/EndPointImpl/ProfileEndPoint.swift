@@ -23,6 +23,9 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
     case fetchUserBlock(Encodable)
     /// 사용자 차단 해체 API
     case updateUserBlock(String)
+    /// 사용자 회원 탈퇴 API
+    case updateUserResign
+    
     public var path: String {
         switch self {
         case .fetchUserProfile:
@@ -37,6 +40,8 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
             return "/messages/blocked"
         case let .updateUserBlock(messageId):
             return "/messages/\(messageId)/unblock"
+        case .updateUserResign:
+            return "/revoke"
         }
     }
     
@@ -53,6 +58,8 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
         case .fetchUserBlock:
             return .get
         case .updateUserBlock:
+            return .post
+        case .updateUserResign:
             return .post
         }
     }
