@@ -38,16 +38,17 @@ struct DomainAssembly: Assembly {
             return CreateReportUserUseCase(commonRepositroy: repository)
         }
         
+        container.register(CreateRefreshTokenUseCaseProtocol.self) { resovler in
+            let repository = resovler.resolve(CommonRepositoryProtocol.self)!
+            return CreateRefreshTokenUseCase(commonRepository: repository)
+        }
+        
         // login
         container.register(CreateAccountUseCaseProtocol.self) { resovler in
             let repository = resovler.resolve(LoginRepositoryProtocol.self)!
             return CreateAccountUseCase(loginRepository: repository)
         }
         
-        container.register(CreateRefreshTokenUseCaseProtocol.self) { resovler in
-            let repository = resovler.resolve(LoginRepositoryProtocol.self)!
-            return CreateRefreshTokenUseCase(loginRepository: repository)
-        }
         
         container.register(CreateNewMemberUseCaseProtocol.self) { resovler in
             let repository = resovler.resolve(LoginRepositoryProtocol.self)!
