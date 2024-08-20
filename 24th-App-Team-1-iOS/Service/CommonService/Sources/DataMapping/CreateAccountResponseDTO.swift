@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import LoginDomain
+import CommonDomain
 
 public struct CreateAccountResponseDTO: Decodable {
     public let accessToken: String
