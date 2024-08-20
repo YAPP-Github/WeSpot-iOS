@@ -63,11 +63,11 @@ public final class SignInViewReactor: Reactor {
             return executeSignUp(socialType: "APPLE", authorizationCode: authorizationCode, identityToken: identityToken)
         case .signInWithKakao:
             
-            return handleKakaoLogin().flatMap { self.executeSignUp(socialType: "KAKAO", authorizationCode: "", identityToken: $0.idToken ?? "" ) }
+            return handleKakaoLogin().flatMap { self.executeSignUp(socialType: "KAKAO", authorizationCode: "", identityToken: $0) }
         }
     }
     
-    func handleKakaoLogin() -> Observable<OAuthToken> {
+    func handleKakaoLogin() -> Observable<String> {
         return Observable.create { observer in
             // 카카오톡 앱에 접근 가능할 때
             if (UserApi.isKakaoTalkLoginAvailable()) {
@@ -76,7 +76,7 @@ public final class SignInViewReactor: Reactor {
                         print(error)
                         observer.onError(error)
                     } else if let oauthToken = oauthToken {
-                        observer.onNext(oauthToken)
+                        observer.onNext(oauthToken.accessToken)
                         observer.onCompleted()
                     }
                 }
@@ -85,7 +85,7 @@ public final class SignInViewReactor: Reactor {
                     if let error = error {
                         print(error)
                     } else if let oauthToken = oauthToken {
-                        observer.onNext(oauthToken)
+                        observer.onNext(oauthToken.accessToken)
                         observer.onCompleted()
                     }
                 }
