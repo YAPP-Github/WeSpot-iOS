@@ -19,6 +19,7 @@ public final class ProfileResignViewReactor: Reactor {
         @Pulse var reasonSection: [ProfileResignReasonSection]
         @Pulse var isEnabled: Bool
         @Pulse var isStatus: Bool
+        @Pulse var isLoading: Bool
     }
     
     public enum Action {
@@ -28,6 +29,7 @@ public final class ProfileResignViewReactor: Reactor {
     public enum Mutation {
         case setReasonButtonEnabled(Bool)
         case setResignStatus(Bool)
+        case setLoading(Bool)
     }
     
     public let initialState: State
@@ -59,7 +61,8 @@ public final class ProfileResignViewReactor: Reactor {
                 ])
             ],
             isEnabled: false,
-            isStatus: false
+            isStatus: false,
+            isLoading: true
         )
         
     }
@@ -69,7 +72,12 @@ public final class ProfileResignViewReactor: Reactor {
             .flatMap { event -> Observable<Mutation> in
                 switch event {
                 case let .didTappedResignButton(isStatus):
-                    return .just(.setResignStatus(isStatus))
+                    
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setResignStatus(isStatus)),
+                        .just(.setLoading(true))
+                    )
                 default:
                     return .empty()
                 }
@@ -91,6 +99,8 @@ public final class ProfileResignViewReactor: Reactor {
             newState.isEnabled = isEnabled
         case let .setResignStatus(isStatus):
             newState.isStatus = isStatus
+        case let .setLoading(isLoading):
+            newState.isLoading = isLoading
         }
         
         return newState

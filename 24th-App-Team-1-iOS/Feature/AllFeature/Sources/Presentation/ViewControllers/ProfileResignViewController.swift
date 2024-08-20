@@ -22,6 +22,7 @@ public final class ProfileResignViewController: BaseViewController<ProfileResign
     //MARK: - Properties
     private let resignReasonLabel: WSLabel = WSLabel(wsFont: .Header01)
     private let resignTableView: UITableView = UITableView()
+    private let loadingIndicatorView: WSLottieIndicatorView = WSLottieIndicatorView()
     private let confirmButton: WSButton = WSButton(wsButtonType: .default(12))
     private let resignDataSources: RxTableViewSectionedReloadDataSource<ProfileResignReasonSection> = .init { dataSources, tableView, indexPath, sectionItem in
         
@@ -135,6 +136,10 @@ public final class ProfileResignViewController: BaseViewController<ProfileResign
             .bind(with: self) { owner, _ in
                 owner.dismiss(animated: true)
             }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicatorView.rx.isHidden)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isEnabled)

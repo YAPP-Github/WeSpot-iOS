@@ -20,6 +20,7 @@ public final class ProfileUserBlockViewReactor: Reactor {
     public struct State {
         @Pulse var userBlockSection: [ProfileUserBlockSection]
         @Pulse var userBlockEntity: UserBlockEntity?
+        @Pulse var isLoading: Bool
         var userPageBlockItems: [ProfileUserBlockItem]
         @Pulse var userBlockId: String
     }
@@ -34,6 +35,7 @@ public final class ProfileUserBlockViewReactor: Reactor {
         case setUserBlockProfileItems([ProfileUserBlockItem])
         case setUserBlockItems(UserBlockEntity)
         case setUserBlockId(String)
+        case setLoading(Bool)
         
     }
     
@@ -45,6 +47,7 @@ public final class ProfileUserBlockViewReactor: Reactor {
     ) {
         self.initialState = State(
             userBlockSection: [],
+            isLoading: false, 
             userPageBlockItems: [],
             userBlockId: ""
         )
@@ -91,8 +94,10 @@ public final class ProfileUserBlockViewReactor: Reactor {
                         )
                     }
                     return .concat(
+                        .just(.setLoading(false)),
                         .just(.setUserBlockProfileItems(blockSectionItem)),
-                        .just(.setUserBlockItems(entity))
+                        .just(.setUserBlockItems(entity)),
+                        .just(.setLoading(true))
                     )
             }
         case .didTappedUserBlockButton:
@@ -132,8 +137,10 @@ public final class ProfileUserBlockViewReactor: Reactor {
                     originalBlockItems.append(contentsOf: currentPageBlcokItems)
                     
                     return .concat(
+                        .just(.setLoading(false)),
                         .just(.setUserBlockProfileItems(originalBlockItems)),
-                        .just(.setUserBlockItems(entity))
+                        .just(.setUserBlockItems(entity)),
+                        .just(.setLoading(true))
                     )
                 }
         }
@@ -142,6 +149,8 @@ public final class ProfileUserBlockViewReactor: Reactor {
     public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
+        case let .setLoading(isLoading):
+            newState.isLoading = isLoading
         case let .setUserBlockProfileItems(items):
             newState.userPageBlockItems = items
             newState.userBlockSection = [.blockInfo(items)]

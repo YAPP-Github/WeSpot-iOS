@@ -19,7 +19,6 @@ public final class WSLottieIndicatorView: UIView {
         didSet {
             if isHidden {
                 hide()
-                print("lotti indicator hidden")
             } else {
                 show()
             }
@@ -70,7 +69,6 @@ public final class WSLottieIndicatorView: UIView {
     
     
     private func hide() {
-        print("is hide mentod call")
         lottieIndicatorView.stop()
         self.removeFromSuperview()
         

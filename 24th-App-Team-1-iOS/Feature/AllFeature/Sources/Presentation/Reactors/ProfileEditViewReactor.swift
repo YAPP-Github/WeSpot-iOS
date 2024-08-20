@@ -26,6 +26,7 @@ public final class ProfileEditViewReactor: Reactor {
         @Pulse var backgroundSection: [BackgroundEditSection]
         @Pulse var characterSection: [CharacterEditSection]
         @Pulse var isUpdate: Bool
+        @Pulse var isLoading: Bool
         var backgroundColor: String
         var iconURL: String
         var isError: Bool
@@ -45,6 +46,7 @@ public final class ProfileEditViewReactor: Reactor {
         case setProfileImageSectionItem([CharacterEditItem])
         case setProfileBackgroundSectionItem([BackgroundEditItem])
         case setUserUpdate(Bool)
+        case setLoading(Bool)
         case setSelctedBackgroundColor(String)
         case setSelectedIconURL(String)
         case setError(Bool)
@@ -65,6 +67,7 @@ public final class ProfileEditViewReactor: Reactor {
             ],
             characterSection: [],
             isUpdate: false,
+            isLoading: false,
             backgroundColor: "",
             iconURL: "",
             isError: false
@@ -96,8 +99,10 @@ public final class ProfileEditViewReactor: Reactor {
                     }
                     
                     return .concat(
+                        .just(.setLoading(false)),
                         .just(.setProfileImageSectionItem(characterSectionItem)),
-                        .just(.setBackgroundImageResponseItems(entity))
+                        .just(.setBackgroundImageResponseItems(entity)),
+                        .just(.setLoading(true))
                     )
                 }
             
@@ -120,8 +125,10 @@ public final class ProfileEditViewReactor: Reactor {
                         )
                     }
                     return .concat(
+                        .just(.setLoading(false)),
                         .just(.setProfileBackgroundSectionItem(backgroundSectionItem)),
-                        .just(.setBackgroundResponseItems(entity))
+                        .just(.setBackgroundResponseItems(entity)),
+                        .just(.setLoading(true))
                     )
                 }
         case let .didTappedCharacterItem(item):
@@ -143,9 +150,10 @@ public final class ProfileEditViewReactor: Reactor {
                 .flatMap { isUpdate -> Observable<Mutation> in
                     if isUpdate {
                         return .concat(
-                            //TODO: Error 예외 처리 추가
+                            .just(.setLoading(false)),
                             .just(.setError(false)),
-                            .just(.setUserUpdate(isUpdate))
+                            .just(.setUserUpdate(isUpdate)),
+                            .just(.setLoading(true))
                         )
                     } else {
                         return .just(.setError(true))
@@ -158,6 +166,8 @@ public final class ProfileEditViewReactor: Reactor {
     public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
+        case let .setLoading(isLoading):
+            newState.isLoading = isLoading
         case let .setBackgroundResponseItems(fetchProfileBackgroundsResponseEntity):
             newState.fetchProfileBackgroundsResponseEntity = fetchProfileBackgroundsResponseEntity
         case let .setBackgroundImageResponseItems(fetchProfileImageResponseEntity):
