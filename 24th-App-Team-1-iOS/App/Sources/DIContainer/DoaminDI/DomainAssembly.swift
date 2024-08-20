@@ -11,6 +11,7 @@ import VoteDomain
 import LoginDomain
 import MessageDomain
 import AllDomain
+import NotificationDomain
 
 import Swinject
 
@@ -148,9 +149,20 @@ struct DomainAssembly: Assembly {
             return UpdateUserBlockUseCase(profileRepository: repository)
         }
         
+        container.register(FetchUserNotificationItemUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(NotificationRepositoryProtocol.self)!
+            return FetchUserNotificationItemUseCase(notificationRepository: repository)
+        }
+        
+        container.register(UpdateUserNotificationItemUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(NotificationRepositoryProtocol.self)!
+            return UpdateUserNotificationItemUseCase(notificationRepository: repository)
+
+                                                                            
         container.register(CreateUserResignUseCaseProtocol.self) { resolver in
             let repository = resolver.resolve(ProfileRepositoryProtocol.self)!
             return CreateUserResignUseCase(profileRepository: repository)
+
         }
     }
 }

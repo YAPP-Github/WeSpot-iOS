@@ -17,6 +17,7 @@ import VoteFeature
 import VoteDomain
 import VoteService
 import AllFeature
+import NotificationFeature
 import Swinject
 import SnapKit
 import ReactorKit
@@ -66,6 +67,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             AllMainProfileResignNotePresentationAssembly(),
             MessageReportPresentationAssembly(),
             AllMainProfileResignPresentationAssembly(),
+            NotificationPresentationAssembly(),
             DataAssembly(),
             DomainAssembly()
         ])
@@ -75,7 +77,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         
         let accessToken = KeychainManager.shared.get(type: .accessToken) 
         
-        if accessToken?.isEmpty ?? true { // accessToken 값이 없으면 (회원가입 안됨)
+        if !(accessToken?.isEmpty ?? true) { // accessToken 값이 없으면 (회원가입 안됨)
             let signInViewController = DependencyContainer.shared.injector.resolve(SignInViewController.self)
             window?.rootViewController = UINavigationController(rootViewController: signInViewController)
             
@@ -95,6 +97,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             window?.rootViewController = tabbarcontroller
         }
         window?.makeKeyAndVisible()
+        setupViewControllers()
     }
     
     @objc private func handleUserDidLogin() {
@@ -118,6 +121,36 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
             if (AuthApi.isKakaoTalkLoginUrl(url)) {
                 _ = AuthController.rx.handleOpenUrl(url: url)
             }
+        }
+    }
+}
+
+extension SceneDelegate {
+    
+    //TODO: Coordinator 패턴으로 수정
+    private func setupViewControllers() {
+        guard let topViewController = self.window?.rootViewController?.topMostViewController() else {
+            return
+        }
+        NotificationCenter.default.addObserver(forName: .showNotifcationViewController, object: nil, queue: .main) { _ in
+            let notificationViewController = DependencyContainer.shared.injector.resolve(NotificationViewController.self)
+            topViewController.navigationController?.pushViewController(notificationViewController, animated: true)
+        }
+        
+        NotificationCenter.default.addObserver(forName: .showVoteProccessController, object: nil, queue: .main) { _ in
+            let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
+            topViewController.navigationController?.pushViewController(voteMainViewController, animated: true)
+        }
+        
+        NotificationCenter.default.addObserver(forName: .showVoteEffectViewController, object: nil, queue: .main) { _ in
+            let voteEffectViewController = DependencyContainer.shared.injector.resolve(VoteEffectViewController.self)
+            topViewController.navigationController?.pushViewController(voteEffectViewController, animated: true)
+        }
+        
+        NotificationCenter.default.addObserver(forName: .showVoteCompleteViewController, object: nil, queue: .main) { _ in
+            let voteCompleteViewController = DependencyContainer.shared.injector.resolve(VoteCompleteViewController.self)
+            topViewController.navigationController?.pushViewController(voteCompleteViewController, animated: true)
+            
         }
     }
     

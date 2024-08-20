@@ -16,6 +16,8 @@ import MessageDomain
 import MessageService
 import AllDomain
 import AllService
+import NotificationDomain
+import NotificationService
 
 import Networking
 
@@ -43,6 +45,10 @@ struct DataAssembly: Assembly {
         
         container.register(ProfileRepositoryProtocol.self) { _ in
             return ProfileRepository()
+        }
+        
+        container.register(NotificationRepositoryProtocol.self) { _ in
+            return NotificationRepository()
         }
     }
 }

@@ -84,6 +84,7 @@ final class VoteAllCollectionViewCell: UICollectionViewCell {
             $0.register(VoteLowCollectionViewCell.self, forCellWithReuseIdentifier: VoteCompleteId.voteLowCell)
             $0.backgroundColor = .clear
             $0.showsVerticalScrollIndicator = false
+            $0.isScrollEnabled = false
             $0.showsHorizontalScrollIndicator = false
         }
         

@@ -49,6 +49,7 @@ extension ModulePaths {
         case AllFeature
         case VoteFeature
         case MessageFeature
+        case NotificationFeature
     }
 }
 
@@ -59,6 +60,7 @@ extension ModulePaths {
         case AllDomain
         case MessageDomain
         case VoteDomain
+        case NotificationDomain
     }
 }
 
@@ -69,6 +71,7 @@ extension ModulePaths {
         case VoteService
         case AllService
         case MessageService
+        case NotificationService
     }
 }
 
