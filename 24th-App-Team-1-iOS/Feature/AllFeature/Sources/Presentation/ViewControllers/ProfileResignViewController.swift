@@ -115,8 +115,14 @@ public final class ProfileResignViewController: BaseViewController<ProfileResign
             .disposed(by: disposeBag)
         
         resignTableView
+            .rx.itemDeselected
+            .map { Reactor.Action.didTappedDeselectedItems($0.item) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        resignTableView
             .rx.itemSelected
-            .map { _ in Reactor.Action.didTappedReasonItems }
+            .map { Reactor.Action.didTappedReasonItems($0.item) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -131,10 +137,22 @@ public final class ProfileResignViewController: BaseViewController<ProfileResign
             .disposed(by: disposeBag)
         
         
+        
         reactor.pulse(\.$isStatus)
             .filter { $0 == true }
             .bind(with: self) { owner, _ in
-                owner.dismiss(animated: true)
+                owner.dismiss(animated: true) {
+                    WSAlertBuilder(showViewController: owner)
+                        .setAlertType(type: .message)
+                        .setTitle(title: "정말 탈퇴하시나요")
+                        .setCancel(text: "탈퇴")
+                        .setConfirm(text: "닫기")
+                        .action(.cancel) { [weak self] in
+                            guard let self else { return }
+                            self.reactor?.action.onNext(.didTappedResignButton)
+                        }
+                        .show()
+                }
             }
             .disposed(by: disposeBag)
         

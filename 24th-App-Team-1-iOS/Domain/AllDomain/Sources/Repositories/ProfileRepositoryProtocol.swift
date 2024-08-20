@@ -16,4 +16,5 @@ public protocol ProfileRepositoryProtocol {
     func updateUserAlarmItem(body: UpdateUserProfileAlarmRequest) -> Single<Bool>
     func fetchUserBlockItems(query: UserBlockRequestQuery) -> Single<UserBlockEntity?>
     func updateUserBlockItem(path: String) -> Single<Bool>
+    func createUserResignItem() -> Single<Bool>
 }

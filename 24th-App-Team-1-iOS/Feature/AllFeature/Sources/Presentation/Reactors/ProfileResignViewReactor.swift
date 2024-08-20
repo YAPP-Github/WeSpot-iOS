@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AllDomain
 import Util
 
 import ReactorKit
@@ -13,6 +14,7 @@ import ReactorKit
 public final class ProfileResignViewReactor: Reactor {
     
     private let globalState: WSGlobalServiceProtocol = WSGlobalStateService.shared
+    private let createUserResignUseCase: CreateUserResignUseCaseProtocol
     
     
     public struct State {
@@ -20,21 +22,27 @@ public final class ProfileResignViewReactor: Reactor {
         @Pulse var isEnabled: Bool
         @Pulse var isStatus: Bool
         @Pulse var isLoading: Bool
+        @Pulse var isSuccess: Bool
+        var selectedItem: [Int]
     }
     
     public enum Action {
-        case didTappedReasonItems
+        case didTappedReasonItems(Int)
+        case didTappedResignButton
+        case didTappedDeselectedItems(Int)
     }
     
     public enum Mutation {
         case setReasonButtonEnabled(Bool)
         case setResignStatus(Bool)
         case setLoading(Bool)
+        case setResignSelectedIndexPath([Int])
+        case setUserResignStatus(Bool)
     }
     
     public let initialState: State
     
-    public init() { 
+    public init(createUserResignUseCase: CreateUserResignUseCaseProtocol) {
         self.initialState = State(
             reasonSection: [
                 .accountResignReasonInfo([
@@ -62,8 +70,12 @@ public final class ProfileResignViewReactor: Reactor {
             ],
             isEnabled: false,
             isStatus: false,
-            isLoading: true
+            isLoading: true,
+            isSuccess: false,
+            selectedItem: []
         )
+        
+        self.createUserResignUseCase = createUserResignUseCase
         
     }
     
@@ -87,8 +99,41 @@ public final class ProfileResignViewReactor: Reactor {
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .didTappedReasonItems:
-            return .just(.setReasonButtonEnabled(true))
+        case let .didTappedReasonItems(item):
+            var selectedItem = currentState.selectedItem
+            selectedItem.append(item)
+            
+            return .concat(
+                .just(.setResignSelectedIndexPath(selectedItem)),
+                .just(.setReasonButtonEnabled(true))
+            )
+        case let .didTappedDeselectedItems(item):
+            var selectedItem = currentState.selectedItem
+            let index = selectedItem.firstIndex(of: item)
+            
+            guard let index = selectedItem.firstIndex(of: item ) else { return .empty() }
+
+            selectedItem.remove(at: index)
+            if selectedItem.isEmpty {
+                return .concat(
+                    .just(.setResignSelectedIndexPath([])),
+                    .just(.setReasonButtonEnabled(false))
+                )
+            } else {
+                return .concat(
+                    .just(.setResignSelectedIndexPath(selectedItem)),
+                    .just(.setReasonButtonEnabled(true))
+                )
+            }
+        case .didTappedResignButton:
+            return createUserResignUseCase
+                .execute()
+                .asObservable()
+                .flatMap { isSuccess -> Observable<Mutation> in
+                    guard isSuccess else { return .just(.setUserResignStatus(false))}
+                    
+                    return .just(.setUserResignStatus(isSuccess))
+                }
         }
     }
     
@@ -101,6 +146,10 @@ public final class ProfileResignViewReactor: Reactor {
             newState.isStatus = isStatus
         case let .setLoading(isLoading):
             newState.isLoading = isLoading
+        case let .setUserResignStatus(isSuccess):
+            newState.isSuccess = isSuccess
+        case let .setResignSelectedIndexPath(selectedItem):
+            newState.selectedItem = selectedItem
         }
         
         return newState

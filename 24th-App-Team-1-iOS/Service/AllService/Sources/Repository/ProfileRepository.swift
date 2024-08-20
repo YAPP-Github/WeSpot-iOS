@@ -93,4 +93,14 @@ public final class ProfileRepository: ProfileRepositoryProtocol {
             .asSingle()
     }
     
+    public func createUserResignItem() -> Single<Bool> {
+        let endPoint = ProfileEndPoint.updateUserResign
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .map { _ in true }
+            .catchAndReturn(false)
+            .logErrorIfDetected(category: Network.error)
+            .asSingle()
+    }
+    
 }

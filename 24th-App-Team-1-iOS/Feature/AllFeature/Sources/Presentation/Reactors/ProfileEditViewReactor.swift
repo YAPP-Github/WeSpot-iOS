@@ -23,8 +23,8 @@ public final class ProfileEditViewReactor: Reactor {
         @Pulse var userProfileEntity: UserProfileEntity
         @Pulse var fetchProfileBackgroundsResponseEntity: FetchProfileBackgroundsResponseEntity?
         @Pulse var fetchProfileImageResponseEntity: FetchProfileImageResponseEntity?
-        @Pulse var backgroundSection: [BackgroundEditSection]
-        @Pulse var characterSection: [CharacterEditSection]
+        var backgroundSection: [BackgroundEditSection]
+        var characterSection: [CharacterEditSection]
         @Pulse var isUpdate: Bool
         @Pulse var isLoading: Bool
         var backgroundColor: String
