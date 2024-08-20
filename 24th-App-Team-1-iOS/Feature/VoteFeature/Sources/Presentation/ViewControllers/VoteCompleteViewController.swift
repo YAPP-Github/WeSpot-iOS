@@ -120,7 +120,7 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         
         navigationBar.do {
             $0.setNavigationBarUI(property: .rightItem("처음으로"))
-            $0.setNavigationBarAutoLayout(property: .rightIcon)
+            $0.setNavigationBarAutoLayout(property: .rightIcon(56, 24))
         }
     
         shareButton.do {

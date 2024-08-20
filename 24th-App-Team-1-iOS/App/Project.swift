@@ -10,6 +10,7 @@ let project = Project
                 .feature(module: .AllFeature),
                 .feature(module: .VoteFeature),
                 .feature(module: .MessageFeature),
+                .feature(module: .NotificationFeature),
                 .shared(module: .DesignSystem),
                 .SPM.firebaseAnalytics,
                 .SPM.firebaseMessaging

@@ -120,7 +120,7 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
         
         navigationBar.do {
             $0.setNavigationBarUI(property: .rightIcon(DesignSystemAsset.Images.icNavigationBarSettingFiled.image))
-            $0.setNavigationBarAutoLayout(property: .rightIcon)
+            $0.setNavigationBarAutoLayout(property: .rightIcon(40, 40))
         }
         
         profileContainerView.do {

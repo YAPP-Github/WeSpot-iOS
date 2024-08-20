@@ -12,23 +12,29 @@ public struct WSNavigationConstraintProperty: Equatable {
     var leftBarButtonItemTopSpacing: CGFloat
     var rightBarButtonItemRightSpacing: CGFloat
     var rightBarButtonItemTopSpacing: CGFloat
-    var widthScale: CGFloat
-    var heightScale: CGFloat
+    var leftWidthScale: CGFloat
+    var leftHeightScale: CGFloat
+    var rightWidthScale: CGFloat
+    var rightHeightScale: CGFloat
     
     init(
         leftBarButtonItemLeftSpacing: CGFloat = 8.0,
         leftBarButtonItemTopSpacing: CGFloat = 10.0,
-        rightBarButtonItemRightSpacing: CGFloat = 18.0,
+        rightBarButtonItemRightSpacing: CGFloat = 16.0,
         rightBarButtonItemTopSpacing: CGFloat = 10.0,
-        widthScale: CGFloat = 40.0,
-        heightScale: CGFloat = 40.0
+        leftWidthScale: CGFloat = 40.0,
+        leftHeightScale: CGFloat = 40.0,
+        rightWidthScale: CGFloat = 40.0,
+        rightHeightScale: CGFloat = 40.0
     ) {
         self.leftBarButtonItemLeftSpacing = leftBarButtonItemLeftSpacing
         self.leftBarButtonItemTopSpacing = leftBarButtonItemTopSpacing
         self.rightBarButtonItemRightSpacing = rightBarButtonItemRightSpacing
         self.rightBarButtonItemTopSpacing = rightBarButtonItemTopSpacing
-        self.widthScale = widthScale
-        self.heightScale = heightScale
+        self.leftWidthScale = leftWidthScale
+        self.leftHeightScale = leftHeightScale
+        self.rightWidthScale = rightWidthScale
+        self.rightHeightScale = rightHeightScale
     }
 }
 
@@ -37,7 +43,7 @@ public enum WSNavigationPropertyType: Equatable {
     case center
     case leftIcon
     case leftWithCenterItem
-    case rightIcon
+    case rightIcon(CGFloat = 40.0, CGFloat = 40.0)
     case leftWithRightItem
     case all
     
@@ -49,8 +55,8 @@ public enum WSNavigationPropertyType: Equatable {
                 leftBarButtonItemLeftSpacing: 14.0,
                 leftBarButtonItemTopSpacing: 8.0,
                 rightBarButtonItemRightSpacing: 16.0,
-                widthScale: 112.0,
-                heightScale: 43.0
+                leftWidthScale: 112.0,
+                leftHeightScale: 43.0
             )
         case .center:
             return .init()
@@ -58,15 +64,17 @@ public enum WSNavigationPropertyType: Equatable {
             return .init(
                 leftBarButtonItemLeftSpacing: 8.0,
                 leftBarButtonItemTopSpacing: 10.0,
-                widthScale: 40.0,
-                heightScale: 40.0
+                leftWidthScale: 40.0,
+                leftHeightScale: 40.0
             )
         case .leftWithCenterItem:
             return .init()
-        case .rightIcon:
+        case let .rightIcon(widthScale, heightScale):
             return .init(
                 rightBarButtonItemRightSpacing: 16,
-                rightBarButtonItemTopSpacing: 18
+                rightBarButtonItemTopSpacing: 10,
+                rightWidthScale: widthScale,
+                rightHeightScale: heightScale
             )
         case .leftWithRightItem:
             return .init(
@@ -74,7 +82,10 @@ public enum WSNavigationPropertyType: Equatable {
             )
         case .all:
             return .init(
-                rightBarButtonItemTopSpacing: 18
+                rightBarButtonItemRightSpacing: 18,
+                rightBarButtonItemTopSpacing: 18,
+                rightWidthScale: 56,
+                rightHeightScale: 24
             )
         }
     }
