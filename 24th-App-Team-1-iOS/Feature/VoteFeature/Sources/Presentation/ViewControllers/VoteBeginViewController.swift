@@ -69,7 +69,6 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
         
         beginlottieView.do {
             $0.isStauts = true
-            $0.wsAnimation = DesignSystemAnimationAsset.demo.animation
         }
         
         navigationBar.do {

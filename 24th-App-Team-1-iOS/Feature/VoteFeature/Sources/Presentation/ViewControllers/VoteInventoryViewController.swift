@@ -25,6 +25,7 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
     //MARK: - Properties
     private let toggleView: VoteInventoryToggleView = VoteInventoryToggleView()
     private let inventoryContainerView: UIView = UIView()
+    private let loadingIndicator: WSLottieIndicatorView = WSLottieIndicatorView()
     private let inventoryTableView: UITableView = UITableView()
     private let inventoryConfirmButton: WSButton = WSButton(wsButtonType: .default(12))
     private let inventoryImageView: UIImageView = UIImageView()
@@ -167,6 +168,10 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicator.rx.isHidden)
+            .disposed(by: disposeBag)
+        
         toggleView.receiveButton
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
@@ -196,7 +201,9 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
             .disposed(by: disposeBag)
        
         reactor.pulse(\.$voteId)
+            .filter { $0 != nil }
             .bind(with: self) { owner, voteId in
+                guard let voteId else { return }
                 let voteInventoryDetailViewController = DependencyContainer.shared.injector.resolve(VoteInventoryDetailViewController.self, argument: voteId)
                 owner.navigationController?.pushViewController(voteInventoryDetailViewController, animated: true)
             }

@@ -24,7 +24,7 @@ public final class VoteProcessViewReactor: Reactor {
         @Pulse var voteOptionsStub: [CreateVoteItemReqeuest]
         @Pulse var processCount: Int
         @Pulse var reportEntity: CreateReportUserEntity?
-        var isLoading: Bool
+        @Pulse var isLoading: Bool
         var voteItemEntity: VoteItemEntity?
         var createVoteEntity: CreateVoteEntity?
     }
@@ -62,7 +62,7 @@ public final class VoteProcessViewReactor: Reactor {
                 voteResponseEntity: voteResponseEntity,
                 voteOptionsStub: voteOptionStub,
                 processCount: processCount,
-                isLoading: true
+                isLoading: false
             )
             self.createVoteUseCase = createVoteUseCase
             self.createUserReportUseCase = createUserReportUseCase
@@ -86,10 +86,10 @@ public final class VoteProcessViewReactor: Reactor {
                 )
             }
             return .concat(
-                .just(.setLoading(true)),
+                .just(.setLoading(false)),
                 .just(.setQuestionRowItems(voteSectionItems)),
                 .just(.setVoteUserItems(entity.userInfo)),
-                .just(.setLoading(false))
+                .just(.setLoading(true))
             )
             
         case let .didTappedQuestionItem(row):

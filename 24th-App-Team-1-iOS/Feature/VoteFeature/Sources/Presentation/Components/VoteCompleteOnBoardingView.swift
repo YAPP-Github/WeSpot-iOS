@@ -52,9 +52,9 @@ final class VoteCompleteOnBoardingView: UIView {
         }
         
         onboardingLottieView.do {
+            $0.lottieView.animation = DesignSystemAnimationAsset.bgVoteFindAnimate.animation
+            $0.lottieView.loopMode = .loop
             $0.isStauts = true
-            //TODO: 임시 Animation
-            $0.wsAnimation = DesignSystemAnimationAsset.demo.animation
         }
         
         descrptionLabel.do {

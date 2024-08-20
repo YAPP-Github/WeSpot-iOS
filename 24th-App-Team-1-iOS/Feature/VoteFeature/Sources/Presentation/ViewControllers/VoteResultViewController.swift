@@ -24,6 +24,7 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
     private lazy var voteResultCollectionViewLayout: UICollectionViewCompositionalLayout = UICollectionViewCompositionalLayout { [weak self] section, _ in
         return self?.createVoteResultSection()
     }
+    private let loadingIndicator: WSLottieIndicatorView = WSLottieIndicatorView()
     private lazy var voteResultCollectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: voteResultCollectionViewLayout)
     private lazy var voteResultsCollectionViewDataSources: RxCollectionViewSectionedReloadDataSource<VoteResultSection> = .init { dataSources, collectionView, indexPath, sectionItem in
         switch sectionItem {
@@ -105,6 +106,10 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicator.rx.isHidden)
+            .disposed(by: disposeBag)
+        
         confirmButton
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
@@ -133,13 +138,13 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
             .disposed(by: disposeBag)
         
         reactor.state
-            .map { $0.isLoading }
+            .map { !$0.isLoading }
             .distinctUntilChanged()
             .bind(to: confirmButton.rx.isHidden)
             .disposed(by: disposeBag)
         
         reactor.state
-            .map { $0.isLoading }
+            .map { !$0.isLoading }
             .distinctUntilChanged()
             .bind(to: resultPageControl.rx.isHidden)
             .disposed(by: disposeBag)

@@ -120,7 +120,6 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         onbardingLottieView.do {
             $0.isHidden = true
             $0.isStauts = false
-            $0.wsAnimation = DesignSystemAnimationAsset.demo.animation
         }
     }
     

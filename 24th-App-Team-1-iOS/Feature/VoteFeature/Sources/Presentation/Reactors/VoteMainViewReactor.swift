@@ -19,7 +19,8 @@ public final class VoteMainViewReactor: Reactor {
         self.initialState = State(
             voteTypes: .main,
             isShowEffectView: false,
-            voteResponseStub: []
+            voteResponseStub: [],
+            isLoading: false
         )
     }
     
@@ -32,6 +33,7 @@ public final class VoteMainViewReactor: Reactor {
         @Pulse var isShowEffectView: Bool
         @Pulse var voteResponseEntity: VoteResponseEntity?
         @Pulse var voteResponseStub: [CreateVoteItemReqeuest]
+        @Pulse var isLoading: Bool
     }
     
     public enum Mutation {
@@ -39,6 +41,7 @@ public final class VoteMainViewReactor: Reactor {
         case setVoteResponseItems(VoteResponseEntity)
         case setVoteUserItems
         case setShowEffectView(Bool)
+        case setLoading(Bool)
     }
     
     public func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
@@ -47,8 +50,10 @@ public final class VoteMainViewReactor: Reactor {
                 switch event {
                 case let .didFetchVoteReponseItems(response):
                     return .concat(
+                        .just(.setLoading(false)),
                         .just(.setVoteResponseItems(response)),
-                        .just(.setVoteUserItems)
+                        .just(.setVoteUserItems),
+                        .just(.setLoading(true))
                     )
                 case .didTappedResultButton:
                     return .just(.setShowEffectView(true))
@@ -79,6 +84,8 @@ public final class VoteMainViewReactor: Reactor {
             newState.voteResponseStub = []
         case let .setShowEffectView(isShowEffectView):
             newState.isShowEffectView = isShowEffectView
+        case let .setLoading(isLoading):
+            newState.isLoading = isLoading
         }
         
         return newState

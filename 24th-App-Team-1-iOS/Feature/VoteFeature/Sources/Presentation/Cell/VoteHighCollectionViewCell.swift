@@ -10,6 +10,7 @@ import UIKit
 
 import ReactorKit
 import RxCocoa
+import Kingfisher
 
 final class VoteHighCollectionViewCell: UICollectionViewCell {
     
@@ -151,6 +152,13 @@ extension VoteHighCollectionViewCell: ReactorKit.View {
             .map { UIColor(hex: $0.profile.backgroundColor) }
             .distinctUntilChanged()
             .bind(to: profileContainerView.rx.backgroundColor)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$highUser)
+            .map { $0.profile.iconUrl}
+            .bind(with: self) { owner, iconURL in
+                owner.profileImageView.kf.setImage(with: iconURL)
+            }
             .disposed(by: disposeBag)
         
         reactor.state

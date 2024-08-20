@@ -19,6 +19,7 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
     
     //MARK: - Properties
     private let voteToggleView: VoteToggleView = VoteToggleView()
+    private let loadingIndicator: WSLottieIndicatorView = WSLottieIndicatorView()
     private lazy var votePageViewController: VotePageViewController = VotePageViewController(reactor: VotePageViewReactor())
     
     //MARK: - LifeCycle
@@ -35,7 +36,7 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
     public override func setupUI() {
         super.setupUI()
         addChild(votePageViewController)
-        view.addSubviews(voteToggleView, votePageViewController.view)
+        view.addSubviews(voteToggleView, loadingIndicator, votePageViewController.view)
     }
 
     public override func setupAutoLayout() {
@@ -84,6 +85,11 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
             .skip(1)
             .bind(to: voteToggleView.rx.isSelected)
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicator.rx.isHidden)
+            .disposed(by: disposeBag)
+        
         
         reactor.pulse(\.$isShowEffectView)
             .filter { $0 == true }

@@ -29,6 +29,7 @@ public final class VoteHomeViewController: BaseViewController<VoteHomeViewReacto
     private let voteDateLabel: WSLabel = WSLabel(wsFont: .Body06, text: Date().toFormatString(with: .MddEEE))
     private let voteDescriptionLabel: WSLabel = WSLabel(wsFont: .Body01, text: VoteHomeStr.voteDescrptionText)
     private let voteImageView: UIImageView = UIImageView()
+    private let voteLottieView: WSLottieView = WSLottieView()
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -39,7 +40,7 @@ public final class VoteHomeViewController: BaseViewController<VoteHomeViewReacto
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
-        voteContainerView.addSubviews(voteConfirmButton, voteDateLabel, voteImageView, voteDescriptionLabel)
+        voteContainerView.addSubviews(voteDateLabel, voteLottieView, voteConfirmButton,voteDescriptionLabel)
         
         view.addSubviews(voteBannerView, voteContainerView)
     }
@@ -71,10 +72,10 @@ public final class VoteHomeViewController: BaseViewController<VoteHomeViewReacto
             $0.height.equalTo(54)
         }
         
-        voteImageView.snp.makeConstraints {
-            $0.top.equalTo(voteDescriptionLabel.snp.bottom).offset(20)
-            $0.centerX.equalToSuperview()
-            $0.height.equalTo(160)
+        voteLottieView.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(20)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(335)
         }
         
         voteConfirmButton.snp.makeConstraints {
@@ -105,6 +106,12 @@ public final class VoteHomeViewController: BaseViewController<VoteHomeViewReacto
             $0.textColor = DesignSystemAsset.Colors.gray100.color
         }
         
+        voteLottieView.do {
+            $0.lottieView.animation = DesignSystemAnimationAsset.bgVoteMainAnimate.animation
+            $0.isStauts = true
+            $0.lottieView.loopMode = .playOnce
+        }
+        
         voteImageView.do {
             $0.contentMode = .scaleAspectFill
             $0.image = DesignSystemAsset.Images.imgMainSymbol.image
@@ -113,6 +120,12 @@ public final class VoteHomeViewController: BaseViewController<VoteHomeViewReacto
     
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
+        
+        self.rx.viewWillAppear
+            .bind(with: self) { owner, _ in
+                owner.voteLottieView.toggleAnimation(isStatus: true)
+            }
+            .disposed(by: disposeBag)
         
         voteConfirmButton
             .rx.tap
