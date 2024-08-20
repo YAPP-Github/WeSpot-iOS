@@ -8,15 +8,15 @@
 import Foundation
 import CommonDomain
 
-public struct CreateAccountResponseDTO: Decodable {
+public struct CreateCommonAccountResponseDTO: Decodable {
     public let accessToken: String
     public let refreshToken: String
     public let refreshTokenExpiredAt: String
     
 }
 
-extension CreateAccountResponseDTO {
-    func toDomain() -> CreateAccountResponseEntity {
+extension CreateCommonAccountResponseDTO {
+    func toDomain() -> CreateCommonAccountResponseEntity {
         return .init(accessToken: accessToken, refreshToken: refreshToken, refreshTokenExpiredAt: refreshTokenExpiredAt)
     }
 }

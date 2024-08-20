@@ -63,7 +63,8 @@ public final class SignInViewReactor: Reactor {
             return executeSignUp(socialType: "APPLE", authorizationCode: authorizationCode, identityToken: identityToken)
         case .signInWithKakao:
             
-            return handleKakaoLogin().flatMap { self.executeSignUp(socialType: "KAKAO", authorizationCode: "", identityToken: $0) }
+            return handleKakaoLogin()
+                .flatMap { self.executeSignUp(socialType: "KAKAO", authorizationCode: "", identityToken: $0) }
         }
     }
     

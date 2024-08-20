@@ -73,7 +73,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         window = UIWindow(windowScene: scene)
         NotificationCenter.default.addObserver(self, selector: #selector(handleUserDidLogin), name: .userDidLogin, object: nil)
         
-        KeychainManager.shared.set(value: "123", type: .accessToken)
+        KeychainManager.shared.delete(type: .accessToken)
         let accessToken = KeychainManager.shared.get(type: .accessToken)
         
         if accessToken?.isEmpty ?? true { // accessToken 값이 없으면 (회원가입 안됨)

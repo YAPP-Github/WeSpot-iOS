@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 
 public protocol CreateRefreshTokenUseCaseProtocol {
-    func execute(body: CreateRefreshTokenRequest) -> Single<CreateAccountResponseEntity?>
+    func execute(body: CreateRefreshTokenRequest) -> Single<CreateCommonAccountResponseEntity?>
 }
 
 public final class CreateRefreshTokenUseCase: CreateRefreshTokenUseCaseProtocol {
@@ -22,7 +22,7 @@ public final class CreateRefreshTokenUseCase: CreateRefreshTokenUseCaseProtocol 
         self.commonRepository = commonRepository
     }
 
-    public func execute(body: CreateRefreshTokenRequest) -> Single<CreateAccountResponseEntity?> {
+    public func execute(body: CreateRefreshTokenRequest) -> Single<CreateCommonAccountResponseEntity?> {
         return commonRepository.createRefreshToken(body: body)
     }
 }

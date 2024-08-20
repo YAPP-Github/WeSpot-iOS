@@ -68,14 +68,14 @@ public final class CommonRepository: CommonRepositoryProtocol {
             .asSingle()
     }
     
-    public func createRefreshToken(body: CommonDomain.CreateRefreshTokenRequest) -> RxSwift.Single<CommonDomain.CreateAccountResponseEntity?> {
+    public func createRefreshToken(body: CommonDomain.CreateRefreshTokenRequest) -> RxSwift.Single<CreateCommonAccountResponseEntity?> {
         let body = CreateRefreshTokenRequestDTO(token: body.token)
         let endPoint = CommonEndPoint.createRefreshToken(body)
         
         return networkService.request(endPoint: endPoint)
             .asObservable()
             .logErrorIfDetected(category: Network.error)
-            .decodeMap(CreateAccountResponseDTO.self)
+            .decodeMap(CreateCommonAccountResponseDTO.self)
             .map { $0.toDomain() }
             .asSingle()
     }
