@@ -32,4 +32,5 @@ public enum WSGlobalStateType {
     case didTappedBlockButton(_ id: Int)
     case didUpdateUserBlockButton(id: String)
     case didTappedResignButton(_ isStatus: Bool)
+    case didShowSignInViewController(_ isSuccess: Bool)
 }

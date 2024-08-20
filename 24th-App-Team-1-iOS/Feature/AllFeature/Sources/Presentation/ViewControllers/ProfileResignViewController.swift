@@ -137,6 +137,12 @@ public final class ProfileResignViewController: BaseViewController<ProfileResign
             .disposed(by: disposeBag)
         
         
+        reactor.pulse(\.$isSuccess)
+            .filter { $0 == true}
+            .bind(with: self) { owner, _ in
+                NotificationCenter.default.post(name: .showSignInViewController, object: nil)
+            }
+            .disposed(by: disposeBag)
         
         reactor.pulse(\.$isStatus)
             .filter { $0 == true }

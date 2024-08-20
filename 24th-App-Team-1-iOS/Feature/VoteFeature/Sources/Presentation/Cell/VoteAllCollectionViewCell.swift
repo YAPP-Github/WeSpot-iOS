@@ -104,7 +104,7 @@ extension VoteAllCollectionViewCell: ReactorKit.View {
             .disposed(by: disposeBag)
         
         reactor.state
-            .map { $0.content}
+            .map { $0.content }
             .distinctUntilChanged()
             .bind(to: descrptionLabel.rx.text)
             .disposed(by: disposeBag)

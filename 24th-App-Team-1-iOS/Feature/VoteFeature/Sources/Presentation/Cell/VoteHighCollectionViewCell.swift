@@ -106,14 +106,12 @@ final class VoteHighCollectionViewCell: UICollectionViewCell {
         }
         
         profileContainerView.do {
-            //TODO: 테스트 코트 서버 통신시 제거
             $0.backgroundColor = DesignSystemAsset.Colors.primary100.color
             $0.clipsToBounds = true
             $0.layer.cornerRadius = 48 / 2
         }
         
         profileImageView.do {
-            //TODO: 테스트 코트 서버 통신시 제거
             $0.contentMode = .scaleAspectFill
             $0.image = DesignSystemAsset.Images.icCommonProfile427323024.image
         }

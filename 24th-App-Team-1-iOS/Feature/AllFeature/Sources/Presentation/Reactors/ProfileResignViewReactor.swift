@@ -129,10 +129,16 @@ public final class ProfileResignViewReactor: Reactor {
             return createUserResignUseCase
                 .execute()
                 .asObservable()
-                .flatMap { isSuccess -> Observable<Mutation> in
+                .withUnretained(self)
+                .flatMap { owner, isSuccess -> Observable<Mutation> in
                     guard isSuccess else { return .just(.setUserResignStatus(false))}
                     
-                    return .just(.setUserResignStatus(isSuccess))
+                    owner.globalState.event.onNext(.didShowSignInViewController(isSuccess))
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setUserResignStatus(isSuccess)),
+                        .just(.setLoading(true))
+                    )
                 }
         }
     }
