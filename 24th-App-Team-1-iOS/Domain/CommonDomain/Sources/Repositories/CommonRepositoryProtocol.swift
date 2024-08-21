@@ -13,6 +13,5 @@ public protocol CommonRepositoryProtocol {
     func createCheckProfanity(body: CreateCheckProfanityRequest) -> Single<Bool>
     func fetchProfileImages() -> Single<FetchProfileImageResponseEntity?>
     func fetchProfileBackgrounds() -> Single<FetchProfileBackgroundsResponseEntity?>
-    func createRefreshToken(body: CreateRefreshTokenRequest) -> Single<CreateCommonAccountResponseEntity?> // 토큰 재발행
     func createReportUserItem(body: CreateUserReportRequest) -> Single<CreateReportUserEntity?>
 }

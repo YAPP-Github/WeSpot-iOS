@@ -20,7 +20,6 @@ public final class SignInViewReactor: Reactor {
     
     private let createNewMemberUseCase: CreateNewMemberUseCaseProtocol
     private let createExistingUseCase: CreateExistingMemberUseCaseProtocol
-    private let keychain = KeychainSwift()
     public var initialState: State
     
     public struct State {

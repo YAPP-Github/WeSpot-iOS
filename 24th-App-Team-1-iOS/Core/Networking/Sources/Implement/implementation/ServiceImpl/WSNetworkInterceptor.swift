@@ -44,23 +44,16 @@ public final class WSNetworkInterceptor: RequestInterceptor {
         }
         
         guard let refreshToken = KeychainManager.shared.get(type: .refreshToken) else { return }
-        let body = CreateRefreshTokenRequest(token: refreshToken)
-        
-        commonRepository
-            .createRefreshToken(body: body)
-            .asObservable()
-            .subscribe(onNext: {[weak self] entity in
-                guard let self = self else { return }
-                
-                KeychainManager.shared.set(value: entity?.accessToken ?? "", type: .accessToken)
-                KeychainManager.shared.set(value: entity?.refreshToken ?? "", type: .refreshToken)
-                
-                let retry = RetryResult.retry
-                completion(retry)
-            }, onError: { error in
+        RefreshTokenManager.shared.refreshToken { result in
+            switch result {
+            case .success(let (newAccessToken, _)):
+                // 토큰 갱신 성공 -> 요청을 재시도
+                KeychainManager.shared.set(value: newAccessToken, type: .accessToken)
+                completion(.retry)
+            case .failure(let error):
+                // 토큰 갱신 실패 -> 재시도 X
                 completion(.doNotRetryWithError(WSNetworkError.default(message: error.localizedDescription)))
-            })
-            .disposed(by: disposeBag)
-        
+            }
+        }
     }
 }
