@@ -9,7 +9,7 @@ import Foundation
 
 public enum NotificationType: String {
     case vote = "VOTE"
-    case voteResults = "VoteResults"
+    case voteResults = "VOTE_RESULT"
     case voteRecevied = "VOTE_RECEIVED"
     case none
 }

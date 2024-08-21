@@ -282,7 +282,7 @@ extension VoteCompleteViewController {
     }
     
     private func fadeInOutOnAnimationView() {
-        UIView.animate(withDuration: 2.0, delay: 0.0, options: .curveEaseInOut) { [weak self] in
+        UIView.animate(withDuration: 4.0, delay: 0.0, options: .curveEaseInOut) { [weak self] in
             self?.onboardingView.alpha = 0.0
         } completion: { [weak self] _ in
             self?.onboardingView.removeFromSuperview()

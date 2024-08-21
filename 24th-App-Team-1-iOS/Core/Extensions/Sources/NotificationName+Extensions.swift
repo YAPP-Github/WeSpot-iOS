@@ -16,4 +16,5 @@ public extension Notification.Name {
     static let showVoteProccessController = Notification.Name("showVoteProccssViewController")
     static let showVoteCompleteViewController = Notification.Name("showVoteCompleteViewController")
     static let showVoteEffectViewController = Notification.Name("showVoteEffectViewController")
+    static let showVoteInventoryViewController = Notification.Name("showVoteInventoryViewController")
 }

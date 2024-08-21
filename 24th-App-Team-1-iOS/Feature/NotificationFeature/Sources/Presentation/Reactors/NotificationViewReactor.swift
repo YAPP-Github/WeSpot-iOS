@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Extensions
 import NotificationDomain
 
 import ReactorKit
@@ -22,6 +23,7 @@ public final class NotificationViewReactor: Reactor {
         @Pulse var notificationEntity: NotificationEntity?
         @Pulse var isSelected: Bool
         @Pulse var selectedType: NotificationType
+        @Pulse var isCurrentDate: Bool
     }
     
     public enum Action {
@@ -34,6 +36,7 @@ public final class NotificationViewReactor: Reactor {
         case setNotificationSectionItems([NotificationItem])
         case setNotificationItems(NotificationEntity)
         case setSelectedNotificationItem(Bool)
+        case setSelectedNotificationDate(Bool)
         case setSelectedType(NotificationType)
     }
     
@@ -47,7 +50,8 @@ public final class NotificationViewReactor: Reactor {
             notificationSection: [],
             notificationItems: [],
             isSelected: false,
-            selectedType: .vote
+            selectedType: .none,
+            isCurrentDate: false
         )
         self.fetchUserNotificationItemsUseCase = fetchUserNotificationItemsUseCase
         self.updateUserNotifcationItemUseCase = updateUserNotifcationItemUseCase
@@ -87,15 +91,17 @@ public final class NotificationViewReactor: Reactor {
             
             let path = String(response.id)
             let type = response.type
+            let isCurrentDate = Date().isFutureDay(response.date.toDate(with: .dashYyyyMMdd))
             return updateUserNotifcationItemUseCase
                 .execute(path: path)
                 .asObservable()
-                .flatMap { isSelected -> Observable<Mutation> in
+                .withUnretained(self)
+                .flatMap { owner, isSelected -> Observable<Mutation> in
                     guard isSelected else { return .empty() }
-                    
                     return .concat(
-                        .just(.setSelectedNotificationItem(isSelected)),
-                        .just(.setSelectedType(type))
+                        .just(.setSelectedType(type)),
+                        .just(.setSelectedNotificationDate(isCurrentDate)),
+                        .just(.setSelectedNotificationItem(isSelected))
                     )
                 }
         case .fetchMoreItems:
@@ -147,6 +153,8 @@ public final class NotificationViewReactor: Reactor {
             newState.selectedType = selectedType
         case let .setSelectedNotificationItem(isSelected):
             newState.isSelected = isSelected
+        case let .setSelectedNotificationDate(isCurrentDate):
+            newState.isCurrentDate = isCurrentDate
         }
         
         return newState

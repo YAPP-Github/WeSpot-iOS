@@ -138,18 +138,26 @@ extension SceneDelegate {
         }
         
         NotificationCenter.default.addObserver(forName: .showVoteProccessController, object: nil, queue: .main) { _ in
-            let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
+            let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self)
             topViewController.navigationController?.pushViewController(voteMainViewController, animated: true)
         }
         
-        NotificationCenter.default.addObserver(forName: .showVoteEffectViewController, object: nil, queue: .main) { _ in
-            let voteEffectViewController = DependencyContainer.shared.injector.resolve(VoteEffectViewController.self)
-            topViewController.navigationController?.pushViewController(voteEffectViewController, animated: true)
+        NotificationCenter.default.addObserver(forName: .showVoteInventoryViewController, object: nil, queue: .main) { _ in
+            let voteInventoryViewController = DependencyContainer.shared.injector.resolve(VoteInventoryViewController.self)
+            topViewController.navigationController?.pushViewController(voteInventoryViewController, animated: true)
         }
         
-        NotificationCenter.default.addObserver(forName: .showVoteCompleteViewController, object: nil, queue: .main) { _ in
-            let voteCompleteViewController = DependencyContainer.shared.injector.resolve(VoteCompleteViewController.self)
-            topViewController.navigationController?.pushViewController(voteCompleteViewController, animated: true)
+        NotificationCenter.default.addObserver(forName: .showVoteCompleteViewController, object: nil, queue: .main) { notification in
+            
+            guard let isCurrnetDate = notification.userInfo?["isCurrnetDate"] as? Bool else { return }
+            
+            if isCurrnetDate {
+                let voteCompleteViewController = DependencyContainer.shared.injector.resolve(VoteCompleteViewController.self)
+                topViewController.navigationController?.pushViewController(voteCompleteViewController, animated: true)
+            } else {
+                let voteEffectViewController = DependencyContainer.shared.injector.resolve(VoteEffectViewController.self)
+                topViewController.navigationController?.pushViewController(voteEffectViewController, animated: true)
+            }
             
         }
     }
