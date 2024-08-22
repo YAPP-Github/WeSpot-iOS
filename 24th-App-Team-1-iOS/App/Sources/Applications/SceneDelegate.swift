@@ -138,8 +138,8 @@ extension SceneDelegate {
         }
         
         NotificationCenter.default.addObserver(forName: .showVoteProccessController, object: nil, queue: .main) { _ in
-            let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self)
-            topViewController.navigationController?.pushViewController(voteMainViewController, animated: true)
+            let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self)
+            topViewController.navigationController?.pushViewController(voteProcessViewController, animated: true)
         }
         
         NotificationCenter.default.addObserver(forName: .showVoteInventoryViewController, object: nil, queue: .main) { _ in

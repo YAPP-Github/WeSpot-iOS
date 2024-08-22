@@ -21,6 +21,16 @@ public final class VoteRepository: VoteRepositoryProtocol {
     
     public init() { }
     
+    public func fetchClassMateItems() -> Single<VoteClassMatesEntity?> {
+        let endPoint = VoteEndPoint.fetchClassMates
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .decodeMap(VoteClassMateResponseDTO.self)
+            .logErrorIfDetected(category: Network.error)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
+    
     public func fetchVoteOptions() -> Single<VoteResponseEntity?> {
         let endPoint = VoteEndPoint.fetchVoteOptions
         return networkService.request(endPoint: endPoint)

@@ -14,7 +14,6 @@ import ReactorKit
 public final class VoteHomeViewReactor: Reactor {
     
     private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
-    private let fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol
     public let initialState: State
     
     public struct State {
@@ -29,8 +28,7 @@ public final class VoteHomeViewReactor: Reactor {
         
     }
     
-    public init(fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol) {
-        self.fetchVoteOptionsUseCase = fetchVoteOptionsUseCase
+    public init() {
         self.initialState = State()
     }
     
@@ -38,16 +36,9 @@ public final class VoteHomeViewReactor: Reactor {
         
         switch action {
         case .didTappedVoteButton:
-            return fetchVoteOptionsUseCase
-                .execute()
-                .asObservable()
-                .withUnretained(self)
-                .flatMap { onwer, entity -> Observable<Mutation> in
-                    guard let response = entity else { return .empty() }
-                    onwer.globalService.event.onNext(.didFetchVoteReponseItems(response))
+            globalService.event.onNext(.didTappedVoteButton(true))
                     
-                    return .empty()
-                }
+            return .empty()
         }
     }
     
