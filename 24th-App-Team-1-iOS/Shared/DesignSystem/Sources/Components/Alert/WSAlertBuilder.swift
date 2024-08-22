@@ -26,14 +26,16 @@ public final class WSAlertBuilder {
     private var alertMessage: String?
     private var confirmText: String?
     private var cancelText: String?
+    private var alertTitleAlignment: NSTextAlignment?
     
     public init(showViewController: UIViewController) {
         self.showViewController = showViewController
     }
     
     /// WSAlert의 타이틀을 설정하기 위한 메서드
-    public func setTitle(title: String) -> Self {
+    public func setTitle(title: String, titleAlignment: NSTextAlignment = .center) -> Self {
         self.alertTitle = title
+        self.alertTitleAlignment = titleAlignment
         return self
     }
     
@@ -70,6 +72,7 @@ public final class WSAlertBuilder {
         
         alertViewController.alertType = alertType
         alertViewController.titleLabel.text = alertTitle
+        alertViewController.titleLabel.textAlignment = alertTitleAlignment ?? .center
         alertViewController.messageLabel.text = alertMessage
         alertViewController.confirmButton.setupButton(text: confirmText ?? "")
         alertViewController.cancelButton.setupButton(text: cancelText ?? "")

@@ -88,8 +88,8 @@ public final class ProfileUserBlockViewController: BaseViewController<ProfileUse
             .bind(with: self) { owner, _ in
                 WSAlertBuilder(showViewController: self)
                     .setAlertType(type: .message)
-                    .setTitle(title: "차단 해체하시나요?")
-                    .setConfirm(text: "차단 해체")
+                    .setTitle(title: "차단 해제하시나요?", titleAlignment: .left)
+                    .setConfirm(text: "차단 해제")
                     .setCancel(text: "닫기")
                     .action(.confirm, action: { [weak self] in
                         guard let self else { return }

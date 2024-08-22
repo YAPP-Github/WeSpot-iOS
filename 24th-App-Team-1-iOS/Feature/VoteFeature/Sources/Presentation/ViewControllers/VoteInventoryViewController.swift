@@ -25,7 +25,7 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
     //MARK: - Properties
     private let toggleView: VoteInventoryToggleView = VoteInventoryToggleView()
     private let inventoryContainerView: UIView = UIView()
-    private let inventoryTableView: UITableView = UITableView()
+    private let inventoryTableView: UITableView = UITableView(frame: .zero, style: .grouped)
     private let inventoryConfirmButton: WSButton = WSButton(wsButtonType: .default(12))
     private let inventoryImageView: UIImageView = UIImageView()
     private let inventoryTitleLabel: WSLabel = WSLabel(wsFont: .Body01)

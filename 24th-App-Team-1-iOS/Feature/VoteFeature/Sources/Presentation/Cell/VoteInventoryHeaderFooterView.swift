@@ -14,7 +14,7 @@ final class VoteInventoryHeaderFooterView: UITableViewHeaderFooterView {
     
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
-        tintColor = .clear
+        tintColor = DesignSystemAsset.Colors.gray900.color
         setupUI()
         setupAutoLayout()
         setupAttributeds()
