@@ -54,9 +54,9 @@ final class VoteCompleteLandingView: UIView {
         }
         
         landingLottieView.do {
+            $0.lottieView.loopMode = .loop
+            $0.lottieView.animation = DesignSystemAnimationAsset.bgVoteSwipeAnimate.animation
             $0.isStauts = true
-            //TODO: 임시 Animation
-            $0.wsAnimation = DesignSystemAnimationAsset.demo.animation
         }
     }
 }

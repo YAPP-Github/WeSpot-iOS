@@ -20,6 +20,7 @@ public final class ProfileUserBlockViewController: BaseViewController<ProfileUse
 
     //MARK: - Properties
     private let blockTableView: UITableView = UITableView()
+    private let loadingIndicatorView: WSLottieIndicatorView = WSLottieIndicatorView()
     private let blockDataSources: RxTableViewSectionedReloadDataSource<ProfileUserBlockSection> = .init { dataSources, tableView, indexPath, sectionItem in
         
         switch sectionItem {
@@ -81,6 +82,10 @@ public final class ProfileUserBlockViewController: BaseViewController<ProfileUse
         reactor.pulse(\.$userBlockSection)
             .asDriver(onErrorJustReturn: [])
             .drive(blockTableView.rx.items(dataSource: blockDataSources))
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicatorView.rx.isHidden)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$userBlockId)

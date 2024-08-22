@@ -21,6 +21,7 @@ public final class ProfileResignViewReactor: Reactor {
         @Pulse var reasonSection: [ProfileResignReasonSection]
         @Pulse var isEnabled: Bool
         @Pulse var isStatus: Bool
+        @Pulse var isLoading: Bool
         @Pulse var isSuccess: Bool
         var selectedItem: [Int]
     }
@@ -34,6 +35,7 @@ public final class ProfileResignViewReactor: Reactor {
     public enum Mutation {
         case setReasonButtonEnabled(Bool)
         case setResignStatus(Bool)
+        case setLoading(Bool)
         case setResignSelectedIndexPath([Int])
         case setUserResignStatus(Bool)
     }
@@ -68,6 +70,7 @@ public final class ProfileResignViewReactor: Reactor {
             ],
             isEnabled: false,
             isStatus: false,
+            isLoading: true,
             isSuccess: false,
             selectedItem: []
         )
@@ -81,7 +84,12 @@ public final class ProfileResignViewReactor: Reactor {
             .flatMap { event -> Observable<Mutation> in
                 switch event {
                 case let .didTappedResignButton(isStatus):
-                    return .just(.setResignStatus(isStatus))
+                    
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setResignStatus(isStatus)),
+                        .just(.setLoading(true))
+                    )
                 default:
                     return .empty()
                 }
@@ -121,10 +129,16 @@ public final class ProfileResignViewReactor: Reactor {
             return createUserResignUseCase
                 .execute()
                 .asObservable()
-                .flatMap { isSuccess -> Observable<Mutation> in
+                .withUnretained(self)
+                .flatMap { owner, isSuccess -> Observable<Mutation> in
                     guard isSuccess else { return .just(.setUserResignStatus(false))}
                     
-                    return .just(.setUserResignStatus(isSuccess))
+                    owner.globalState.event.onNext(.didShowSignInViewController(isSuccess))
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setUserResignStatus(isSuccess)),
+                        .just(.setLoading(true))
+                    )
                 }
         }
     }
@@ -136,6 +150,8 @@ public final class ProfileResignViewReactor: Reactor {
             newState.isEnabled = isEnabled
         case let .setResignStatus(isStatus):
             newState.isStatus = isStatus
+        case let .setLoading(isLoading):
+            newState.isLoading = isLoading
         case let .setUserResignStatus(isSuccess):
             newState.isSuccess = isSuccess
         case let .setResignSelectedIndexPath(selectedItem):

@@ -23,6 +23,7 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
     //MARK: - Properties
     private let toggleView: VoteEffectToggleView = VoteEffectToggleView()
     private let noticeButton: WSButton = WSButton(wsButtonType: .default(12))
+    private let loadingIndicator: WSLottieIndicatorView = WSLottieIndicatorView()
     private let shareButton: UIButton = UIButton()
     private let effectPageControl: UIPageControl = UIPageControl()
     private lazy var effectCollectionViewLayout: UICollectionViewCompositionalLayout = UICollectionViewCompositionalLayout { [weak self] section, _ in
@@ -189,6 +190,10 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
             .map { $0.toggleType }
             .distinctUntilChanged()
             .bind(to: toggleView.rx.isSelected)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicator.rx.isHidden)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$effectSection)

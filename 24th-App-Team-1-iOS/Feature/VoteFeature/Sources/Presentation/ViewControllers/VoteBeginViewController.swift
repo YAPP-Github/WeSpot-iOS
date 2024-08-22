@@ -21,7 +21,7 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
     //MARK: - Properties
     private let beginInfoLabel: WSLabel = WSLabel(wsFont: .Header01, text: VoteBeginStr.voteBeginInfoText)
     private let inviteButton: WSButton = WSButton(wsButtonType: .default(12))
-    private let beginlottieView: WSLottieView = WSLottieView()
+    private let beginImageView: UIImageView = UIImageView()
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -31,7 +31,7 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
-        view.addSubviews(beginInfoLabel, beginlottieView, inviteButton)
+        view.addSubviews(beginInfoLabel, beginImageView, inviteButton)
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -47,10 +47,10 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
             $0.height.equalTo(60)
         }
         
-        beginlottieView.snp.makeConstraints {
-            $0.top.equalTo(beginInfoLabel.snp.bottom).offset(8)
+        beginImageView.snp.makeConstraints {
+            $0.top.equalTo(beginInfoLabel.snp.bottom).offset(16)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(450)
+            $0.height.equalTo(292)
         }
         
         inviteButton.snp.makeConstraints {
@@ -67,9 +67,8 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
             $0.textColor = DesignSystemAsset.Colors.gray100.color
         }
         
-        beginlottieView.do {
-            $0.isStauts = true
-            $0.wsAnimation = DesignSystemAnimationAsset.demo.animation
+        beginImageView.do {
+            $0.image = DesignSystemAsset.Images.imgEmptyFriendFiled.image
         }
         
         navigationBar.do {

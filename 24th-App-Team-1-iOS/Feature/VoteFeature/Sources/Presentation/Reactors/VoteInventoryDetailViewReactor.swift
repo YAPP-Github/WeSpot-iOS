@@ -17,6 +17,7 @@ public final class VoteInventoryDetailViewReactor: Reactor {
     
     public struct State {
         @Pulse var receiveEntity: VoteIndividualEntity?
+        @Pulse var isLoading: Bool
         var voteId: Int
     }
     
@@ -26,6 +27,7 @@ public final class VoteInventoryDetailViewReactor: Reactor {
     
     public enum Mutation {
         case setReceiveEntity(VoteIndividualEntity)
+        case setLoading(Bool)
     }
     
     public init(
@@ -34,6 +36,7 @@ public final class VoteInventoryDetailViewReactor: Reactor {
     ) {
         self.initialState = State(
             receiveEntity: nil,
+            isLoading: false,
             voteId: voteId
         )
         self.fetchIndividualItemUseCase = fetchIndividualItemUseCase
@@ -51,7 +54,11 @@ public final class VoteInventoryDetailViewReactor: Reactor {
                 .flatMap { entity -> Observable<Mutation> in
                     guard let originalEntity = entity else { return .empty() }
                     
-                    return .just(.setReceiveEntity(originalEntity))
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setReceiveEntity(originalEntity)),
+                        .just(.setLoading(true))
+                    )
                 }
         }
     }
@@ -62,6 +69,8 @@ public final class VoteInventoryDetailViewReactor: Reactor {
         switch mutation {
         case let .setReceiveEntity(receiveEntity):
             newState.receiveEntity = receiveEntity
+        case let .setLoading(isLoading):
+            newState.isLoading = isLoading
         }
         
         return newState

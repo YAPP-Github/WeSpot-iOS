@@ -22,7 +22,7 @@ public final class VoteEffectViewReactor: Reactor {
     public struct State {
         @Pulse var effectSection: [VoteCompleteSection]
         @Pulse var voteAllEntity: [VoteAllEntity]
-        var isLoading: Bool
+        @Pulse var isLoading: Bool
         var currentPage: Int
         var toggleType: VoteEffectType
     }
@@ -70,11 +70,11 @@ public final class VoteEffectViewReactor: Reactor {
                     completeSectionitem = owner.createCompleteSectionItem(entity: originalEntity)
                     
                     return .concat(
-                        .just(.setLoading(true)),
+                        .just(.setLoading(false)),
                         .just(.setToggleType(.latest)),
                         .just(.setVoteAllEntity(originalEntity.response)),
                         .just(.setEffectSection(completeSectionitem)),
-                        .just(.setLoading(false))
+                        .just(.setLoading(true))
                     )
                 }
         case let .didShowVisibleCell(index):
@@ -93,11 +93,11 @@ public final class VoteEffectViewReactor: Reactor {
                     completeSectionitem = owner.createCompleteSectionItem(entity: originalEntity)
                     
                     return .concat(
-                        .just(.setLoading(true)),
+                        .just(.setLoading(false)),
                         .just(.setToggleType(.previous)),
                         .just(.setVoteAllEntity(originalEntity.response)),
                         .just(.setEffectSection(completeSectionitem)),
-                        .just(.setLoading(false))
+                        .just(.setLoading(true))
                     )
                 }
         }

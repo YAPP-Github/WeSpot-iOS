@@ -18,7 +18,7 @@ public final class VoteCompleteViewReactor: Reactor {
     public struct State {
         @Pulse var completeSection: [VoteCompleteSection]
         @Pulse var voteAllEntity: [VoteAllEntity]
-        var isLoading: Bool
+        @Pulse var isLoading: Bool
         var currentPage: Int
     }
     
@@ -84,11 +84,11 @@ public final class VoteCompleteViewReactor: Reactor {
                             }
                     }
                     return .concat(
-                        .just(.setLoading(true)),
+                        .just(.setLoading(false)),
                         .just(.setOnboadingView(true)),
                         .just(.setVoteAllEntity(originalEntity.response)),
                         .just(.setCompleteSection(completeSectionitem)),
-                        .just(.setLoading(false))
+                        .just(.setLoading(true))
                     )
                 }
         case let .didShowVisibleCell(index):

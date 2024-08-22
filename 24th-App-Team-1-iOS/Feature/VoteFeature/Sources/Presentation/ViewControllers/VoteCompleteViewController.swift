@@ -23,10 +23,10 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
     //MARK: - Properties
     private let onboardingView: VoteCompleteOnBoardingView = VoteCompleteOnBoardingView()
     private let lendingView: VoteCompleteLandingView = VoteCompleteLandingView()
+    private let loadingIndicator: WSLottieIndicatorView = WSLottieIndicatorView()
     private let noticeButton: WSButton = WSButton(wsButtonType: .default(12))
     private let shareButton: UIButton = UIButton()
     private let completePageControl: UIPageControl = UIPageControl()
-    private let indicatorView: UIActivityIndicatorView = UIActivityIndicatorView(style: .medium)
     
     private lazy var completeCollectionViewLayout: UICollectionViewCompositionalLayout = UICollectionViewCompositionalLayout { [weak self] section, _ in
         let sectionItem = self?.completeCollectionViewDataSources[section]
@@ -67,15 +67,11 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
-        view.addSubviews(indicatorView, shareButton, completePageControl, noticeButton, completeCollectionView, onboardingView, lendingView)
+        view.addSubviews(shareButton, completePageControl, noticeButton, completeCollectionView, onboardingView, lendingView)
     }
     
     public override func setupAutoLayout() {
         super.setupAutoLayout()
-
-        indicatorView.snp.makeConstraints {
-            $0.center.equalToSuperview()
-        }
         
         onboardingView.snp.makeConstraints {
             $0.edges.equalToSuperview()
@@ -184,10 +180,8 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             }
             .disposed(by: disposeBag)
         
-        reactor.state
-            .map { $0.isLoading }
-            .distinctUntilChanged()
-            .bind(to: indicatorView.rx.isAnimating)
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicator.rx.isHidden)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$completeSection)
@@ -207,7 +201,7 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             .disposed(by: disposeBag)
         
         lendingView
-            .rx.swipeGestureRecognizer(direction: .right)
+            .rx.swipeGestureRecognizer(direction: .left)
             .bind(with: self) { owner, _ in
                 owner.fadeInOutLendigView()
             }
