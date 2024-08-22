@@ -14,6 +14,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 import ReactorKit
+import Kingfisher
 
 public final class ProfileSettingViewController: BaseViewController<ProfileSettingViewReactor> {
 
@@ -23,6 +24,7 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
     private let userContainerView: UIView = UIView()
     private let userImageView: UIImageView = UIImageView()
     private let userProfileEditButton: UIButton = UIButton(type: .custom)
+    private let loadingIndicatorView: WSLottieIndicatorView = WSLottieIndicatorView()
     private let userNameTextField: WSTextField = WSTextField(state: .withRightItem(DesignSystemAsset.Images.lock.image), placeholder: "김선희", title: "이름")
     private let userGenderTextFiled: WSTextField = WSTextField(state: .withRightItem(DesignSystemAsset.Images.lock.image), placeholder: "여", title: "성별")
     private let userClassInfoTextField: WSTextField = WSTextField(state: .withRightItem(DesignSystemAsset.Images.lock.image), placeholder: "역삼중학교 1학년 6반", title: "학적 정보")
@@ -325,6 +327,14 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .disposed(by: disposeBag)
         
         reactor.state
+            .compactMap { $0.userProfileEntity?.profile.iconUrl }
+            .distinctUntilChanged()
+            .bind(with: self) { owner, iconURL in
+                owner.userImageView.kf.setImage(with: iconURL)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
             .compactMap { $0.userProfileEntity }
             .compactMap { "\($0.introduction.count)/20" }
             .distinctUntilChanged()
@@ -356,6 +366,9 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             }
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicatorView.rx.isHidden)
+            .disposed(by: disposeBag)
         
         editButton
             .rx.tap

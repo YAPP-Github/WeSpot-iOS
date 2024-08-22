@@ -21,6 +21,7 @@ public final class ProfileSettingViewReactor: Reactor {
         @Pulse var isProfanity: Bool
         @Pulse var userProfileEntity: UserProfileEntity?
         @Pulse var isUpdate: Bool
+        @Pulse var isLoading: Bool
         var errorMessage: String
         var isEnabled: Bool
         var introudce: String
@@ -39,6 +40,7 @@ public final class ProfileSettingViewReactor: Reactor {
         case setUpdateUserProfileItem(UserProfileEntity)
         case setUpdateIntroduce(String)
         case setUpdateUserProfile(Bool)
+        case setLoading(Bool)
     }
     
     public let initialState: State
@@ -54,6 +56,7 @@ public final class ProfileSettingViewReactor: Reactor {
         self.initialState = State(
             isProfanity: false,
             isUpdate: false,
+            isLoading: false,
             errorMessage: "",
             isEnabled: false,
             introudce: ""
@@ -68,7 +71,11 @@ public final class ProfileSettingViewReactor: Reactor {
                 .asObservable()
                 .compactMap { $0 }
                 .flatMap { entity -> Observable<Mutation> in
-                    return .just(.setUpdateUserProfileItem(entity))
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setUpdateUserProfileItem(entity)),
+                        .just(.setLoading(true))
+                    )
                 }
         case let .didUpdateIntroduceProfile(introduce):
             let checkProfanityBody = CreateCheckProfanityRequest(message: introduce)
@@ -107,7 +114,11 @@ public final class ProfileSettingViewReactor: Reactor {
             return updateUserProfileUseCase.execute(body: updateUserProfileBody)
                 .asObservable()
                 .flatMap { isUpdate -> Observable<Mutation> in
-                    return .just(.setUpdateUserProfile(isUpdate))
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setUpdateUserProfile(isUpdate)),
+                        .just(.setLoading(true))
+                    )
                 }
         }
     }
@@ -127,6 +138,8 @@ public final class ProfileSettingViewReactor: Reactor {
             newState.userProfileEntity = userProfileEntity
         case let .setButtonEnabled(isEnabled):
             newState.isEnabled = isEnabled
+        case let .setLoading(isLoading):
+            newState.isLoading = isLoading
         }
         
         return newState

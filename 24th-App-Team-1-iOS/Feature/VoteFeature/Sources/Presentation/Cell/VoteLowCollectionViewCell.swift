@@ -10,6 +10,7 @@ import UIKit
 
 import ReactorKit
 import RxCocoa
+import Kingfisher
 import Extensions
 
 
@@ -131,6 +132,14 @@ extension VoteLowCollectionViewCell: ReactorKit.View {
             .map { UIColor(hex:$0.profile.backgroundColor) }
             .distinctUntilChanged()
             .bind(to: userContainerView.rx.backgroundColor)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$lowUser)
+            .map { $0.profile.iconUrl }
+            .distinctUntilChanged()
+            .bind(with: self) { owner, iconURL in
+                owner.userProfileImageView.kf.setImage(with: iconURL)
+            }
             .disposed(by: disposeBag)
         
         reactor.state

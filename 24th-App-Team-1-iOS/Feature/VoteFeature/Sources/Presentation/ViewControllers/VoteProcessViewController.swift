@@ -17,6 +17,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 import RxDataSources
+import Kingfisher
 
 fileprivate typealias VoteProcessStr = VoteStrings
 fileprivate typealias VoteProcessId = VoteStrings.Identifier
@@ -26,6 +27,7 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
     private let profileView: UIView = UIView()
     private let faceImageView: UIImageView = UIImageView()
     private let questionLabel: WSLabel = WSLabel(wsFont: .Header01)
+    private let loadingIndicator: WSLottieIndicatorView = WSLottieIndicatorView()
     private let questionTableView: UITableView = UITableView()
     private let resultButton: WSButton = WSButton(wsButtonType: .default(12))
     private let processInjector: Injector = DependencyInjector(container: Container())
@@ -213,9 +215,13 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             .disposed(by: disposeBag)
         
         reactor.state
-            .map { $0.isLoading }
+            .map { !$0.isLoading }
             .distinctUntilChanged()
             .bind(to: profileView.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicator.rx.isHidden)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$questionSection)
@@ -235,6 +241,15 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             .map { UIColor(hex: $0.backgroundColor) }
             .distinctUntilChanged()
             .bind(to: profileView.rx.backgroundColor)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.voteUserEntity?.profileInfo.iconUrl }
+            .debug("test Process Profile URL")
+            .distinctUntilChanged()
+            .bind(with: self) { owner, imageURL in
+                owner.faceImageView.kf.setImage(with: imageURL)
+            }
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$reportEntity)

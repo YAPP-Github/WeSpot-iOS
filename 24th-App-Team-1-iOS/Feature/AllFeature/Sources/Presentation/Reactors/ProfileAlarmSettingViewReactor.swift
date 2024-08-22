@@ -19,6 +19,7 @@ public final class ProfileAlarmSettingViewReactor: Reactor {
     
     public struct State {
         @Pulse var alarmEntity: UserAlarmEntity?
+        @Pulse var isLoading: Bool
         @Pulse var isUpdate: Bool
     }
     
@@ -32,6 +33,7 @@ public final class ProfileAlarmSettingViewReactor: Reactor {
     public enum Mutation {
         case setProfileAlarmEntity(UserAlarmEntity)
         case setUpdateAlarm(Bool)
+        case setLoading(Bool)
         
     }
     
@@ -43,7 +45,10 @@ public final class ProfileAlarmSettingViewReactor: Reactor {
     ) {
         self.fetchUserAlarmUseCase = fetchUserAlarmUseCase
         self.updateUserAlarmUseCase = updateUserAlarmUseCase
-        self.initialState = State(isUpdate: false)
+        self.initialState = State(
+            isLoading: false,
+            isUpdate: false
+        )
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
@@ -54,7 +59,11 @@ public final class ProfileAlarmSettingViewReactor: Reactor {
                 .asObservable()
                 .compactMap { $0 }
                 .flatMap { response -> Observable<Mutation> in
-                    return .just(.setProfileAlarmEntity(response))
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setProfileAlarmEntity(response)),
+                        .just(.setLoading(true))
+                    )
                 }
         case let .didChangeVoteStatus(isOn):
             guard let response = currentState.alarmEntity else { return .empty() }
@@ -67,7 +76,11 @@ public final class ProfileAlarmSettingViewReactor: Reactor {
                 .execute(body: updateUserAlarmRequest)
                 .asObservable()
                 .flatMap { isUpdate -> Observable<Mutation> in
-                    return .just(.setUpdateAlarm(isUpdate))
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setUpdateAlarm(isUpdate)),
+                        .just(.setLoading(true))
+                    )
                 }
             
         case let .didChangeSentStatus(isOn):
@@ -81,7 +94,11 @@ public final class ProfileAlarmSettingViewReactor: Reactor {
                 .execute(body: updateUserAlarmRequest)
                 .asObservable()
                 .flatMap { isUpdate -> Observable<Mutation> in
-                    return .just(.setUpdateAlarm(isUpdate))
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setUpdateAlarm(isUpdate)),
+                        .just(.setLoading(true))
+                    )
                 }
         case let .didChangeEventStatus(isOn):
             guard let response = currentState.alarmEntity else { return .empty() }
@@ -95,7 +112,11 @@ public final class ProfileAlarmSettingViewReactor: Reactor {
                 .execute(body: updateUserAlarmRequest)
                 .asObservable()
                 .flatMap { isUpdate -> Observable<Mutation> in
-                    return .just(.setUpdateAlarm(isUpdate))
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setUpdateAlarm(isUpdate)),
+                        .just(.setLoading(true))
+                    )
                 }
             
         }
@@ -109,6 +130,8 @@ public final class ProfileAlarmSettingViewReactor: Reactor {
             newState.alarmEntity = alarmEntity
         case let .setUpdateAlarm(isUpdate):
             newState.isUpdate = isUpdate
+        case let .setLoading(isLoading):
+            newState.isLoading = isLoading
         }
         return newState
     }

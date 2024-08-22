@@ -14,6 +14,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 import ReactorKit
+import Kingfisher
 
 public final class VoteInventoryDetailViewController: BaseViewController<VoteInventoryDetailViewReactor> {
 
@@ -29,7 +30,7 @@ public final class VoteInventoryDetailViewController: BaseViewController<VoteInv
     private let detailLogoImageView: UIImageView = UIImageView()
     private let detailConfirmButton: WSButton = WSButton(wsButtonType: .default(12))
     private let detailSharedButton: UIButton = UIButton(type: .custom)
-    
+    private let loadingIndicator: WSLottieIndicatorView = WSLottieIndicatorView()
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -190,10 +191,22 @@ public final class VoteInventoryDetailViewController: BaseViewController<VoteInv
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicator.rx.isHidden)
+            .disposed(by: disposeBag)
+        
         reactor.state
             .compactMap { $0.receiveEntity }
             .map { "\($0.response.voteCount)표" }
             .bind(to: detailRankView.rankLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.receiveEntity?.response.user }
+            .map { $0.profile.iconUrl }
+            .bind(with: self) { owner, iconURL in
+                owner.detailFaceView.kf.setImage(with: iconURL)
+            }
             .disposed(by: disposeBag)
         
         reactor.state

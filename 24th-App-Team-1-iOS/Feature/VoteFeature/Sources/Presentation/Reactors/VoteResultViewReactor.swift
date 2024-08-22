@@ -21,7 +21,7 @@ public final class VoteResultViewReactor: Reactor {
         @Pulse var resultSection: [VoteResultSection]
         @Pulse var winnerResponseEntity: VoteWinnerResponseEntity?
         var currentPage: Int = 0
-        var isLoading: Bool = false
+        @Pulse var isLoading: Bool
     }
     
     public enum Action {
@@ -38,7 +38,9 @@ public final class VoteResultViewReactor: Reactor {
     
     public init(fetchWinnerVoteOptionsUseCase: FetchWinnerVoteOptionsUseCaseProtocol) {
         self.initialState = State(
-            resultSection: [.voteResultInfo([])]
+            resultSection: [
+                .voteResultInfo([])],
+            isLoading: false
         )
         self.fetchWinnerVoteOptionsUseCase = fetchWinnerVoteOptionsUseCase
     }
@@ -67,10 +69,10 @@ public final class VoteResultViewReactor: Reactor {
                     }
                     
                     return .concat(
-                        .just(.setLoading(true)),
+                        .just(.setLoading(false)),
                         .just(.setResultSectionItems(winnerSectionItem)),
                         .just(.setWinnerItems(originalEntity)),
-                        .just(.setLoading(false))
+                        .just(.setLoading(true))
                     )
                     
                 }

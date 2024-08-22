@@ -10,6 +10,7 @@ import UIKit
 
 import ReactorKit
 import RxCocoa
+import Kingfisher
 
 final class VoteResultCollectionViewCell: UICollectionViewCell {
     
@@ -171,6 +172,13 @@ extension VoteResultCollectionViewCell: ReactorKit.View {
             .map { $0.introduction }
             .distinctUntilChanged()
             .bind(to: introduceLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.winnerUser?.profile.iconUrl }
+            .bind(with: self) { owner, iconURL in
+                owner.faceImageView.kf.setImage(with: iconURL)
+            }
             .disposed(by: disposeBag)
         
         reactor.state

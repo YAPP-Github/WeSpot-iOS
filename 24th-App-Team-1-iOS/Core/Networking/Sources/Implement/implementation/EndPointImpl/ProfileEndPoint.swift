@@ -41,7 +41,7 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
         case let .updateUserBlock(messageId):
             return "/messages/\(messageId)/unblock"
         case .updateUserResign:
-            return "/revoke"
+            return "/auth/revoke"
         }
     }
     

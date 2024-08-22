@@ -14,11 +14,11 @@ import SnapKit
 public final class WSLottieView: UIView {
     
     //MARK: - Properties
-    private let lottieView: LottieAnimationView = LottieAnimationView()
+    public let lottieView: LottieAnimationView = LottieAnimationView()
     public var isStauts: Bool = true {
         didSet { toggleAnimation(isStatus: isStauts) }
     }
-    public var wsAnimation: LottieAnimation? = DesignSystemAnimationAsset.demo.animation
+    public var wsAnimation: LottieAnimation?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -44,16 +44,14 @@ public final class WSLottieView: UIView {
     }
     
     //TODO: 테스트 코드
-    /// - 반복 횟수, 애니메이션 속도 논의 후 설정 코드 추가
     private func setupAttributes() {
         lottieView.do {
             $0.loopMode = .loop
-            $0.animation = wsAnimation
         }
         
     }
     
-    private func toggleAnimation(isStatus: Bool) {
+    public func toggleAnimation(isStatus: Bool) {
         isStatus ? lottieView.play() : lottieView.stop()
     }
 }

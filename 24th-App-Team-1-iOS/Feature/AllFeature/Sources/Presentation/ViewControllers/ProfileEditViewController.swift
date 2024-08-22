@@ -15,6 +15,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 import RxDataSources
+import Kingfisher
 
 public final class ProfileEditViewController: BaseViewController<ProfileEditViewReactor> {
 
@@ -22,6 +23,7 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
     private let userDescrptionLabel: WSLabel = WSLabel(wsFont: .Header01)
     private let profileContainerView: UIView = UIView()
     private let profileImageView: UIImageView = UIImageView()
+    private let loadingIndicator: WSLottieIndicatorView = WSLottieIndicatorView()
     private let characterEditButton: WSToggleProfileTableViewButton = WSToggleProfileTableViewButton(profileButtonType: .character)
     private let backgroundEditButton: WSToggleProfileTableViewButton = WSToggleProfileTableViewButton(profileButtonType: .background)
     private let confirmButton: WSButton = WSButton(wsButtonType: .default(12))
@@ -234,11 +236,23 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
             .bind(to: userDescrptionLabel.rx.text)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicator.rx.isHidden)
+            .disposed(by: disposeBag)
+        
         reactor.state
             .compactMap { $0.userProfileEntity.profile.backgroundColor }
             .map {UIColor(hex: $0) }
             .distinctUntilChanged()
             .bind(to: profileContainerView.rx.backgroundColor)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.userProfileEntity.profile.iconUrl }
+            .distinctUntilChanged()
+            .bind(with: self) { owner, iconURL in
+                owner.profileImageView.kf.setImage(with: iconURL)
+            }
             .disposed(by: disposeBag)
         
         

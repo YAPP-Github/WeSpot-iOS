@@ -18,7 +18,8 @@ public final class VoteCompleteViewReactor: Reactor {
     public struct State {
         @Pulse var completeSection: [VoteCompleteSection]
         @Pulse var voteAllEntity: [VoteAllEntity]
-        var isLoading: Bool
+        @Pulse var isLoading: Bool
+        @Pulse var isOnboarding: Bool
         var currentPage: Int
     }
     
@@ -40,6 +41,7 @@ public final class VoteCompleteViewReactor: Reactor {
             completeSection: [.voteAllRankerInfo([])],
             voteAllEntity: [],
             isLoading: false,
+            isOnboarding: false,
             currentPage: 0
         )
         self.fetchAllVoteOptionsUseCase = fetchAllVoteOptionsUseCase
@@ -84,11 +86,11 @@ public final class VoteCompleteViewReactor: Reactor {
                             }
                     }
                     return .concat(
-                        .just(.setLoading(true)),
+                        .just(.setLoading(false)),
                         .just(.setOnboadingView(true)),
                         .just(.setVoteAllEntity(originalEntity.response)),
                         .just(.setCompleteSection(completeSectionitem)),
-                        .just(.setLoading(false))
+                        .just(.setLoading(true))
                     )
                 }
         case let .didShowVisibleCell(index):
@@ -101,8 +103,8 @@ public final class VoteCompleteViewReactor: Reactor {
         switch mutation {
         case let .setLoading(isLoading):
             newState.isLoading = isLoading
-        case let .setOnboadingView(isLoading):
-            newState.isLoading = isLoading
+        case let .setOnboadingView(isOnboarding):
+            newState.isOnboarding = isOnboarding
         case let .setCurrentPageControl(currentPage):
             newState.currentPage = currentPage
         case let .setCompleteSection(items):

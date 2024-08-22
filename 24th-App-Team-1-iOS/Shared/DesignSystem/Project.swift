@@ -18,6 +18,7 @@ let project = Project.makeProject(
     ],
     resourceSynthesizers: [
         .custom(name: "lottie", parser: .json, extensions: ["lottie"]),
+        .custom(name: "JSON", parser: .json, extensions: ["json"]),
         .assets(),
         .fonts(),
     ]
