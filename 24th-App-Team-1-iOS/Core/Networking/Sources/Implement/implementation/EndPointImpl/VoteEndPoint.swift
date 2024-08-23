@@ -11,6 +11,8 @@ import Alamofire
 
 
 public enum VoteEndPoint: WSNetworkEndPoint {
+    /// 반 친구 조회 API
+    case fetchClassMates
     /// 질문지 조회 API
     case fetchVoteOptions
     /// 투표 하기 API
@@ -28,6 +30,8 @@ public enum VoteEndPoint: WSNetworkEndPoint {
     
     public var path: String {
         switch self {
+        case .fetchClassMates:
+            return "/users/classmates"
         case .fetchVoteOptions:
             return "/votes/options"
         case .addVotes:
@@ -47,6 +51,8 @@ public enum VoteEndPoint: WSNetworkEndPoint {
     
     public var method: HTTPMethod {
         switch self {
+        case .fetchClassMates:
+            return .get
         case .fetchVoteOptions:
             return .get
         case .addVotes:

@@ -25,8 +25,8 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
     //MARK: - Properties
     private let toggleView: VoteInventoryToggleView = VoteInventoryToggleView()
     private let inventoryContainerView: UIView = UIView()
+    private let inventoryTableView: UITableView = UITableView(frame: .zero, style: .grouped)
     private let loadingIndicator: WSLottieIndicatorView = WSLottieIndicatorView()
-    private let inventoryTableView: UITableView = UITableView()
     private let inventoryConfirmButton: WSButton = WSButton(wsButtonType: .default(12))
     private let inventoryImageView: UIImageView = UIImageView()
     private let inventoryTitleLabel: WSLabel = WSLabel(wsFont: .Body01)
@@ -62,7 +62,7 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
     public override func setupUI() {
         super.setupUI()
         inventoryContainerView.addSubviews(inventoryImageView, inventoryTitleLabel, inventorySubTitleLabel)
-        view.addSubviews(toggleView, inventoryTableView, inventoryContainerView, inventoryConfirmButton)
+        view.addSubviews(toggleView, inventoryTableView, loadingIndicator ,inventoryContainerView, inventoryConfirmButton)
     }
     
     public override func setupAutoLayout() {

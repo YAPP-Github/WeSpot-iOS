@@ -66,6 +66,11 @@ struct DomainAssembly: Assembly {
         }
         
         // vote
+        container.register(FetchClassMatesUseCaseProtocol.self) { resolver in
+            let repository = resolver.resolve(VoteRepositoryProtocol.self)!
+            return FetchClassMatesUseCase(voteRepository: repository)
+        }
+        
         container.register(FetchVoteOptionsUseCaseProtocol.self) { resolver in
             let repository = resolver.resolve(VoteRepositoryProtocol.self)!
             return FetchVoteOptionsUseCase(voteRepository: repository)
@@ -157,7 +162,7 @@ struct DomainAssembly: Assembly {
         container.register(UpdateUserNotificationItemUseCaseProtocol.self) { resolver in
             let repository = resolver.resolve(NotificationRepositoryProtocol.self)!
             return UpdateUserNotificationItemUseCase(notificationRepository: repository)
-
+        }
                                                                             
         container.register(CreateUserResignUseCaseProtocol.self) { resolver in
             let repository = resolver.resolve(ProfileRepositoryProtocol.self)!

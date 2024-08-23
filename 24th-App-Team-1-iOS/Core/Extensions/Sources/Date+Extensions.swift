@@ -32,6 +32,21 @@ public extension Date {
         let calendar = Calendar.current
         return calendar.isDate(self, inSameDayAs: otherDate)
     }
+    
+    func isFutureDay(_ otherDate: Date) -> Bool {
+        let calendar = Calendar.current
+        
+        if calendar.isDate(self, inSameDayAs: otherDate) {
+            return true
+        }
+        
+        if calendar.isDateInYesterday(otherDate) || otherDate < self {
+            return false
+        } else {
+            return true
+        }
+        
+    }
 }
 
 public extension DateFormatter {

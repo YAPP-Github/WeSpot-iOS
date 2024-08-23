@@ -45,10 +45,10 @@ public extension UIViewController {
     
     func shareToKakaoTalk() {
         //TODO: 앱 설치 링크로 변경 및 문구 변경
-        let shareURL = "https://apps.apple.com/kr/app/instagram/id389801252"
-        let shareText = "wespot 설치 링크 입니다."
+        let shareURL = URL(string: "https://apps.apple.com/kr/app/instagram/id389801252")!
         
-        let shareViewController = UIActivityViewController(activityItems: [shareText, shareURL], applicationActivities: nil)
+        
+        let shareViewController = UIActivityViewController(activityItems: [WSURLItemSource(wespotAppURL: shareURL)], applicationActivities: nil)
         shareViewController.excludedActivityTypes = [.copyToPasteboard, .assignToContact]
         self.present(shareViewController, animated: true)
     }

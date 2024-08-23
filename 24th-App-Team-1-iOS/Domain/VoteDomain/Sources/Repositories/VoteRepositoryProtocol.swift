@@ -10,6 +10,7 @@ import Foundation
 import RxSwift
 
 public protocol VoteRepositoryProtocol {
+    func fetchClassMateItems() -> Single<VoteClassMatesEntity?>
     func fetchVoteOptions() -> Single<VoteResponseEntity?>
     func fetchWinnerVoteOptions(query: VoteWinnerRequestQuery) -> Single<VoteWinnerResponseEntity?>
     func uploadFinalVoteResults(body: [CreateVoteItemReqeuest]) -> Single<CreateVoteEntity?>

@@ -19,6 +19,8 @@ public final class ProfileResignNoteViewController: BaseViewController<ProfileRe
 
     //MARK: - Properties
     private let noteTitleLabel: WSLabel = WSLabel(wsFont: .Header01)
+    private let noteMainImageView: UIImageView = UIImageView()
+    private let noteContainerView: UIView = UIView()
     private let noteWarningImageView: UIImageView = UIImageView()
     private let noteSubTitleLabel: WSLabel = WSLabel(wsFont: .Body03)
     private let noteDescriptionLabel: WSLabel = WSLabel(wsFont: .Body06)
@@ -39,7 +41,8 @@ public final class ProfileResignNoteViewController: BaseViewController<ProfileRe
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
-        view.addSubviews(noteTitleLabel, noteWarningImageView, noteSubTitleLabel, noteDescriptionLabel, noteWarningLabel, confirmButton)
+        noteContainerView.addSubviews(noteWarningImageView, noteSubTitleLabel, noteDescriptionLabel, noteWarningLabel)
+        view.addSubviews(noteTitleLabel, noteContainerView, noteMainImageView, confirmButton)
     }
     
     public override func setupAutoLayout() {
@@ -51,27 +54,40 @@ public final class ProfileResignNoteViewController: BaseViewController<ProfileRe
             $0.height.equalTo(60)
         }
         
+        noteMainImageView.snp.makeConstraints {
+            $0.top.equalTo(noteTitleLabel.snp.bottom).offset(40)
+            $0.height.equalTo(122)
+            $0.width.equalTo(150)
+            $0.centerX.equalToSuperview()
+        }
+        
+        noteContainerView.snp.makeConstraints {
+            $0.top.equalTo(noteMainImageView.snp.bottom).offset(-10)
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.height.equalTo(179)
+        }
+        
         noteWarningImageView.snp.makeConstraints {
-            $0.top.equalTo(noteTitleLabel.snp.bottom).offset(28)
+            $0.top.equalToSuperview().inset(24)
             $0.size.equalTo(24)
-            $0.left.equalToSuperview().inset(30)
+            $0.left.equalToSuperview().inset(20)
         }
         
         noteSubTitleLabel.snp.makeConstraints {
-            $0.top.equalTo(noteTitleLabel.snp.bottom).offset(28)
+            $0.top.equalToSuperview().inset(24)
             $0.left.equalTo(noteWarningImageView.snp.right).offset(6)
             $0.height.equalTo(24)
         }
         
         noteDescriptionLabel.snp.makeConstraints {
             $0.top.equalTo(noteSubTitleLabel.snp.bottom).offset(8)
-            $0.horizontalEdges.equalToSuperview().inset(30)
+            $0.horizontalEdges.equalToSuperview().inset(20)
             $0.height.equalTo(63)
         }
         
         noteWarningLabel.snp.makeConstraints {
             $0.top.equalTo(noteDescriptionLabel.snp.bottom).offset(16)
-            $0.horizontalEdges.equalToSuperview().inset(30)
+            $0.horizontalEdges.equalToSuperview().inset(20)
             $0.height.equalTo(20)
         }
         
@@ -84,9 +100,20 @@ public final class ProfileResignNoteViewController: BaseViewController<ProfileRe
     
     public override func setupAttributes() {
         super.setupAttributes()
+        
         navigationBar.do {
             $0.setNavigationBarUI(property: .leftWithCenterItem(DesignSystemAsset.Images.arrow.image, "회원 탈퇴"))
             $0.setNavigationBarAutoLayout(property: .leftWithCenterItem)
+        }
+        
+        noteContainerView.do {
+            $0.backgroundColor = DesignSystemAsset.Colors.gray600.color
+            $0.layer.cornerRadius = 20
+            $0.clipsToBounds = true
+        }
+        
+        noteMainImageView.do {
+            $0.image = DesignSystemAsset.Images.imgProfileResignFiled.image
         }
         
         noteTitleLabel.do {

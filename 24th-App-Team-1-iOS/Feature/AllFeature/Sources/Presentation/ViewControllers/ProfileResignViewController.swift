@@ -150,7 +150,7 @@ public final class ProfileResignViewController: BaseViewController<ProfileResign
                 owner.dismiss(animated: true) {
                     WSAlertBuilder(showViewController: owner)
                         .setAlertType(type: .message)
-                        .setTitle(title: "정말 탈퇴하시나요")
+                        .setTitle(title: "정말 탈퇴하시나요", titleAlignment: .left)
                         .setCancel(text: "탈퇴")
                         .setConfirm(text: "닫기")
                         .action(.cancel) { [weak self] in

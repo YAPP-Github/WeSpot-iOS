@@ -16,6 +16,7 @@ public final class VoteProcessViewReactor: Reactor {
     
     private let createVoteUseCase: CreateVoteUseCaseProtocol
     private let createUserReportUseCase: CreateReportUserUseCaseProtocol
+    private let fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol
     
     public struct State {
         @Pulse var questionSection: [VoteProcessSection]
@@ -43,7 +44,7 @@ public final class VoteProcessViewReactor: Reactor {
         case addVoteOptionStub(CreateVoteItemReqeuest)
         case updateVoteOptionStub(Int, CreateVoteItemReqeuest)
         case setVoteUserItems(VoteUserEntity)
-        case setVoteResponseItems(VoteResponseEntity)
+        case setVoteResponseItems(VoteResponseEntity?)
         case setCreateVoteItems(CreateVoteEntity)
         case setReportItem(CreateReportUserEntity)
     }
@@ -53,19 +54,21 @@ public final class VoteProcessViewReactor: Reactor {
     public init(
         createVoteUseCase: CreateVoteUseCaseProtocol,
         createUserReportUseCase: CreateReportUserUseCaseProtocol,
-        voteResponseEntity: VoteResponseEntity,
+        fetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol,
+        voteResponseEntity: VoteResponseEntity? = nil,
         voteOptionStub: [CreateVoteItemReqeuest] = [],
         processCount: Int = 1
     ) {
-            self.initialState = State(
-                questionSection: [.votePrcessInfo([])],
-                voteResponseEntity: voteResponseEntity,
-                voteOptionsStub: voteOptionStub,
-                processCount: processCount,
-                isLoading: false
-            )
-            self.createVoteUseCase = createVoteUseCase
-            self.createUserReportUseCase = createUserReportUseCase
+        self.initialState = State(
+            questionSection: [.votePrcessInfo([])],
+            voteResponseEntity: voteResponseEntity,
+            voteOptionsStub: voteOptionStub,
+            processCount: processCount,
+            isLoading: false
+        )
+        self.createVoteUseCase = createVoteUseCase
+        self.createUserReportUseCase = createUserReportUseCase
+        self.fetchVoteOptionsUseCase = fetchVoteOptionsUseCase
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
@@ -73,28 +76,59 @@ public final class VoteProcessViewReactor: Reactor {
         switch action {
         case .viewDidLoad:
             var voteSectionItems: [VoteProcessItem] = []
-            guard let entity = currentState.voteResponseEntity?.response[index] else { return .empty() }
             
-            entity.voteInfo.forEach {
-                voteSectionItems.append(
-                    .voteQuestionItem(
-                        VoteProcessCellReactor(
-                            id: $0.id,
-                            content: $0.content
+            guard currentState.processCount == 1 else {
+                
+                guard let response = currentState.voteResponseEntity?.response[index] else { return .empty() }
+                
+                response.voteInfo.forEach {
+                    voteSectionItems.append(
+                        .voteQuestionItem(
+                            VoteProcessCellReactor(
+                                id: $0.id,
+                                content: $0.content
+                            )
                         )
                     )
+                }
+                
+                return .concat(
+                    .just(.setLoading(false)),
+                    .just(.setQuestionRowItems(voteSectionItems)),
+                    .just(.setVoteUserItems(response.userInfo)),
+                    .just(.setVoteResponseItems(currentState.voteResponseEntity)),
+                    .just(.setLoading(true))
                 )
             }
-            return .concat(
-                .just(.setLoading(false)),
-                .just(.setQuestionRowItems(voteSectionItems)),
-                .just(.setVoteUserItems(entity.userInfo)),
-                .just(.setLoading(true))
-            )
+            
+            return fetchVoteOptionsUseCase
+                .execute()
+                .asObservable()
+                .flatMap { entity -> Observable<Mutation> in
+                    guard let response = entity?.response[index] else { return .empty() }
+                    response.voteInfo.forEach {
+                        voteSectionItems.append(
+                            .voteQuestionItem(
+                                VoteProcessCellReactor(
+                                    id: $0.id,
+                                    content: $0.content
+                                )
+                            )
+                        )
+                    }
+                    
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setQuestionRowItems(voteSectionItems)),
+                        .just(.setVoteUserItems(response.userInfo)),
+                        .just(.setVoteResponseItems(entity)),
+                        .just(.setLoading(true))
+                    )
+                }
             
         case let .didTappedQuestionItem(row):
             guard let request = currentState.voteResponseEntity?.response[row] else { return .empty() }
-                        
+            
             let voteOption = CreateVoteItemReqeuest(
                 userId: request.userInfo.id,
                 voteOptionId: request.voteInfo[row].id

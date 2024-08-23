@@ -89,6 +89,7 @@ public final class WSAlertView: UIViewController {
             titleLabel.snp.makeConstraints {
                 $0.top.equalToSuperview().offset(32)
                 $0.height.equalTo(32)
+                $0.horizontalEdges.equalToSuperview().inset(20)
                 $0.centerX.equalToSuperview()
             }
             
@@ -127,7 +128,6 @@ public final class WSAlertView: UIViewController {
         
         titleLabel.do {
             $0.textColor = DesignSystemAsset.Colors.gray100.color
-            $0.textAlignment = alertType == .message ? .left : .center
         }
         
         messageLabel.do {

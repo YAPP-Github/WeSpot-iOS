@@ -144,6 +144,7 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         super.bind(reactor: reactor)
         
         Observable.just(())
+            .take(1)
             .map { Reactor.Action.viewDidLoad }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -198,8 +199,7 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             .filter { $0.1.count == $0.2 && $0.0?.response.count != $0.2 }
             .compactMap { ($0.0, $0.1, $0.2 + 1) }
             .bind(with: self) { owner, response in
-                guard let entity = response.0 else { return }
-                let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self, arguments: entity, response.1, response.2)
+                let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self, arguments: response.0, response.1, response.2)
                 owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -244,7 +244,8 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             .disposed(by: disposeBag)
         
         reactor.state
-            .compactMap { $0.voteUserEntity?.profileInfo.iconUrl}
+            .compactMap { $0.voteUserEntity?.profileInfo.iconUrl }
+            .debug("test Process Profile URL")
             .distinctUntilChanged()
             .bind(with: self) { owner, imageURL in
                 owner.faceImageView.kf.setImage(with: imageURL)
@@ -267,7 +268,7 @@ extension VoteProcessViewController {
         let reportAction = UIAlertAction(title: VoteProcessStr.voteReportAlertText, style: .default) { _ in
             WSAlertBuilder(showViewController: self)
                 .setAlertType(type: .titleWithMeesage)
-                .setTitle(title: VoteProcessStr.voteModalTitleText)
+                .setTitle(title: VoteProcessStr.voteModalTitleText, titleAlignment: .left)
                 .setMessage(message: VoteProcessStr.voteModalMessageText)
                 .setConfirm(text: VoteProcessStr.voteModalConfirmText)
                 .setCancel(text: VoteProcessStr.voteModalCancelText)

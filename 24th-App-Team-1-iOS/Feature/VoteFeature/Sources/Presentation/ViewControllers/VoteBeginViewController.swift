@@ -84,5 +84,12 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        inviteButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToKakaoTalk()
+            }
+            .disposed(by: disposeBag)
     }
 }

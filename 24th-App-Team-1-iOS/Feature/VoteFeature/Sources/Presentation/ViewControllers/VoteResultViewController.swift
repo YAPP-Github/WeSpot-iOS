@@ -50,7 +50,7 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
         voteResultCollectionView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(32)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(391)
+            $0.bottom.equalTo(resultPageControl.snp.top).offset(-16)
         }
         
         confirmButton.snp.makeConstraints {
@@ -66,7 +66,7 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
         }
         
         resultPageControl.snp.makeConstraints {
-            $0.top.equalTo(voteResultCollectionView.snp.bottom).offset(16)
+            $0.bottom.equalTo(confirmButton.snp.top).offset(-17)
             $0.centerX.equalToSuperview()
         }
     }
@@ -94,6 +94,7 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
         
         resultPageControl.do {
             $0.currentPage = 0
+            $0.isUserInteractionEnabled = false
             $0.isHidden = true
         }
     }
@@ -151,6 +152,8 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
     }
     
     private func createVoteResultSection() -> NSCollectionLayoutSection {
+        let verticalInset = (voteResultCollectionView.frame.height - 392) / 2
+        
         
         let voteResultItemSize: NSCollectionLayoutSize = .init(
             widthDimension: .fractionalWidth(1.0),
@@ -159,17 +162,18 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
         
         let voteResultItem: NSCollectionLayoutItem = NSCollectionLayoutItem(layoutSize: voteResultItemSize)
         
-        voteResultItem.contentInsets = .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+        voteResultItem.contentInsets = .init(top: 0, leading: 25, bottom: 0, trailing: 25)
         
         let voteResultGroupSize: NSCollectionLayoutSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(0.8),
-            heightDimension: .absolute(392)
+            heightDimension: .absolute(voteResultCollectionView.frame.height)
         )
         
         let voteResultGroup: NSCollectionLayoutGroup = NSCollectionLayoutGroup.horizontal(
             layoutSize: voteResultGroupSize,
             subitems: [voteResultItem]
         )
+        voteResultGroup.contentInsets = .init(top: verticalInset, leading: 0, bottom: verticalInset, trailing: 0)
         
         let voteResultSection: NSCollectionLayoutSection = NSCollectionLayoutSection(group: voteResultGroup)
         voteResultSection.orthogonalScrollingBehavior = .groupPagingCentered

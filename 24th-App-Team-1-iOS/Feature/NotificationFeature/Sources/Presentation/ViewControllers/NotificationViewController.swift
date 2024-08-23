@@ -105,17 +105,21 @@ public final class NotificationViewController: BaseViewController<NotificationVi
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$isSelected)
-            .filter { $0 == true }
-            .withLatestFrom(reactor.pulse(\.$selectedType))
-            .bind(with: self) { owner, type in
-                switch type {
+        Observable
+            .zip(
+                reactor.pulse(\.$selectedType),
+                reactor.pulse(\.$isCurrentDate)
+            )
+            .bind(with: self) { owner, response in
+                switch response.0 {
                 case .vote:
                     NotificationCenter.default.post(name: .showVoteProccessController, object: nil)
                 case .voteRecevied:
-                    NotificationCenter.default.post(name: .showVoteCompleteViewController, object: nil)
+                    NotificationCenter.default.post(name: .showVoteInventoryViewController, object: nil)
                 case .voteResults:
-                    NotificationCenter.default.post(name: .showVoteCompleteViewController, object: nil)
+                    let userInfo: [AnyHashable: Any] = ["isCurrnetDate": response.1]
+                    
+                    NotificationCenter.default.post(name: .showVoteCompleteViewController, object: nil, userInfo: userInfo)
                 default:
                     break
                 }

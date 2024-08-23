@@ -16,8 +16,9 @@ import Swinject
 struct VoteMainPresentationAssembly: Assembly {
     func assemble(container: Container) {
         
-        container.register(VoteMainViewReactor.self) { _ in
-            return VoteMainViewReactor()
+        container.register(VoteMainViewReactor.self) { resolver in
+            let fetchClassMatesUseCase = resolver.resolve(FetchClassMatesUseCaseProtocol.self)!
+            return VoteMainViewReactor(fetchClassMatesUseCase: fetchClassMatesUseCase)
         }
         
         container.register(VoteMainViewController.self) { resolver in
@@ -48,9 +49,7 @@ struct VoteBeginPresentationAssembly: Assembly {
 struct VoteHomePresentationAssembly: Assembly {
     func assemble(container: Container) {
         container.register(VoteHomeViewReactor.self) { resolver in
-            let fetchVoteUseCase = resolver.resolve(FetchVoteOptionsUseCaseProtocol.self)!
-            
-            return VoteHomeViewReactor(fetchVoteOptionsUseCase: fetchVoteUseCase)
+            return VoteHomeViewReactor()
         }
         
         container.register(VoteHomeViewController.self) { resovler in

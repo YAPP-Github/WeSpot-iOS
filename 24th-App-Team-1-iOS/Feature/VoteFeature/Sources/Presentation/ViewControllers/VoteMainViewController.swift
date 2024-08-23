@@ -19,7 +19,6 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
     
     //MARK: - Properties
     private let voteToggleView: VoteToggleView = VoteToggleView()
-    private let loadingIndicator: WSLottieIndicatorView = WSLottieIndicatorView()
     private lazy var votePageViewController: VotePageViewController = VotePageViewController(reactor: VotePageViewReactor())
     
     //MARK: - LifeCycle
@@ -36,7 +35,7 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
     public override func setupUI() {
         super.setupUI()
         addChild(votePageViewController)
-        view.addSubviews(voteToggleView, loadingIndicator, votePageViewController.view)
+        view.addSubviews(voteToggleView, votePageViewController.view)
     }
 
     public override func setupAutoLayout() {
@@ -65,6 +64,11 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
             
+        Observable.just(())
+            .map { Reactor.Action.viewDidLoad }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         voteToggleView.mainButton
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
@@ -94,11 +98,6 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
             .bind(to: voteToggleView.rx.isSelected)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$isLoading)
-            .bind(to: loadingIndicator.rx.isHidden)
-            .disposed(by: disposeBag)
-        
-        
         reactor.pulse(\.$isShowEffectView)
             .filter { $0 == true }
             .bind(with: self) { owner, _ in
@@ -106,22 +105,20 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
                 owner.navigationController?.pushViewController(voteEffectViewController, animated: true)
             }
             .disposed(by: disposeBag)
-        Observable.zip(
-            reactor.pulse(\.$voteResponseEntity),
-            reactor.pulse(\.$voteResponseStub)
-        )
-        .bind(with: self) { owner, response in
-            guard let responseEntity = response.0 else { return }
-            
-            if responseEntity.response.isEmpty {
-                let voteBegingViewController = DependencyContainer.shared.injector.resolve(VoteBeginViewController.self)
-                owner.navigationController?.pushViewController(voteBegingViewController, animated: true)
-            } else {
-                let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self, arguments: responseEntity, response.1, 1)
-                owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
+                
+        reactor.pulse(\.$isSelected)
+            .filter { $0 == true }
+            .withLatestFrom(reactor.pulse(\.$voteClassMateEntity).compactMap { $0?.user.isEmpty})
+            .bind(with: self) { owner, isCheck in
+                if isCheck {
+                    let voteBegingViewController = DependencyContainer.shared.injector.resolve(VoteBeginViewController.self)
+                    owner.navigationController?.pushViewController(voteBegingViewController, animated: true)
+                    
+                } else {
+                    let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self)
+                    owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
+                }
             }
-        }
-        .disposed(by: disposeBag)        
-        
+            .disposed(by: disposeBag)
     }
 }

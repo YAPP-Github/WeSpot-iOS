@@ -67,7 +67,7 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
-        view.addSubviews(shareButton, completePageControl, noticeButton, completeCollectionView, onboardingView, lendingView)
+        view.addSubviews(shareButton, completePageControl, noticeButton, completeCollectionView, lendingView, onboardingView)
     }
     
     public override func setupAutoLayout() {
@@ -208,9 +208,8 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
             .disposed(by: disposeBag)
         
         
-        reactor.state
-            .map { $0.isLoading }
-            .distinctUntilChanged()
+        reactor.pulse(\.$isOnboarding)
+            .filter { $0 == true }
             .bind(with: self) { owner, _ in
                 owner.fadeInOutOnAnimationView()
             }
@@ -276,7 +275,7 @@ extension VoteCompleteViewController {
     }
     
     private func fadeInOutOnAnimationView() {
-        UIView.animate(withDuration: 2.0, delay: 0.0, options: .curveEaseInOut) { [weak self] in
+        UIView.animate(withDuration: 4.0, delay: 0.0, options: .curveEaseInOut) { [weak self] in
             self?.onboardingView.alpha = 0.0
         } completion: { [weak self] _ in
             self?.onboardingView.removeFromSuperview()
