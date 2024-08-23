@@ -11,7 +11,7 @@ extension InfoPlist {
     
     public static var `default`: Self = {
         return .extendingDefault(with: [
-            "BASE_URL": .string("https://74a7cbb8-7129-42f6-9958-b1658e7c1882.mock.pstmn.io/api/v1")
+            "BASE_URL": .string("https://7b99aa13-6125-4dea-b4e0-2c99c33e5c51.mock.pstmn.io/api/v1")
         ])
     }()
     
@@ -59,7 +59,7 @@ extension InfoPlist {
                 .string("Pretendard-Medium.otf"),
                 .string("Pretendard-SemiBold.otf")
             ]),
-            "BASE_URL": .string("https://74a7cbb8-7129-42f6-9958-b1658e7c1882.mock.pstmn.io/api/v1"),
+            "BASE_URL": .string("https://7b99aa13-6125-4dea-b4e0-2c99c33e5c51.mock.pstmn.io/api/v1"),
             "NSAppleIDUsageDescription": .string("로그인에 Apple ID를 사용합니다."),
             "aps-environment": .string("development") 
         ]
