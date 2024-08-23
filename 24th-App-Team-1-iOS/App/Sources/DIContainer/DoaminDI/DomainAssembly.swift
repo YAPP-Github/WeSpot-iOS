@@ -7,6 +7,7 @@
 
 import Foundation
 import CommonDomain
+import CommonService
 import VoteDomain
 import LoginDomain
 import MessageDomain
@@ -37,11 +38,6 @@ struct DomainAssembly: Assembly {
         container.register(CreateReportUserUseCaseProtocol.self) { resolver in
             let repository = resolver.resolve(CommonRepositoryProtocol.self)!
             return CreateReportUserUseCase(commonRepositroy: repository)
-        }
-        
-        container.register(CreateRefreshTokenUseCaseProtocol.self) { resovler in
-            let repository = resovler.resolve(CommonRepositoryProtocol.self)!
-            return CreateRefreshTokenUseCase(commonRepository: repository)
         }
         
         // login

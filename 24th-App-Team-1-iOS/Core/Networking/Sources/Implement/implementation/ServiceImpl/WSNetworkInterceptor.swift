@@ -6,21 +6,17 @@
 //
 
 import Foundation
-import CommonDomain
 import Storage
+import Util
 
 import Alamofire
 import RxSwift
 import RxCocoa
 
 public final class WSNetworkInterceptor: RequestInterceptor {
-    
-    private let commonRepository: CommonRepositoryProtocol
+
+    private var retryLimit = 2
     private let disposeBag = DisposeBag()
-    
-    public init(commonRepository: CommonRepositoryProtocol) {
-        self.commonRepository = commonRepository
-    }
     
     public func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, any Error>) -> Void) {
         var urlRequest = urlRequest
@@ -37,22 +33,34 @@ public final class WSNetworkInterceptor: RequestInterceptor {
     
     public func retry(_ request: Request, for session: Session, dueTo error: any Error, completion: @escaping (RetryResult) -> Void) {
         
-        // StatusCode 401의 경우
-        guard let response = request.task?.response as? HTTPURLResponse, response.statusCode == 401 else {
-            completion(.doNotRetryWithError(WSNetworkError.default(message: "잘못된 상태코드입니다.")))
-            return
-        }
+        let refreshToken = KeychainManager.shared.get(type: .refreshToken)
         
-        guard let refreshToken = KeychainManager.shared.get(type: .refreshToken) else { return }
-        RefreshTokenManager.shared.refreshToken { result in
-            switch result {
-            case .success(let (newAccessToken, _)):
-                // 토큰 갱신 성공 -> 요청을 재시도
-                KeychainManager.shared.set(value: newAccessToken, type: .accessToken)
-                completion(.retry)
-            case .failure(let error):
-                // 토큰 갱신 실패 -> 재시도 X
-                completion(.doNotRetryWithError(WSNetworkError.default(message: error.localizedDescription)))
+        guard let statusCode = request.response?.statusCode,
+              request.retryCount < retryLimit else { return completion(.doNotRetry) }
+        
+        if request.retryCount < retryLimit {
+            if statusCode == 401  {
+                guard let refreshToken = KeychainManager.shared.get(type: .refreshToken) else { 
+                    return completion(.doNotRetryWithError(WSNetworkError.default(message: "리프레쉬 토큰을 찾을 수 없습니다.")))
+                }
+                
+                let body = ReissueToken(token: refreshToken)
+                let endPoint = ReissueEndPoint.createReissueToken(body: body)
+                WSNetworkService().request(endPoint: endPoint)
+                    .asObservable()
+                    .decodeMap(AccessToken.self)
+                    .logErrorIfDetected(category: Network.error)
+                    .subscribe { token in
+                        KeychainManager.shared.set(value: token.accessToken, type: .accessToken)
+                        KeychainManager.shared.set(value: token.refreshToken, type: .refreshToken)
+                    } onError: { error in
+                        completion(.doNotRetryWithError(error))
+                    }
+                    .disposed(by: disposeBag)
+
+
+
+                
             }
         }
     }

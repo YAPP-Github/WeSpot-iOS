@@ -14,7 +14,8 @@ let project = Project
         targets: [
             .core(module: .Networking, dependencies: [
                 .shared(module: .ThirdPartyLib),
-                .core(module: .Util)
+                .core(module: .Util),
+                .core(module: .Storage)
             ])
         ]
     )

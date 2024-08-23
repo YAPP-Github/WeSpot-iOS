@@ -24,7 +24,7 @@ public extension ModulePathProtocol {
     }
     
     var appBundleId: String {
-        return "com.wespot.apps"
+        return "com.app.wespot"
     }
 }
 
