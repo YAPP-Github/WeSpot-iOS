@@ -220,11 +220,11 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
                 switch owner.mainDataSources[indexPath] {
                 case .movementItem:
                     if indexPath.item == 0 {
-                        let googleURL = URL(string: "https://forms.gle/eiKdpjmwdxzvqm947")!
+                        let googleURL = URL(string: "https://pf.kakao.com/_SEDcG")!
                         let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: googleURL)
                         owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                     } else {
-                        let channelURL = URL(string: "https://pf.kakao.com/_SEDcG")!
+                        let channelURL = URL(string: "https://www.instagram.com/wespot.official/")!
                         let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: channelURL)
                         owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                     }
@@ -232,7 +232,7 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
                     if indexPath.item == 0  {
                         
                     } else if indexPath.item == 1 {
-                        let opinionURL = URL(string: "https://forms.gle/BZbC5wpuMt9mynUG6")!
+                        let opinionURL = URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSdObjdp0fJa-rwNNcsf9wGRJwSizxQKDM7t5JHV-n9-5DIO6g/viewform")!
                         let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: opinionURL)
                         owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                     } else {
