@@ -221,18 +221,17 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             .disposed(by: disposeBag)
         
         
-//        pageControl.rx.controlEvent(.valueChanged)
-//            .map { _ in self.pageControl.currentPage }
-//            .bind(with: self) { owner, currentPage in
-//                let offsetX = CGFloat(currentPage) * owner.onboardingCarouselView.frame.width
-//                owner.onboardingCarouselView.setContentOffset(CGPoint(x: offsetX, y: 0), animated: true)
-//            }
-//            .disposed(by: disposeBag)
+        pageControl.rx.controlEvent(.valueChanged)
+            .map { _ in self.pageControl.currentPage }
+            .bind(with: self) { owner, currentPage in
+                let offsetX = CGFloat(currentPage) * owner.onboardingCarouselView.frame.width
+                owner.onboardingCarouselView.setContentOffset(CGPoint(x: offsetX, y: 0), animated: true)
+            }
+            .disposed(by: disposeBag)
         
         reactor.state
             .filter { $0.signUpTokenResponse != nil }
             .bind(with: self) { owner, state in
-                // 메인 스레드에서 UI 업데이트
                 DispatchQueue.main.async {
                     owner.updateUI()
                 }
