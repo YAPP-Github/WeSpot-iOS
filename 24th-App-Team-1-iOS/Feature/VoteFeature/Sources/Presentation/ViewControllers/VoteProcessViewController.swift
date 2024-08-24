@@ -245,7 +245,6 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         
         reactor.state
             .compactMap { $0.voteUserEntity?.profileInfo.iconUrl }
-            .debug("test Process Profile URL")
             .distinctUntilChanged()
             .bind(with: self) { owner, imageURL in
                 owner.faceImageView.kf.setImage(with: imageURL)

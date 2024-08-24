@@ -17,8 +17,7 @@ public final class WSNetworkService: WSNetworkServiceProtocol {
     private let session: Session = {
         let networkMonitor: WSNetworkMonitor = WSNetworkMonitor()
         let networkConfigure: URLSessionConfiguration = URLSessionConfiguration.af.default
-        let commonRepository = CommonRepository()
-        let interceptor = WSNetworkInterceptor(commonRepository: commonRepository)
+        let interceptor = WSNetworkInterceptor()
                
         let networkSession: Session = Session(
             configuration: networkConfigure,

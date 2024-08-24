@@ -78,7 +78,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         KeychainManager.shared.delete(type: .accessToken)
         let accessToken = KeychainManager.shared.get(type: .accessToken)
         
-        if !(accessToken?.isEmpty ?? true) { // accessToken 값이 없으면 (회원가입 안됨)
+        if accessToken?.isEmpty ?? true { // accessToken 값이 없으면 (회원가입 안됨)
             let signInViewController = DependencyContainer.shared.injector.resolve(SignInViewController.self)
             window?.rootViewController = UINavigationController(rootViewController: signInViewController)
             
