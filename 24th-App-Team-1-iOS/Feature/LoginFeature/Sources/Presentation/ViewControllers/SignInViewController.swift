@@ -276,7 +276,6 @@ extension SignInViewController: UIScrollViewDelegate {
         let index = Int(value)
         pageControl.currentPage = index
         
-        print(index)
         if index < 1 {
             firstBackgroundView.isHidden = false
             DispatchQueue.global().async {
