@@ -9,9 +9,13 @@ import Foundation
 
 public struct SchoolListResponseEntity {
     public var schools: [SchoolListEntity]
+    public var lastCursorId: Int
+    public var hasNext: Bool
     
-    public init(schools: [SchoolListEntity]) {
+    public init(schools: [SchoolListEntity], lastCursorId: Int, hasNext: Bool) {
         self.schools = schools
+        self.lastCursorId = lastCursorId
+        self.hasNext = hasNext
     }
 }
 

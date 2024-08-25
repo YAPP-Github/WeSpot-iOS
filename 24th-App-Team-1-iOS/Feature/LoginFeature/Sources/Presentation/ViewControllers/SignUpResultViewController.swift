@@ -126,21 +126,27 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         
         reactor.state
             .map { $0.accountRequest.gender }
+            .map{ gender in
+                if gender == "female" { return "여학생" }
+                else { return "남학생" }
+            }
             .bind(to: genderTextField.rx.text)
             .disposed(by: disposeBag)
         
         reactor.state
-            .map { "\($0.accountRequest.classNumber)" }
+            .compactMap { $0.accountRequest.classNumber }
+            .map { "\($0)" }
             .bind(to: classTextField.rx.text)
             .disposed(by: disposeBag)
         
         reactor.state
-            .map { "\($0.accountRequest.grade)" }
+            .compactMap { $0.accountRequest.grade }
+            .map { "\($0)학년"}
             .bind(to: gradeTextField.rx.text)
             .disposed(by: disposeBag)
         
         reactor.state
-            .map { $0.accountRequest.schoolId?.description }
+            .map { $0.schoolName }
             .bind(to: schoolTextField.rx.text)
             .disposed(by: disposeBag)
         

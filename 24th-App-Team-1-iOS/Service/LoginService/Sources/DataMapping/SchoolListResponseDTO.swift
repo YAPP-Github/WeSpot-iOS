@@ -11,6 +11,8 @@ import LoginDomain
 
 public struct SchoolListResponseDTO: Decodable {
     public let schools: [SchoolListEntityResponseDTO]
+    public let lastCursorId: Int
+    public let hasNext: Bool
 }
 
 public struct SchoolListEntityResponseDTO: Decodable {
@@ -30,7 +32,7 @@ public struct SchoolListEntityResponseDTO: Decodable {
 
 extension SchoolListResponseDTO {
     func toDomain() -> SchoolListResponseEntity {
-        return .init(schools: schools.map { $0.toDomain() })
+        return .init(schools: schools.map { $0.toDomain() }, lastCursorId: lastCursorId, hasNext: hasNext)
     }
 }
 

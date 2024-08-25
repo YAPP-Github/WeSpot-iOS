@@ -19,6 +19,7 @@ public final class SignUpResultViewReactor: Reactor {
         var accountRequest: CreateAccountRequest
         var isAccountCreationCompleted: Bool = false
         var isMarketingAgreed: Bool = false
+        var schoolName: String
     }
     
     public enum Action {
@@ -33,9 +34,10 @@ public final class SignUpResultViewReactor: Reactor {
     
     public init(
         accountRequest: CreateAccountRequest,
-        createAccountUseCase: CreateAccountUseCaseProtocol
+        createAccountUseCase: CreateAccountUseCaseProtocol,
+        schoolName: String
     ) {
-        self.initialState = State(accountRequest: accountRequest)
+        self.initialState = State(accountRequest: accountRequest, schoolName: schoolName)
         self.createAccountUseCase = createAccountUseCase
     }
     

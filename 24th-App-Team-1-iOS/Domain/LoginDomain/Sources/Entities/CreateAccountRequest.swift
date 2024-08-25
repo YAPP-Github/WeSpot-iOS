@@ -10,7 +10,7 @@ import Foundation
 public struct ConsentsRequest {
     public var marketing: Bool?
     
-    public init(marketing: Bool? = nil) {
+    public init(marketing: Bool? = false) {
         self.marketing = marketing
     }
 }
@@ -24,7 +24,7 @@ public struct CreateAccountRequest {
     public var consents: ConsentsRequest?
     public var signUpToken: String?
     
-    public init(name: String? = nil, gender: String? = nil, schoolId: Int? = nil, grade: Int? = nil, classNumber: Int? = nil, consents: ConsentsRequest? = nil, signUpToken: String? = nil) {
+    public init(name: String? = nil, gender: String? = nil, schoolId: Int? = nil, grade: Int? = nil, classNumber: Int? = nil, consents: ConsentsRequest? = .init(), signUpToken: String? = nil) {
         self.name = name
         self.gender = gender
         self.schoolId = schoolId

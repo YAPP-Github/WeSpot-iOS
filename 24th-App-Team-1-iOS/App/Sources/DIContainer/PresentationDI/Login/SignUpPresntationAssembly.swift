@@ -17,14 +17,13 @@ import Swinject
 struct SignUpSchoolPresentationAssembly: Assembly {
     func assemble(container: Container) {
         
-        container.register(SignUpSchoolViewReactor.self) { resolver in
+        container.register(SignUpSchoolViewReactor.self) { (resolver, accountRequest: CreateAccountRequest, schoolName: String)  in
             let fetchSchoolListUseCase = resolver.resolve(FetchSchoolListUseCaseProtocol.self)!
-            let accountRequest = CreateAccountRequest()
-            return SignUpSchoolViewReactor(fetchSchoolListUseCase: fetchSchoolListUseCase, accountRequest: accountRequest)
+            return SignUpSchoolViewReactor(fetchSchoolListUseCase: fetchSchoolListUseCase, accountRequest: accountRequest, schoolName: schoolName)
         }
 
-        container.register(SignUpSchoolViewController.self) { resolver in
-            let reactor = resolver.resolve(SignUpSchoolViewReactor.self)!
+        container.register(SignUpSchoolViewController.self) { (resolver, accountRequest: CreateAccountRequest, schoolName: String) in
+            let reactor = resolver.resolve(SignUpSchoolViewReactor.self, arguments: accountRequest, schoolName)!
             
             return SignUpSchoolViewController(reactor: reactor)
         }
@@ -36,12 +35,12 @@ struct SignUpSchoolPresentationAssembly: Assembly {
 struct SignUpGradePresentationAssembly: Assembly {
     func assemble(container: Container) {
 
-        container.register(SignUpGradeViewReactor.self) {(resolver, accountRequest: CreateAccountRequest) in
-            return SignUpGradeViewReactor(accountRequest: accountRequest)
+        container.register(SignUpGradeViewReactor.self) {(resolver, accountRequest: CreateAccountRequest, schoolName: String) in
+            return SignUpGradeViewReactor(accountRequest: accountRequest, schoolName: schoolName)
         }
 
-        container.register(SignUpGradeViewController.self) { (resolver, accountRequest: CreateAccountRequest) in
-            let reactor = resolver.resolve(SignUpGradeViewReactor.self, argument: accountRequest)!
+        container.register(SignUpGradeViewController.self) { (resolver, accountRequest: CreateAccountRequest, schoolName: String) in
+            let reactor = resolver.resolve(SignUpGradeViewReactor.self, arguments: accountRequest, schoolName)!
             return SignUpGradeViewController(reactor: reactor)
         }
 
@@ -52,12 +51,12 @@ struct SignUpGradePresentationAssembly: Assembly {
 struct SignUpClassPresentationAssembly: Assembly {
     func assemble(container: Container) {
 
-        container.register(SignUpClassViewReactor.self) {(resolver, accountRequest: CreateAccountRequest) in
-            return SignUpClassViewReactor(accountRequest: accountRequest)
+        container.register(SignUpClassViewReactor.self) {(resolver, accountRequest: CreateAccountRequest, schoolName: String) in
+            return SignUpClassViewReactor(accountRequest: accountRequest, schoolName: schoolName)
         }
 
-        container.register(SignUpClassViewController.self) { (resolver, argument: CreateAccountRequest) in
-            let reactor = resolver.resolve(SignUpClassViewReactor.self, argument: argument)!
+        container.register(SignUpClassViewController.self) { (resolver, argument: CreateAccountRequest, schollName: String) in
+            let reactor = resolver.resolve(SignUpClassViewReactor.self, arguments: argument, schollName)!
             return SignUpClassViewController(reactor: reactor)
         }
 
@@ -69,12 +68,12 @@ struct SignUpClassPresentationAssembly: Assembly {
 struct SignUpGenderPresentationAssembly: Assembly {
     func assemble(container: Container) {
 
-        container.register(SignUpGenderViewReactor.self) { (resolver, accountRequest: CreateAccountRequest) in
-            return SignUpGenderViewReactor(accountRequest: accountRequest)
+        container.register(SignUpGenderViewReactor.self) { (resolver, accountRequest: CreateAccountRequest, schoolName: String) in
+            return SignUpGenderViewReactor(accountRequest: accountRequest, schoolName: schoolName)
         }
 
-        container.register(SignUpGenderViewController.self) { (resolver, argument: CreateAccountRequest) in
-            let reactor = resolver.resolve(SignUpGenderViewReactor.self, argument: argument)!
+        container.register(SignUpGenderViewController.self) { (resolver, argument: CreateAccountRequest , schoolName: String) in
+            let reactor = resolver.resolve(SignUpGenderViewReactor.self, arguments: argument, schoolName)!
             return SignUpGenderViewController(reactor: reactor)
         }
 
@@ -84,13 +83,13 @@ struct SignUpGenderPresentationAssembly: Assembly {
 /// SignUpName DIContainer
 struct SignUpNamePresentationAssembly: Assembly {
     func assemble(container: Container) {
-        container.register(SignUpNameViewReactor.self) { (resolver, accountRequest: CreateAccountRequest) in
+        container.register(SignUpNameViewReactor.self) { (resolver, accountRequest: CreateAccountRequest, schoolName: String) in
             let createCheckProfanityUseCase = resolver.resolve(CreateCheckProfanityUseCaseProtocol.self)!
-            return SignUpNameViewReactor(createCheckProfanityUseCase: createCheckProfanityUseCase, accountRequest: accountRequest)
+            return SignUpNameViewReactor(createCheckProfanityUseCase: createCheckProfanityUseCase, accountRequest: accountRequest, schoolName: schoolName)
         }
 
-        container.register(SignUpNameViewController.self) { (resolver, argument: CreateAccountRequest) in
-            let reactor = resolver.resolve(SignUpNameViewReactor.self, argument: argument)!
+        container.register(SignUpNameViewController.self) { (resolver, argument: CreateAccountRequest, schoolName: String) in
+            let reactor = resolver.resolve(SignUpNameViewReactor.self, arguments: argument, schoolName)!
             return SignUpNameViewController(reactor: reactor)
         }
 
@@ -102,13 +101,13 @@ struct SignUpNamePresentationAssembly: Assembly {
 struct SignUpResultPresentationAssembly: Assembly {
     func assemble(container: Container) {
 
-        container.register(SignUpResultViewReactor.self) { (resolver, accountRequest: CreateAccountRequest) in
+        container.register(SignUpResultViewReactor.self) { (resolver, accountRequest: CreateAccountRequest, schoolName: String) in
             let createAccountUseCase = resolver.resolve(CreateAccountUseCaseProtocol.self)!
-            return SignUpResultViewReactor(accountRequest: accountRequest, createAccountUseCase: createAccountUseCase)
+            return SignUpResultViewReactor(accountRequest: accountRequest, createAccountUseCase: createAccountUseCase, schoolName: schoolName)
         }
 
-        container.register(SignUpResultViewController.self) { (resolver, argument: CreateAccountRequest) in
-            let reactor = resolver.resolve(SignUpResultViewReactor.self, argument: argument)!
+        container.register(SignUpResultViewController.self) { (resolver, argument: CreateAccountRequest, schoolName: String) in
+            let reactor = resolver.resolve(SignUpResultViewReactor.self, arguments: argument, schoolName)!
             return SignUpResultViewController(reactor: reactor)
         }
 
@@ -119,12 +118,12 @@ struct SignUpResultPresentationAssembly: Assembly {
 struct SignUpCompletePresentationAssembly: Assembly {
     func assemble(container: Container) {
 
-        container.register(SignUpClassViewReactor.self) { (resolver, accountRequest: CreateAccountRequest) in
-            return SignUpClassViewReactor(accountRequest: accountRequest)
+        container.register(SignUpClassViewReactor.self) { (resolver, accountRequest: CreateAccountRequest, schoolName: String) in
+            return SignUpClassViewReactor(accountRequest: accountRequest, schoolName: schoolName)
         }
 
-        container.register(SignUpClassViewController.self) { (resolver, argument: CreateAccountRequest) in
-            let reactor = resolver.resolve(SignUpClassViewReactor.self, argument: argument)!
+        container.register(SignUpClassViewController.self) { (resolver, argument: CreateAccountRequest, schoolName: String) in
+            let reactor = resolver.resolve(SignUpClassViewReactor.self, arguments: argument, schoolName)!
             return SignUpClassViewController(reactor: reactor)
         }
 

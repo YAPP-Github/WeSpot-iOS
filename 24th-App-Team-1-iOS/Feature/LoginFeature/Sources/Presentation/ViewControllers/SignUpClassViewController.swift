@@ -129,7 +129,7 @@ public final class SignUpClassViewController: BaseViewController<SignUpClassView
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpGenderViewController = DependencyContainer.shared.injector.resolve(SignUpGenderViewController.self, argument: reactor.currentState.accountRequest)
+                let signUpGenderViewController = DependencyContainer.shared.injector.resolve(SignUpGenderViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
                 owner.navigationController?.pushViewController(signUpGenderViewController, animated: true)
             }
             .disposed(by: disposeBag)

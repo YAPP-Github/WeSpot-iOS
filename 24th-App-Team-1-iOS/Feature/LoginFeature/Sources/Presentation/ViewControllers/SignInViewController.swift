@@ -236,8 +236,9 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
                     owner.updateUI()
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self)
+                    let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self, arguments: CreateAccountRequest(), "")
                     signUpSchoolViewController.reactor?.initialState.accountRequest = CreateAccountRequest()
+                    signUpSchoolViewController.reactor?.initialState.schoolName = String()
                     owner.navigationController?.setViewControllers([signUpSchoolViewController], animated: true)
                 }
             }

@@ -90,7 +90,7 @@ public final class SignUpGenderViewController: BaseViewController<SignUpGenderVi
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.reactor?.action.onNext(.selectGender("male"))
-                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self, argument: reactor.currentState.accountRequest)
+                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName )
                 owner.navigationController?.pushViewController(signUpNameViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -99,7 +99,7 @@ public final class SignUpGenderViewController: BaseViewController<SignUpGenderVi
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.reactor?.action.onNext(.selectGender("female"))
-                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self, argument: reactor.currentState.accountRequest)
+                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
                 owner.navigationController?.pushViewController(signUpNameViewController, animated: true)
             }
             .disposed(by: disposeBag)
