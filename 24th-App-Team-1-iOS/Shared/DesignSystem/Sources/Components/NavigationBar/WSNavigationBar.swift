@@ -78,6 +78,7 @@ public final class WSNavigationBar: UIView {
         
         rightBarButton.snp.makeConstraints {
             $0.right.equalToSuperview().offset(-property.constraints.rightBarButtonItemRightSpacing)
+            $0.top.equalToSuperview().offset(property.constraints.rightBarButtonItemTopSpacing)
             $0.width.equalTo(property.constraints.rightWidthScale)
             $0.height.equalTo(property.constraints.rightHeightScale)
         }

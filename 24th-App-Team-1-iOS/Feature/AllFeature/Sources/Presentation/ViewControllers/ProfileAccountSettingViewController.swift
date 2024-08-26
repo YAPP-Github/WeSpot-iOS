@@ -82,7 +82,7 @@ public final class ProfileAccountSettingViewController: BaseViewController<Profi
         reactor.pulse(\.$isLogout)
             .filter { $0 == true }
             .bind(with: self) { owner, _ in
-                //TODO: 화면 전환 코드 추가
+                NotificationCenter.default.post(name: .showSignInViewController, object: nil)
             }
             .disposed(by: disposeBag)
         
@@ -96,6 +96,9 @@ public final class ProfileAccountSettingViewController: BaseViewController<Profi
                         .setTitle(title: "로그아웃 하시나요?", titleAlignment: .left)
                         .setConfirm(text: "닫기")
                         .setCancel(text: "로그아웃")
+                        .action(.cancel) {
+                            self.reactor?.action.onNext(.didTappedLogoutButton)
+                        }
                         .show()
                 } else {
                     let profileResignNoteViewController = DependencyContainer.shared.injector.resolve(ProfileResignNoteViewController.self)

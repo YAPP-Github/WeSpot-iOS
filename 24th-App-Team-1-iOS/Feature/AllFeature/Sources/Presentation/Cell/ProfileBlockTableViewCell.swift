@@ -82,7 +82,7 @@ final class ProfileBlockTableViewCell: UITableViewCell {
         }
         
         blockButton.do {
-            $0.setupButton(text: "차단 해체")
+            $0.setupButton(text: "차단 해제")
             $0.setupFont(font: .Body09)
             $0.layer.cornerRadius = 14
         }
@@ -148,7 +148,7 @@ extension ProfileBlockTableViewCell: ReactorKit.View {
             .disposed(by: disposeBag)
         
         reactor.state
-            .map { $0.isUpdate == true ? "해체 완료" : "차단 해체" }
+            .map { $0.isUpdate == true ? "해체 완료" : "차단 해제" }
             .distinctUntilChanged()
             .bind(to: blockButton.rx.title())
             .disposed(by: disposeBag)

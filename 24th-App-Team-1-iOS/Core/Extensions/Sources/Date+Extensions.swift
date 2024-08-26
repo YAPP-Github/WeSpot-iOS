@@ -19,13 +19,23 @@ public extension Date {
     }
     
     func toFormatRelative() -> String {
-        let relativeDateformatter = RelativeDateTimeFormatter()
-        relativeDateformatter.unitsStyle = .short
-        relativeDateformatter.locale = Locale(identifier: "ko_KR")
-        relativeDateformatter.calendar = .autoupdatingCurrent
         
-        let relativeString = relativeDateformatter.localizedString(for: self, relativeTo: .now)
-        return relativeString
+        let calendar = Calendar.current
+        
+        guard let sevenDaysAgo = calendar.date(byAdding: .day, value: -7, to: .now) else {
+            return self.toFormatString(with: .dashYyyyMMdd)
+        }
+        
+        if calendar.isDate(self, inSameDayAs: sevenDaysAgo) {
+            let relativeDateFormatter = RelativeDateTimeFormatter()
+            relativeDateFormatter.unitsStyle = .short
+            relativeDateFormatter.locale = Locale(identifier: "ko_KR")
+            relativeDateFormatter.calendar = .autoupdatingCurrent
+            
+            return relativeDateFormatter.localizedString(for: self, relativeTo: .now)
+        }
+        
+        return self.toFormatString(with: .dashYyyyMMdd)
     }
       
     func isSameDay(as otherDate: Date) -> Bool {
