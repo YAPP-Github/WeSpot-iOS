@@ -15,6 +15,7 @@ public final class SignUpGradeViewReactor: Reactor {
     public struct State {
         var accountRequest: CreateAccountRequest
         var isGradeSelected: Bool = false
+        var schoolName: String
     }
     
     public enum Action {
@@ -28,8 +29,8 @@ public final class SignUpGradeViewReactor: Reactor {
     
     public var initialState: State
     
-    public init(accountRequest: CreateAccountRequest) {
-        self.initialState = State(accountRequest: accountRequest)
+    public init(accountRequest: CreateAccountRequest, schoolName: String) {
+        self.initialState = State(accountRequest: accountRequest, schoolName: schoolName)
         print(initialState.accountRequest)
     }
     

@@ -27,9 +27,10 @@ public final class CommonRepository: CommonRepositoryProtocol {
         let endPoint = CommonEndPoint.createProfanityCheck(query)
         
         return networkService.request(endPoint: endPoint)
-            .asObservable() // Observable<Data>
-            .map{ _ in  true }
-            .catchAndReturn(false)
+            .asObservable()
+            .map { data in
+                return data.count > 0
+            }
             .logErrorIfDetected(category: Network.error)
             .asSingle()
     }

@@ -17,6 +17,7 @@ public final class SignUpClassViewReactor: Reactor {
     public struct State {
         var accountRequest: CreateAccountRequest
         var isEnabledButton: Bool = false
+        var schoolName: String
     }
     
     public enum Action {
@@ -29,8 +30,8 @@ public final class SignUpClassViewReactor: Reactor {
     }
     
     
-    public init(accountRequest: CreateAccountRequest) {
-        self.initialState = State(accountRequest: accountRequest)
+    public init(accountRequest: CreateAccountRequest, schoolName: String) {
+        self.initialState = State(accountRequest: accountRequest, schoolName: schoolName)
         print(initialState)
     }
     

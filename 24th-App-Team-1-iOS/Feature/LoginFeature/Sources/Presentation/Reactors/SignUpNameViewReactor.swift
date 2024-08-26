@@ -22,6 +22,7 @@ public final class SignUpNameViewReactor: Reactor {
         var isButtonEnabled: Bool = false
         var isWarningHidden: Bool = true
         var accountRequest: CreateAccountRequest
+        var schoolName: String
     }
     
     public enum Action {
@@ -37,10 +38,11 @@ public final class SignUpNameViewReactor: Reactor {
     
     public init(
         createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol,
-        accountRequest: CreateAccountRequest
+        accountRequest: CreateAccountRequest,
+        schoolName: String
     ) {
         self.createCheckProfanityUseCase = createCheckProfanityUseCase
-        self.initialState = State(accountRequest: accountRequest)
+        self.initialState = State(accountRequest: accountRequest, schoolName: schoolName)
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
@@ -63,6 +65,7 @@ public final class SignUpNameViewReactor: Reactor {
                     } else {
                         let isValid = self.validateName(name)
                         let errorMessage = isValid ? nil : (name.count <= 1 ? nil : "2~5자의 한글만 입력 가능해요")
+                        let errorMessage = isValid ? nil : (name.count <= 1 ? "" : "2~5자의 한글만 입력 가능해요")
                         let isButtonEnabled = name.count >= 2 && isValid
                         let isWarningHidden = name.count <= 1
                         

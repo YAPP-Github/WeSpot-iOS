@@ -13,6 +13,7 @@ import ReactorKit
 public final class SignUpSchoolViewReactor: Reactor {
     
     private let fetchSchoolListUseCase: FetchSchoolListUseCaseProtocol
+    private let schoolName: String
     public var initialState: State
     
     public struct State {
@@ -40,33 +41,36 @@ public final class SignUpSchoolViewReactor: Reactor {
     
     public init(
         fetchSchoolListUseCase: FetchSchoolListUseCaseProtocol,
-        accountRequest: CreateAccountRequest
+        accountRequest: CreateAccountRequest,
+        schoolName: String
     ) {
         self.initialState = State(
-            schoolName: "",
-            schoolList: SchoolListResponseEntity(schools: []),
+            schoolName: schoolName,
+            schoolList: SchoolListResponseEntity(schools: [], lastCursorId: 0, hasNext: false),
             cursorId: 0,
             isLoading: false,
             accountRequest: accountRequest
         )
         self.fetchSchoolListUseCase = fetchSchoolListUseCase
+        self.schoolName = schoolName
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .searchSchool(let schoolName):
             guard !schoolName.isEmpty else {
-                return .just(.setSchoolList(SchoolListResponseEntity(schools: [])))
+                return .just(.setSchoolList(SchoolListResponseEntity(schools: [], lastCursorId: 0, hasNext: false)))
             }
-            
+            print(schoolName)
             let query = SchoolListRequestQuery(name: schoolName, cursorId: 0)
             
             return fetchSchoolListUseCase
                 .execute(query: query)
                 .asObservable()
                 .flatMap { entity -> Observable<Mutation> in
+                    dump(entity)
                     guard let entity else {
-                        return .just(.setSchoolList(SchoolListResponseEntity(schools: [])))
+                        return .just(.setSchoolList(SchoolListResponseEntity(schools: [], lastCursorId: 0, hasNext: false)))
                     }
                     return .just(.setSchoolList(entity))
                 }
@@ -102,12 +106,13 @@ public final class SignUpSchoolViewReactor: Reactor {
         case .appendSchoolList(let results):
             var currentSchools = newState.schoolList.schools
             currentSchools.append(contentsOf: results.schools)
-            newState.schoolList = SchoolListResponseEntity(schools: currentSchools)
+            newState.schoolList = SchoolListResponseEntity(schools: currentSchools, lastCursorId: results.lastCursorId, hasNext: results.hasNext)
             newState.cursorId = results.schools.last?.id ?? newState.cursorId
             
         case .setSelectedSchool(let school):
             newState.accountRequest.schoolId = school?.id
             newState.selectedSchool = school
+            newState.schoolName = school?.name ?? ""
             
         case .setCursorId(let cursorId):
             newState.cursorId = cursorId

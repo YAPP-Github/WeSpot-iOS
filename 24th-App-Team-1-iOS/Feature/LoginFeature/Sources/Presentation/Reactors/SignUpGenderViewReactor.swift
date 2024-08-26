@@ -14,6 +14,7 @@ public final class SignUpGenderViewReactor: Reactor {
     
     public struct State {
         var accountRequest: CreateAccountRequest
+        var schoolName: String
     }
     
     public enum Action {
@@ -26,8 +27,8 @@ public final class SignUpGenderViewReactor: Reactor {
     
     public var initialState: State
     
-    public init(accountRequest: CreateAccountRequest) {
-        self.initialState = State(accountRequest: accountRequest)
+    public init(accountRequest: CreateAccountRequest, schoolName: String) {
+        self.initialState = State(accountRequest: accountRequest, schoolName: schoolName)
     }
     
     public  func mutate(action: Action) -> Observable<Mutation> {
