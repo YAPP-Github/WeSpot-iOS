@@ -59,7 +59,7 @@ extension InfoPlist {
                 .string("Pretendard-Medium.otf"),
                 .string("Pretendard-SemiBold.otf")
             ]),
-            "BASE_URL": .string("https://7b99aa13-6125-4dea-b4e0-2c99c33e5c51.mock.pstmn.io/api/v1"),
+            "BASE_URL": .string("https://wespot.kro.kr/api/v1"),
             "NSAppleIDUsageDescription": .string("로그인에 Apple ID를 사용합니다."),
             "aps-environment": .string("development") 
         ]

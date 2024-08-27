@@ -18,15 +18,9 @@ final public class SelectPolicyAgreementView: UIView {
     public let checkButton = UIButton()
     private let titleLabel = WSLabel(wsFont: .Body06)
     public let moreDetailButton = UIButton()
-    private let isCheckedRelay = BehaviorRelay<Bool>(value: false)
-    public var isCheckedObservable: Observable<Bool> {
-        return isCheckedRelay.asObservable()
-    }
-    
-    private var isChecked: Bool {
-        get { return isCheckedRelay.value }
-        set {
-            isCheckedRelay.accept(newValue)
+    public var isChecked: Bool = false {
+        didSet {
+            checkButton.isSelected = isChecked
         }
     }
     private let disposeBag = DisposeBag()
@@ -39,7 +33,6 @@ final public class SelectPolicyAgreementView: UIView {
         setupAutoLayout()
         setupAttributes()
         setupDetail(text: text, font: font, isHidden: isHiddenDetailButton)
-        bindUI()
     }
     
     required init?(coder: NSCoder) {
@@ -80,30 +73,11 @@ final public class SelectPolicyAgreementView: UIView {
     private func setupDetail(text: String, font: WSFont, isHidden: Bool) {
     
         checkButton.setImage(DesignSystemAsset.Images.check.image, for: .normal)
-        checkButton.setImage(DesignSystemAsset.Images.checkSelected.image, for: .highlighted)
+        checkButton.setImage(DesignSystemAsset.Images.checkSelected.image, for: .selected)
         
         titleLabel.text = text
         titleLabel.font = font.font()
         
         moreDetailButton.isHidden = isHidden
     }
-    
-    private func bindUI() {
-        
-        checkButton.rx.tap
-            .withLatestFrom(isCheckedRelay)
-            .map { !$0 }
-            .bind(to: isCheckedRelay)
-            .disposed(by: disposeBag)
-        
-        isCheckedRelay
-            .map { $0 ? DesignSystemAsset.Images.checkSelected.image : DesignSystemAsset.Images.check.image }
-            .bind(to: checkButton.rx.image(for: .normal))
-            .disposed(by: disposeBag)
-    }
-    
-    public func setCheckedState(_ isChecked: Bool) {
-        isCheckedRelay.accept(isChecked)
-    }
-
 }

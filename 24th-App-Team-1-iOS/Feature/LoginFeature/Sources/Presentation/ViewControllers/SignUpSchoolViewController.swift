@@ -193,9 +193,14 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                let signUpGradeViewController =  DependencyContainer.shared.injector.resolve(SignUpGradeViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
-                owner.navigationController?.pushViewController(signUpGradeViewController, animated: true)
+            .withLatestFrom(reactor.state.map { $0.accountRequest})
+            .bind(with: self) { owner, response in
+                if response.grade == 0 {
+                    let signUpGradeViewController =  DependencyContainer.shared.injector.resolve(SignUpGradeViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
+                    owner.navigationController?.pushViewController(signUpGradeViewController, animated: true)
+                } else {
+                    owner.navigationController?.popViewController(animated: true)
+                }
             }
             .disposed(by: disposeBag)
     }

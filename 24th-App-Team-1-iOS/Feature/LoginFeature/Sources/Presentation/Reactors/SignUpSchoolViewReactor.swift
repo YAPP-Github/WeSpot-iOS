@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Util
 import LoginDomain
 
 import ReactorKit
@@ -13,6 +14,7 @@ import ReactorKit
 public final class SignUpSchoolViewReactor: Reactor {
     
     private let fetchSchoolListUseCase: FetchSchoolListUseCaseProtocol
+    private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     private let schoolName: String
     public var initialState: State
     
@@ -92,6 +94,7 @@ public final class SignUpSchoolViewReactor: Reactor {
                 }
             
         case .selectSchool(let school):
+            globalService.event.onNext(.didChangedAccountSchoolName(schoolName: school?.name ?? ""))
             return .just(.setSelectedSchool(school))
         }
     }
@@ -110,7 +113,7 @@ public final class SignUpSchoolViewReactor: Reactor {
             newState.cursorId = results.schools.last?.id ?? newState.cursorId
             
         case .setSelectedSchool(let school):
-            newState.accountRequest.schoolId = school?.id
+            newState.accountRequest.schoolId = school?.id ?? 0
             newState.selectedSchool = school
             newState.schoolName = school?.name ?? ""
             

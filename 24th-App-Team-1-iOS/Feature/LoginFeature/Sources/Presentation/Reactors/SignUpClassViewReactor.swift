@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Util
 
 import ReactorKit
 import LoginDomain
@@ -13,6 +14,7 @@ import LoginDomain
 public final class SignUpClassViewReactor: Reactor {
     
     public var initialState: State
+    private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     
     public struct State {
         var accountRequest: CreateAccountRequest
@@ -32,13 +34,13 @@ public final class SignUpClassViewReactor: Reactor {
     
     public init(accountRequest: CreateAccountRequest, schoolName: String) {
         self.initialState = State(accountRequest: accountRequest, schoolName: schoolName)
-        print(initialState)
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .inputClass(let classNumber):
             let isEnabledButton = classNumber > 0 && classNumber <= 20
+            globalService.event.onNext(.didChangedAccountClass(classNumber: classNumber))
             return Observable.concat([
                 .just(.setClass(classNumber)),
                 .just(.setEnabledButton(isEnabledButton))

@@ -6,11 +6,14 @@
 //
 
 import Foundation
+import Util
 
 import ReactorKit
 import LoginDomain
 
 public final class SignUpGradeViewReactor: Reactor {
+    
+    private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     
     public struct State {
         var accountRequest: CreateAccountRequest
@@ -31,12 +34,13 @@ public final class SignUpGradeViewReactor: Reactor {
     
     public init(accountRequest: CreateAccountRequest, schoolName: String) {
         self.initialState = State(accountRequest: accountRequest, schoolName: schoolName)
-        print(initialState.accountRequest)
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .selectGrade(let grade):
+            globalService.event.onNext(.didChangedAccountGrade(grade: grade))
+            
             return Observable.concat([
                 .just(.setGrade(grade)),
                 .just(.setGradeSelected(true))

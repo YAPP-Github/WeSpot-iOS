@@ -100,7 +100,28 @@ struct SignUpNamePresentationAssembly: Assembly {
 /// SignUpResult DIContainer
 struct SignUpResultPresentationAssembly: Assembly {
     func assemble(container: Container) {
+        
+        container.register(SignUpInfoBottomSheetViewReactor.self) { (_, accountRequest: CreateAccountRequest, schoolName: String) in
+            
+            return SignUpInfoBottomSheetViewReactor(accountRequest: accountRequest, schoolName: schoolName)
+        }
+        
+        container.register(SignUpInfoBottomSheetViewController.self) { (resolver, argument: CreateAccountRequest, schoolName: String) in
+            let reactor = resolver.resolve(SignUpInfoBottomSheetViewReactor.self, arguments: argument, schoolName)!
+            
+            return SignUpInfoBottomSheetViewController(reactor: reactor)
+        }
 
+        container.register(PolicyAgreementBottomSheetViewReactor.self) { _ in
+            return PolicyAgreementBottomSheetViewReactor()
+        }
+        
+        container.register(PolicyAgreementBottomSheetViewController.self) { resolver in
+            let reactor = resolver.resolve(PolicyAgreementBottomSheetViewReactor.self)!
+            
+            return PolicyAgreementBottomSheetViewController(reactor: reactor)
+        }
+        
         container.register(SignUpResultViewReactor.self) { (resolver, accountRequest: CreateAccountRequest, schoolName: String) in
             let createAccountUseCase = resolver.resolve(CreateAccountUseCaseProtocol.self)!
             return SignUpResultViewReactor(accountRequest: accountRequest, createAccountUseCase: createAccountUseCase, schoolName: schoolName)

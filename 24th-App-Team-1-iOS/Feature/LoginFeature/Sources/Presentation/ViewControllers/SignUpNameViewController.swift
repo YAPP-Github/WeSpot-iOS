@@ -106,6 +106,13 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
+        reactor.pulse(\.$accountRequest)
+            .map { $0.name.isEmpty ? "다음" : "수정 완료" }
+            .take(1)
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: nextButton.rx.title())
+            .disposed(by: disposeBag)
+
         reactor.state
             .map { $0.name.count }
             .distinctUntilChanged()

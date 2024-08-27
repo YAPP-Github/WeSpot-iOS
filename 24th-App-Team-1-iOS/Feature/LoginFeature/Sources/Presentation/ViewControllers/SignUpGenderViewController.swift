@@ -24,7 +24,6 @@ public final class SignUpGenderViewController: BaseViewController<SignUpGenderVi
     private let subTitleLabel = WSLabel(wsFont: .Body06, text: "회원가입 이후에는 이름을 변경할 수 없어요")
     private let boyCardButton = GenderCardButton(type: .boy)
     private let girlCardButton = GenderCardButton(type: .girl)
-    private let accountInjector: Injector = DependencyInjector(container: Container())
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -88,19 +87,29 @@ public final class SignUpGenderViewController: BaseViewController<SignUpGenderVi
         
         boyCardButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
+            .withLatestFrom(reactor.state.map { $0.accountRequest })
+            .bind(with: self) { owner, response in
                 owner.reactor?.action.onNext(.selectGender("male"))
-                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName )
-                owner.navigationController?.pushViewController(signUpNameViewController, animated: true)
+                if response.name.isEmpty {
+                    let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName )
+                    owner.navigationController?.pushViewController(signUpNameViewController, animated: true)
+                } else {
+                    owner.navigationController?.popViewController(animated: true)
+                }
             }
             .disposed(by: disposeBag)
         
         girlCardButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
+            .withLatestFrom(reactor.state.map {$0.accountRequest })
+            .bind(with: self) { owner, response in
                 owner.reactor?.action.onNext(.selectGender("female"))
-                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
-                owner.navigationController?.pushViewController(signUpNameViewController, animated: true)
+                if response.name.isEmpty  {
+                    let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName )
+                    owner.navigationController?.pushViewController(signUpNameViewController, animated: true)
+                } else {
+                    owner.navigationController?.popViewController(animated: true)
+                }
             }
             .disposed(by: disposeBag)
     }
