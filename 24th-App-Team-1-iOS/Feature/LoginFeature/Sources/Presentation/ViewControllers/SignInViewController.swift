@@ -34,7 +34,6 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
     private let thirdLottieView = WSLottieView()
     
     private let lottieLabel = WSLabel(wsFont: .Body02, textAlignment: .center)
-    private let onbardingLabel = WSLabel(wsFont: .Header01, text: "우리가 연결되어 공간\n위스팟에 오신 것을 환영해요")
     private let onbardingLottieView = WSLottieView()
     
     //MARK: - LifeCycle
@@ -53,7 +52,7 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
     public override func setupUI() {
         super.setupUI()
         
-        view.addSubviews(onboardingCarouselView, lottieLabel, pageControl, appleLoginButton, kakaoLoginButton, onbardingLabel, onbardingLottieView)
+        view.addSubviews(onboardingCarouselView, lottieLabel, pageControl, appleLoginButton, kakaoLoginButton, onbardingLottieView)
         onboardingCarouselView.addSubview(horizentalStackView)
         horizentalStackView.addArrangedSubview(firstContainerView)
         firstContainerView.addSubviews(firstBackgroundView, firstLottieView)
@@ -128,13 +127,8 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(32)
         }
         
-        onbardingLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(60)
-            $0.horizontalEdges.equalTo(30)
-        }
-        
         onbardingLottieView.snp.makeConstraints {
-            $0.top.equalTo(onbardingLabel.snp.bottom).offset(120)
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(180)
             $0.centerX.equalTo(view.safeAreaLayoutGuide)
             $0.size.equalTo(250)
         }
@@ -169,11 +163,6 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         
         kakaoLoginButton.do {
             $0.setImage(DesignSystemAsset.Images.kakaoLoginButton.image, for: .normal)
-        }
-        
-        onbardingLabel.do {
-            $0.textColor = DesignSystemAsset.Colors.gray100.color
-            $0.isHidden = true
         }
         
         onbardingLottieView.do {
@@ -230,17 +219,18 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             .disposed(by: disposeBag)
         
         reactor.state
-            .filter { $0.signUpTokenResponse != nil }
-            .bind(with: self) { owner, state in
-                DispatchQueue.main.async {
-                    owner.updateUI()
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self, arguments: CreateAccountRequest(), "")
-                    signUpSchoolViewController.reactor?.initialState.accountRequest = CreateAccountRequest()
-                    signUpSchoolViewController.reactor?.initialState.schoolName = String()
-                    owner.navigationController?.setViewControllers([signUpSchoolViewController], animated: true)
-                }
+            .filter { $0.signUpTokenResponse == nil }
+            .withLatestFrom(reactor.state.map { $0.accountRequest })
+            .bind(with: self) { owner, response in
+                let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self, arguments: response, "")
+                owner.navigationController?.setViewControllers([signUpSchoolViewController], animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isExisting)
+            .filter { $0 == true }
+            .bind { _ in
+                NotificationCenter.default.post(name: .showVoteMainViewController, object: nil)
             }
             .disposed(by: disposeBag)
         
@@ -256,16 +246,6 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         onboardingCarouselView.delegate = self
         
         
-    }
-    
-    private func updateUI() {
-        onbardingLabel.isHidden = false
-        onbardingLottieView.isHidden = false
-        onbardingLottieView.isStauts = true
-        onboardingCarouselView.isHidden = true
-        appleLoginButton.isHidden = true
-        kakaoLoginButton.isHidden = true
-        pageControl.isHidden = true
     }
 }
 

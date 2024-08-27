@@ -29,7 +29,6 @@ import KeychainSwift
 public class SceneDelegate: UIResponder, UISceneDelegate {
     
     var window: UIWindow?
-    public let injector: Injector = DependencyInjector(container: Container())
     
     public func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let scene = (scene as? UIWindowScene) else { return }
@@ -133,6 +132,14 @@ extension SceneDelegate {
         guard let topViewController = self.window?.rootViewController?.topMostViewController() else {
             return
         }
+        
+        NotificationCenter.default.addObserver(forName: .showVoteMainViewController, object: nil, queue: .main) { [weak self] _ in
+            guard let self else { return }
+            let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
+            self.window?.rootViewController = UINavigationController(rootViewController: voteMainViewController)
+            self.window?.makeKeyAndVisible()
+        }
+        
         NotificationCenter.default.addObserver(forName: .showNotifcationViewController, object: nil, queue: .main) { _ in
             let notificationViewController = DependencyContainer.shared.injector.resolve(NotificationViewController.self)
             topViewController.navigationController?.pushViewController(notificationViewController, animated: true)

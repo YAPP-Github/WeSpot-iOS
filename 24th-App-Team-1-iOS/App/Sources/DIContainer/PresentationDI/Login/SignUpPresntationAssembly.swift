@@ -138,15 +138,14 @@ struct SignUpResultPresentationAssembly: Assembly {
 /// SignUpComplete DIContainer
 struct SignUpCompletePresentationAssembly: Assembly {
     func assemble(container: Container) {
-
-        container.register(SignUpClassViewReactor.self) { (resolver, accountRequest: CreateAccountRequest, schoolName: String) in
-            return SignUpClassViewReactor(accountRequest: accountRequest, schoolName: schoolName)
+        container.register(SignUpCompleteViewReactor.self) { (resolver, accountRequest: CreateAccountRequest) in
+            let createAccountUseCase = resolver.resolve(CreateAccountUseCaseProtocol.self)!
+            return SignUpCompleteViewReactor(createAccountUseCase: createAccountUseCase, accountRequest: accountRequest)
         }
-
-        container.register(SignUpClassViewController.self) { (resolver, argument: CreateAccountRequest, schoolName: String) in
-            let reactor = resolver.resolve(SignUpClassViewReactor.self, arguments: argument, schoolName)!
-            return SignUpClassViewController(reactor: reactor)
+        
+        container.register(SignUpCompleteViewController.self) { (resolver, accountRequest: CreateAccountRequest) in
+            let reactor = resolver.resolve(SignUpCompleteViewReactor.self, argument: accountRequest)!
+            return SignUpCompleteViewController(reactor: reactor)
         }
-
     }
 }

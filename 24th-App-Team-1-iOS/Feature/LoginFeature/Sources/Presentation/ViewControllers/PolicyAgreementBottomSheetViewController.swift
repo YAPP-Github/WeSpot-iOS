@@ -151,6 +151,13 @@ public final class PolicyAgreementBottomSheetViewController: BaseViewController<
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        confirmButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTappedConfirmButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         reactor.state
             .map { $0.isAllAgreement }
             .distinctUntilChanged()

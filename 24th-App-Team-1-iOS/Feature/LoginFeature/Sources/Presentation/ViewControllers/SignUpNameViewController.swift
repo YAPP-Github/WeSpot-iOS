@@ -149,6 +149,12 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
         
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTappedConfirmButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isConfirm)
+            .filter { $0 == true }
             .bind(with: self) { owner, _ in
                 let signUpResultViewController = DependencyContainer.shared.injector.resolve(SignUpResultViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName )
                 owner.navigationController?.pushViewController(signUpResultViewController, animated: true)

@@ -165,6 +165,12 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
         
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTappedNextButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isSelected)
+            .filter { $0 == true }
             .withLatestFrom(reactor.state.map { $0.accountRequest })
             .bind(with: self) { owner, response in
                 if response.classNumber == 0 {

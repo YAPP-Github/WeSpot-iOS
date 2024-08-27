@@ -20,16 +20,16 @@ public final class SignUpResultViewReactor: Reactor {
     public struct State {
         var accountRequest: CreateAccountRequest
         var isAccountCreationCompleted: Bool = false
-        var isMarketingAgreed: Bool = false
         var schoolName: String
+        @Pulse var isMarketingAgreed: Bool = false
         @Pulse var isShowBottomSheet: Bool = false
         @Pulse var isShowPolicyBottomSheet: Bool = false
+        @Pulse var isConfirm: Bool = false
     }
     
     public enum Action {
         case viewDidLoad
         case createAccount
-        case setMarketingAgreement(Bool)
     }
     
     public enum Mutation {
@@ -40,6 +40,7 @@ public final class SignUpResultViewReactor: Reactor {
         case setAccountGrade(Int)
         case setAccountSchoolName(String)
         case setAccountEditBottomSheet(Bool)
+        case setConfirmButton(Bool)
         case setPolicyBottomSheet(Bool)
         case setMarketingAgreement(Bool)
     }
@@ -71,6 +72,10 @@ public final class SignUpResultViewReactor: Reactor {
                 return .just(.setAccountClass(classNumber))
             case let .didChangedAccountSchoolName(schoolName):
                 return .just(.setAccountSchoolName(schoolName))
+            case let .didTappedAccountSuccessButton(isSelected):
+                return .just(.setConfirmButton(isSelected))
+            case let .didTappedMarketingButton(isMarketing):
+                return .just(.setMarketingAgreement(isMarketing))
             default:
                 return .empty()
             }
@@ -88,8 +93,6 @@ public final class SignUpResultViewReactor: Reactor {
                     return .just(.isCompletedAccount(true))
                 }
                 .catchAndReturn(.isCompletedAccount(false))
-        case .setMarketingAgreement(let isAgreed):
-            return .just(.setMarketingAgreement(isAgreed))
         case .viewDidLoad:
             return .just(.setAccountEditBottomSheet(true))
         }
@@ -101,7 +104,7 @@ public final class SignUpResultViewReactor: Reactor {
         case .isCompletedAccount(let isCompleted):
             newState.isAccountCreationCompleted = isCompleted
         case .setMarketingAgreement(let isAgreed):
-            newState.accountRequest.consents?.marketing = isAgreed
+            newState.accountRequest.consents.marketing = isAgreed
         case let .setPolicyBottomSheet(isShowPolicyBottomSheet):
             newState.isShowPolicyBottomSheet = isShowPolicyBottomSheet
         case let .setAccountEditBottomSheet(isShowBottomSheet):
@@ -116,6 +119,8 @@ public final class SignUpResultViewReactor: Reactor {
             newState.accountRequest.grade = grade
         case let .setAccountSchoolName(schoolName):
             newState.schoolName = schoolName
+        case let .setConfirmButton(isConfirm):
+            newState.isConfirm = isConfirm
         }
         return newState
     }

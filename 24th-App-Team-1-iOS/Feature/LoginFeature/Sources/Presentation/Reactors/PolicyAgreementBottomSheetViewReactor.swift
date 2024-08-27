@@ -6,17 +6,20 @@
 //
 
 import Foundation
+import Util
 
 import ReactorKit
 
 public final class PolicyAgreementBottomSheetViewReactor: Reactor {
     public var initialState: State
+    private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     
     public enum Action {
         case didTappedAllAgreement
         case didTappedPrivacyAgreement
         case didTappedServiceAgreement
         case didTappedMarketingAgreement
+        case didTappedConfirmButton
     }
     
     public enum Mutation {
@@ -70,6 +73,9 @@ public final class PolicyAgreementBottomSheetViewReactor: Reactor {
             )
         case .didTappedMarketingAgreement:
             return .just(.setupMarketingAgreement(!currentState.isMarketingAgreement))
+        case .didTappedConfirmButton:
+            globalService.event.onNext(.didTappedAccountSuccessButton(true))
+            return .empty()
         }
     }
     
@@ -85,6 +91,7 @@ public final class PolicyAgreementBottomSheetViewReactor: Reactor {
         case let .setupConfirmButton(isEnabled):
             newState.isEnabled = isEnabled
         case let .setupMarketingAgreement(isMarketingAgreement):
+            globalService.event.onNext(.didTappedMarketingButton(isMarketingAgreement))
             newState.isMarketingAgreement = isMarketingAgreement
         }
         return newState

@@ -20,14 +20,17 @@ public final class SignUpClassViewReactor: Reactor {
         var accountRequest: CreateAccountRequest
         var isEnabledButton: Bool = false
         var schoolName: String
+        @Pulse var isSelected: Bool = false
     }
     
     public enum Action {
         case inputClass(Int)
+        case didTappedNextButton
     }
     
     public enum Mutation {
         case setClass(Int)
+        case setSelected(Bool)
         case setEnabledButton(Bool)
     }
     
@@ -40,11 +43,13 @@ public final class SignUpClassViewReactor: Reactor {
         switch action {
         case .inputClass(let classNumber):
             let isEnabledButton = classNumber > 0 && classNumber <= 20
-            globalService.event.onNext(.didChangedAccountClass(classNumber: classNumber))
             return Observable.concat([
                 .just(.setClass(classNumber)),
                 .just(.setEnabledButton(isEnabledButton))
             ])
+        case .didTappedNextButton:
+            globalService.event.onNext(.didChangedAccountClass(classNumber: currentState.accountRequest.classNumber))
+            return .just(.setSelected(true))
         }
     }
     
@@ -55,6 +60,8 @@ public final class SignUpClassViewReactor: Reactor {
             newState.accountRequest.classNumber = classNumber
         case .setEnabledButton(let isEnabled):
             newState.isEnabledButton = isEnabled
+        case let .setSelected(isSelected):
+            newState.isSelected = isSelected
         }
         return newState
     }

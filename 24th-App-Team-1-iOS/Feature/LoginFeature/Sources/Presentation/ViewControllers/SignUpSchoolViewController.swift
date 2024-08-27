@@ -36,7 +36,6 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         cell.setupCell(schoolName: item.school.name, address: item.school.address)
         return cell
     })
-    private let accountInjector: Injector = DependencyInjector(container: Container())
     
     //MARK: - LifeCycle
     public override func viewWillAppear(_ animated: Bool) {
@@ -176,6 +175,12 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
             .map { $0.schoolName.isEmpty || (!$0.schoolName.isEmpty && $0.schoolList.schools.count > 0)}
             .distinctUntilChanged()
             .bind(to: additionalButton.rx.isHidden, additionalButtonLine.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.accountRequest.grade == 0 ? "다음" : "수정 완료" }
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: nextButton.rx.title())
             .disposed(by: disposeBag)
         
         reactor.state

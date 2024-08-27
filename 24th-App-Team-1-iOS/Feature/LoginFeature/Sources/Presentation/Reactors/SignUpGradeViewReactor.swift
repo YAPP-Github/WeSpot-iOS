@@ -19,15 +19,18 @@ public final class SignUpGradeViewReactor: Reactor {
         var accountRequest: CreateAccountRequest
         var isGradeSelected: Bool = false
         var schoolName: String
+        @Pulse var isSelected: Bool = false
     }
     
     public enum Action {
         case selectGrade(Int)
+        case didTappedNextButton
     }
     
     public enum Mutation {
         case setGrade(Int)
         case setGradeSelected(Bool)
+        case setConfirm(Bool)
     }
     
     public var initialState: State
@@ -39,12 +42,14 @@ public final class SignUpGradeViewReactor: Reactor {
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .selectGrade(let grade):
-            globalService.event.onNext(.didChangedAccountGrade(grade: grade))
             
             return Observable.concat([
                 .just(.setGrade(grade)),
                 .just(.setGradeSelected(true))
             ])
+        case .didTappedNextButton:
+            globalService.event.onNext(.didChangedAccountGrade(grade: currentState.accountRequest.grade))
+            return .just(.setConfirm(true))
         }
     }
     
@@ -55,6 +60,8 @@ public final class SignUpGradeViewReactor: Reactor {
             newState.accountRequest.grade = grade
         case .setGradeSelected(let isSelected):
             newState.isGradeSelected = isSelected
+        case let .setConfirm(isSelected):
+            newState.isSelected = isSelected
         }
         return newState
     }

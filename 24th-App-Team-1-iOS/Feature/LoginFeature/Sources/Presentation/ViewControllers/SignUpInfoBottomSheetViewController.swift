@@ -32,6 +32,14 @@ public final class SignUpInfoBottomSheetViewController: BaseViewController<SignU
         super.viewDidLoad()
         
     }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut, animations: { [weak self] in
+            guard let self else { return }
+            self.containerView.transform = .identity
+        }, completion: nil)
+    }
 
     //MARK: - Configure
     public override func setupUI() {
@@ -101,6 +109,7 @@ public final class SignUpInfoBottomSheetViewController: BaseViewController<SignU
         containerView.do {
             $0.backgroundColor = DesignSystemAsset.Colors.gray600.color
             $0.layer.cornerRadius = 25
+            $0.transform = CGAffineTransform(translationX: 0, y: 304)
             $0.layer.masksToBounds = true
             $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         }

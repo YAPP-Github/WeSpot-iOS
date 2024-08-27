@@ -29,6 +29,8 @@ public enum WSGlobalStateType {
     case didChangedAccountClass(classNumber: Int)
     case didTappedAccountNickNameButton(nickName: String)
     case didChangedAccountGrade(grade: Int)
+    case didTappedMarketingButton(_ isSelected: Bool)
+    case didTappedAccountSuccessButton(_ isSelected: Bool)
     case didChangedAccountSchoolName(schoolName: String)
     case didTappedResultButton
     case didTappedVoteButton(_ isSelected: Bool)

@@ -8,15 +8,15 @@
 import Foundation
 
 public struct CreateAccountRequestDTO: Encodable {
-    public let name: String?
-    public let gender: String?
-    public let schoolId: Int?
-    public let grade: Int?
-    public let classNumber: Int?
-    public let consents: ConsentsRequestDTO?
-    public let signUpToken: String?
+    public let name: String
+    public let gender: String
+    public let schoolId: Int
+    public let grade: Int
+    public let classNumber: Int
+    public let consents: ConsentsRequestDTO
+    public let signUpToken: String
     
-    public init(name: String?, gender: String?, schoolId: Int?, grade: Int?, classNumber: Int?, consents: ConsentsRequestDTO?, signUpToken: String?) {
+    public init(name: String, gender: String, schoolId: Int, grade: Int, classNumber: Int, consents: ConsentsRequestDTO, signUpToken: String) {
         self.name = name
         self.gender = gender
         self.schoolId = schoolId
@@ -28,9 +28,9 @@ public struct CreateAccountRequestDTO: Encodable {
 }
 
 public struct ConsentsRequestDTO: Encodable {
-    public let marketing: Bool?
+    public let marketing: Bool
     
-    public init(marketing: Bool?) {
+    public init(marketing: Bool) {
         self.marketing = marketing
     }
 }

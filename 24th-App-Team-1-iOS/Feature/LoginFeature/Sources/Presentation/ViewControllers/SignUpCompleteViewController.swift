@@ -60,6 +60,10 @@ public final class SignUpCompleteViewController: BaseViewController<SignUpComple
         
         view.backgroundColor = DesignSystemAsset.Colors.gray900.color
         
+        imageView.do {
+            $0.image = DesignSystemAsset.Images.imgLoginFriendFiled.image
+        }
+        
         inviteStartButton.do {
             $0.setupButton(text: "친구 초대하고 시작하기")
         }
@@ -72,5 +76,16 @@ public final class SignUpCompleteViewController: BaseViewController<SignUpComple
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        Observable.just(())
+            .map { Reactor.Action.viewDidLoad}
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        inviteStartButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToKakaoTalk()
+            }
+            .disposed(by: disposeBag)
     }
 }

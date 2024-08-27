@@ -26,6 +26,7 @@ public final class SignInViewReactor: Reactor {
         var signUpTokenResponse: CreateSignUpTokenResponseEntity?
         var accountResponse: CreateAccountResponseEntity?
         var accountRequest: CreateAccountRequest
+        @Pulse var isExisting: Bool
     }
     
     public enum Action {
@@ -35,14 +36,14 @@ public final class SignInViewReactor: Reactor {
     
     public enum Mutation {
         case setSignUpTokenResponse(CreateSignUpTokenResponseEntity)
-        case setAccountResponse(CreateAccountResponseEntity)
+        case setAccountExisting(Bool)
     }
     
     public init(createNewMemberUseCase: CreateNewMemberUseCaseProtocol,
                 createExistingUseCase: CreateExistingMemberUseCaseProtocol) {
         self.createNewMemberUseCase = createNewMemberUseCase
         self.createExistingUseCase = createExistingUseCase
-        self.initialState = State(accountRequest: CreateAccountRequest())
+        self.initialState = State(accountRequest: CreateAccountRequest(), isExisting: false)
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
@@ -114,8 +115,7 @@ public final class SignInViewReactor: Reactor {
             return createExistingUseCase
                 .execute(body: body)
                 .asObservable()
-                .compactMap { $0 }
-                .map { .setAccountResponse($0) }
+                .map {.setAccountExisting($0)}
         }
     }
     
@@ -125,8 +125,8 @@ public final class SignInViewReactor: Reactor {
         case .setSignUpTokenResponse(let signUpTokenResponse):
             newState.signUpTokenResponse = signUpTokenResponse
             newState.accountRequest.signUpToken = signUpTokenResponse.signUpToken
-        case .setAccountResponse(let accountResponse):
-            newState.accountResponse = accountResponse
+        case .setAccountExisting(let isExisting):
+            newState.isExisting = isExisting
         }
         return newState
     }

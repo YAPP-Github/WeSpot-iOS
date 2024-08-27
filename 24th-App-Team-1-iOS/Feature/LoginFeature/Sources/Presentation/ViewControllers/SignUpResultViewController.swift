@@ -83,6 +83,10 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
     public override func setupAttributes() {
         super.setupAttributes()
         
+        self.do {
+            $0.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        }
+        
         view.backgroundColor = DesignSystemAsset.Colors.gray900.color
         
         navigationBar.do {
@@ -112,7 +116,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .filter { $0.0 == true }
             .observe(on: MainScheduler.asyncInstance)
             .bind(with: self) { owner, arg in
-                owner.setupSignUpBottomSheet(argument: arg.1, schoolName: arg.2)
+                owner.showSignUpBottomSheet(argument: arg.1, schoolName: arg.2)
             }
             .disposed(by: disposeBag)
         
@@ -156,6 +160,31 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .bind(to: schoolTextField.rx.text)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isShowPolicyBottomSheet)
+            .filter { $0 == true }
+            .bind(with: self) { owner, _ in
+                owner.showBottomSheet()
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isConfirm)
+            .filter { $0 == true }
+            .withLatestFrom(reactor.state.map { $0.accountRequest })
+            .bind(with: self) { owner, arg in
+                owner.dismiss(animated: true) {
+                    let signupCompleteViewController = DependencyContainer.shared.injector.resolve(SignUpCompleteViewController.self, argument: arg)
+                    owner.navigationController?.pushViewController(signupCompleteViewController, animated: true)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        nextButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.showBottomSheet()
+            }
+            .disposed(by: disposeBag)
+        
         nameTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
@@ -175,7 +204,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         classTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpClassViewController = DependencyContainer.shared.injector.resolve(SignUpGradeViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
+                let signUpClassViewController = DependencyContainer.shared.injector.resolve(SignUpClassViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
                 owner.navigationController?.pushViewController(signUpClassViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -206,14 +235,14 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .disposed(by: disposeBag)
     }
     
-    private func setupBottomSheet() {
+    private func showBottomSheet() {
         let policyAgreementBottomSheetViewController = DependencyContainer.shared.injector.resolve(PolicyAgreementBottomSheetViewController.self)
         policyAgreementBottomSheetViewController.modalPresentationStyle = .overCurrentContext
         policyAgreementBottomSheetViewController.modalTransitionStyle = .crossDissolve
         self.present(policyAgreementBottomSheetViewController, animated: true)
     }
     
-    private func setupSignUpBottomSheet(argument: CreateAccountRequest, schoolName: String) {
+    private func showSignUpBottomSheet(argument: CreateAccountRequest, schoolName: String) {
         let signUpInfoBottomSheetViewController = DependencyContainer.shared.injector.resolve(SignUpInfoBottomSheetViewController.self, arguments: argument, schoolName)
         signUpInfoBottomSheetViewController.modalPresentationStyle = .overCurrentContext
         signUpInfoBottomSheetViewController.modalTransitionStyle = .crossDissolve
