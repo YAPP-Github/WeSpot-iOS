@@ -39,7 +39,7 @@ public final class SignUpInfoBottomSheetViewReactor: Reactor {
         
         switch action {
         case .didTappedAccountEditButton:
-            globalService.event.onNext(.didTappedAccountEditButton(false))
+            globalService.event.onNext(.didTappedAccountEditButton(true))
         case .didTappedConfirmButton:
             globalService.event.onNext(.didTappedAccountConfirmButton(true))
         }

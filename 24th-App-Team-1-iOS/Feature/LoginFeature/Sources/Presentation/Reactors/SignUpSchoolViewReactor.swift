@@ -23,7 +23,7 @@ public final class SignUpSchoolViewReactor: Reactor {
         @Pulse var schoolList: SchoolListResponseEntity
         var selectedSchool: SchoolListEntity?
         var cursorId: Int
-        var isLoading: Bool
+        @Pulse var isLoading: Bool
         var accountRequest: CreateAccountRequest
     }
     
@@ -61,20 +61,28 @@ public final class SignUpSchoolViewReactor: Reactor {
         switch action {
         case .searchSchool(let schoolName):
             guard !schoolName.isEmpty else {
-                return .just(.setSchoolList(SchoolListResponseEntity(schools: [], lastCursorId: 0, hasNext: false)))
+                
+                return .concat(
+                    .just(.setLoading(false)),
+                    .just(.setSchoolList(SchoolListResponseEntity(schools: [], lastCursorId: 0, hasNext: false))),
+                    .just(.setLoading(true))
+                )
             }
-            print(schoolName)
+            
             let query = SchoolListRequestQuery(name: schoolName, cursorId: 0)
             
             return fetchSchoolListUseCase
                 .execute(query: query)
                 .asObservable()
                 .flatMap { entity -> Observable<Mutation> in
-                    dump(entity)
                     guard let entity else {
                         return .just(.setSchoolList(SchoolListResponseEntity(schools: [], lastCursorId: 0, hasNext: false)))
                     }
-                    return .just(.setSchoolList(entity))
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setSchoolList(entity)),
+                        .just(.setLoading(true))
+                    )
                 }
             
         case .loadMoreSchools:
@@ -88,8 +96,10 @@ public final class SignUpSchoolViewReactor: Reactor {
                         return .empty()
                     }
                     return .concat([
+                        .just(.setLoading(false)),
                         .just(.appendSchoolList(entity)),
-                        .just(.setCursorId(entity.schools.last?.id ?? self.currentState.cursorId))
+                        .just(.setCursorId(entity.schools.last?.id ?? self.currentState.cursorId)),
+                        .just(.setLoading(true))
                     ])
                 }
             

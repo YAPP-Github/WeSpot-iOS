@@ -27,6 +27,7 @@ public final class SignInViewReactor: Reactor {
         var accountResponse: CreateAccountResponseEntity?
         var accountRequest: CreateAccountRequest
         @Pulse var isExisting: Bool
+        @Pulse var isLoading: Bool
     }
     
     public enum Action {
@@ -37,13 +38,18 @@ public final class SignInViewReactor: Reactor {
     public enum Mutation {
         case setSignUpTokenResponse(CreateSignUpTokenResponseEntity)
         case setAccountExisting(Bool)
+        case setLoading(Bool)
     }
     
     public init(createNewMemberUseCase: CreateNewMemberUseCaseProtocol,
                 createExistingUseCase: CreateExistingMemberUseCaseProtocol) {
         self.createNewMemberUseCase = createNewMemberUseCase
         self.createExistingUseCase = createExistingUseCase
-        self.initialState = State(accountRequest: CreateAccountRequest(), isExisting: false)
+        self.initialState = State(
+            accountRequest: CreateAccountRequest(),
+            isExisting: false,
+            isLoading: false
+        )
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
@@ -103,19 +109,30 @@ public final class SignInViewReactor: Reactor {
                                             fcmToken: fcmToken)
         
         let accessToken = KeychainManager.shared.get(type: .accessToken)
-        
         if (accessToken?.isEmpty ?? true) {
             return createNewMemberUseCase
                 .execute(body: body)
                 .asObservable()
                 .compactMap { $0 }
-                .map { .setSignUpTokenResponse($0) }
+                .flatMap { response -> Observable<Mutation> in
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setSignUpTokenResponse(response)),
+                        .just(.setLoading(true))
+                    )
+                }
             
         } else {
             return createExistingUseCase
                 .execute(body: body)
                 .asObservable()
-                .map {.setAccountExisting($0)}
+                .flatMap { response -> Observable<Mutation> in
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setAccountExisting(response)),
+                        .just(.setLoading(true))
+                    )
+                }
         }
     }
     
@@ -125,8 +142,12 @@ public final class SignInViewReactor: Reactor {
         case .setSignUpTokenResponse(let signUpTokenResponse):
             newState.signUpTokenResponse = signUpTokenResponse
             newState.accountRequest.signUpToken = signUpTokenResponse.signUpToken
+            let expiredDate = Date().addingTimeInterval(30 * 60)
+            UserDefaultsManager.shared.expiredDate = expiredDate
         case .setAccountExisting(let isExisting):
             newState.isExisting = isExisting
+        case .setLoading(let isLoading):
+            newState.isLoading = isLoading
         }
         return newState
     }

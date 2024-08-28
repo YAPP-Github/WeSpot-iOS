@@ -29,6 +29,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
     private let additionalButtonLine = UIView()
     private let schoolSearchTableView = UITableView()
     private let gradientView = GradientView()
+    private let loadingIndicatorView = WSLottieIndicatorView()
     private let nextButton = WSButton(wsButtonType: .default(12))
     private lazy var schoolSearchTableViewDataSource = RxTableViewSectionedReloadDataSource<SchoolSection>(configureCell: { (dataSource, tableView, indexPath, item) in
         let cell = tableView.dequeueReusableCell(withIdentifier: SchoolSearchTableViewCell.identifier, for: indexPath) as! SchoolSearchTableViewCell
@@ -175,6 +176,10 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
             .map { $0.schoolName.isEmpty || (!$0.schoolName.isEmpty && $0.schoolList.schools.count > 0)}
             .distinctUntilChanged()
             .bind(to: additionalButton.rx.isHidden, additionalButtonLine.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicatorView.rx.isHidden)
             .disposed(by: disposeBag)
         
         reactor.state

@@ -110,8 +110,8 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         Observable
             .combineLatest(
                 reactor.pulse(\.$isShowBottomSheet),
-                reactor.state.map { $0.accountRequest },
-                reactor.state.map { $0.schoolName }
+                reactor.pulse(\.$accountRequest),
+                reactor.pulse(\.$schoolName)
             )
             .filter { $0.0 == true }
             .observe(on: MainScheduler.asyncInstance)
@@ -121,8 +121,8 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .disposed(by: disposeBag)
         
         
-        reactor.pulse(\.$isShowBottomSheet)
-            .filter { $0 == false }
+        reactor.pulse(\.$isHideInfoBottomSheet)
+            .filter { $0 == true }
             .observe(on: MainScheduler.asyncInstance)
             .bind(with: self) { owner, _ in
                 owner.dismiss(animated: true)
@@ -163,7 +163,9 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         reactor.pulse(\.$isShowPolicyBottomSheet)
             .filter { $0 == true }
             .bind(with: self) { owner, _ in
-                owner.showBottomSheet()
+                owner.dismiss(animated: true) {
+                    owner.showBottomSheet()
+                }
             }
             .disposed(by: disposeBag)
         

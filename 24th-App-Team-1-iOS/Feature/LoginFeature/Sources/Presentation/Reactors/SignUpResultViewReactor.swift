@@ -18,13 +18,14 @@ public final class SignUpResultViewReactor: Reactor {
     public var initialState: State
     
     public struct State {
-        var accountRequest: CreateAccountRequest
+        @Pulse var accountRequest: CreateAccountRequest
         var isAccountCreationCompleted: Bool = false
-        var schoolName: String
+        @Pulse var schoolName: String
         @Pulse var isMarketingAgreed: Bool = false
         @Pulse var isShowBottomSheet: Bool = false
         @Pulse var isShowPolicyBottomSheet: Bool = false
         @Pulse var isConfirm: Bool = false
+        @Pulse var isHideInfoBottomSheet: Bool = false
     }
     
     public enum Action {
@@ -40,6 +41,7 @@ public final class SignUpResultViewReactor: Reactor {
         case setAccountGrade(Int)
         case setAccountSchoolName(String)
         case setAccountEditBottomSheet(Bool)
+        case setAccountEditHideBottomSheet(Bool)
         case setConfirmButton(Bool)
         case setPolicyBottomSheet(Bool)
         case setMarketingAgreement(Bool)
@@ -59,7 +61,7 @@ public final class SignUpResultViewReactor: Reactor {
             
             switch event {
             case let .didTappedAccountEditButton(isSelected):
-                return .just(.setAccountEditBottomSheet(isSelected))
+                return .just(.setAccountEditHideBottomSheet(isSelected))
             case let .didTappedAccountConfirmButton(isConfirm):
                 return .just(.setPolicyBottomSheet(isConfirm))
             case let .didTappedAccountGenderButton(gender):
@@ -73,7 +75,10 @@ public final class SignUpResultViewReactor: Reactor {
             case let .didChangedAccountSchoolName(schoolName):
                 return .just(.setAccountSchoolName(schoolName))
             case let .didTappedAccountSuccessButton(isSelected):
-                return .just(.setConfirmButton(isSelected))
+                return .concat(
+                    .just(.setConfirmButton(isSelected)),
+                    .just(.setAccountEditBottomSheet(!isSelected))
+                )
             case let .didTappedMarketingButton(isMarketing):
                 return .just(.setMarketingAgreement(isMarketing))
             default:
@@ -121,6 +126,8 @@ public final class SignUpResultViewReactor: Reactor {
             newState.schoolName = schoolName
         case let .setConfirmButton(isConfirm):
             newState.isConfirm = isConfirm
+        case let .setAccountEditHideBottomSheet(isHideInfoBottomSheet):
+            newState.isHideInfoBottomSheet = isHideInfoBottomSheet
         }
         return newState
     }

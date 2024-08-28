@@ -32,6 +32,7 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
     private let firstLottieView = WSLottieView()
     private let secondLottieView = WSLottieView()
     private let thirdLottieView = WSLottieView()
+    private let loadingIndicatorView = WSLottieIndicatorView()
     
     private let lottieLabel = WSLabel(wsFont: .Body02, textAlignment: .center)
     private let onbardingLottieView = WSLottieView()
@@ -39,13 +40,10 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
     //MARK: - LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
     }
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        UserDefaultsManager.shared.accessToken = nil
     }
     
     //MARK: - Configure
@@ -218,8 +216,12 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             }
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicatorView.rx.isHidden)
+            .disposed(by: disposeBag)
+        
         reactor.state
-            .filter { $0.signUpTokenResponse == nil }
+            .filter { $0.signUpTokenResponse != nil }
             .withLatestFrom(reactor.state.map { $0.accountRequest })
             .bind(with: self) { owner, response in
                 let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self, arguments: response, "")

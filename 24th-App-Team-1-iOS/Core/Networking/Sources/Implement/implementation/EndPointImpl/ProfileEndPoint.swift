@@ -6,11 +6,19 @@
 //
 
 import Foundation
+import Storage
 
 import Alamofire
 
 
 public enum ProfileEndPoint: WSNetworkEndPoint {
+    private var accessToken: String {
+        guard let accessToken = KeychainManager.shared.get(type: .accessToken) else {
+            return ""
+        }
+        return accessToken
+    }
+    
     /// 사용자 프로필 조회 API
     case fetchUserProfile
     /// 사용자 프로필 수정 API
@@ -80,7 +88,7 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
     public var headers: HTTPHeaders {
         return [
             "Content-Type": "application/json",
-            "Authorization": "Bearer testToken"
+            "Authorization": "Bearer \(accessToken)"
         ]
     }
 }

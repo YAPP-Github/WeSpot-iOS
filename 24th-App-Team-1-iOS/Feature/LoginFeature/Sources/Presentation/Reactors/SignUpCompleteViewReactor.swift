@@ -65,8 +65,11 @@ public final class SignUpCompleteViewReactor: Reactor {
             newState.isLoading = isLoading
         case let .setAccountToken(accountEntity):
             newState.accountEntity = accountEntity
+            print("accountEntity: \(accountEntity)")
             KeychainManager.shared.set(value: accountEntity.accessToken, type: .accessToken)
-            KeychainManager.shared.set(value: accountEntity.refreshToken, type: .refreshToken)
+            UserDefaultsManager.shared.refreshToken = accountEntity.refreshToken
+            
+            print("accessToken Keychain : \(KeychainManager.shared.get(type: .accessToken))")
         }
         
         

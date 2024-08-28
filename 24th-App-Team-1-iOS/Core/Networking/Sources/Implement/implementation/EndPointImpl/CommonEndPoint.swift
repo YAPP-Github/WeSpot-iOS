@@ -6,10 +6,17 @@
 //
 
 import Foundation
+import Storage
 
 import Alamofire
 
 public enum CommonEndPoint: WSNetworkEndPoint {
+    private var accessToken: String {
+        guard let accessToken = KeychainManager.shared.get(type: .accessToken) else {
+            return ""
+        }
+        return accessToken
+    }
     
     // 비속어 검색 API
     case createProfanityCheck(Encodable)
@@ -61,7 +68,8 @@ public enum CommonEndPoint: WSNetworkEndPoint {
     
     public var headers: HTTPHeaders {
         return [
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "Bearer \(accessToken)"
         ]
     }
 }
