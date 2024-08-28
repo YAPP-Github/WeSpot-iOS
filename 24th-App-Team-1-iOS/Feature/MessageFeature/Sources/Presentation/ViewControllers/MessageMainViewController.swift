@@ -7,6 +7,7 @@
 
 import UIKit
 import Util
+import DesignSystem
 
 import Then
 import SnapKit
@@ -17,7 +18,6 @@ import ReactorKit
 public final class MessageMainViewController: BaseViewController<MessageMainViewReactor> {
 
     //MARK: - Properties
-    private let messageToggleView = MessageToggleView()
     private let messagePageViewController = MessagePageViewController(reactor: MessagePageViewReactor())
     
     //MARK: - LifeCycle
@@ -31,20 +31,14 @@ public final class MessageMainViewController: BaseViewController<MessageMainView
         super.setupUI()
         
         addChild(messagePageViewController)
-        view.addSubviews(messageToggleView, messagePageViewController.view)
+        view.addSubviews(messagePageViewController.view)
     }
     
     public override func setupAutoLayout() {
         super.setupAutoLayout()
         
-        messageToggleView.snp.makeConstraints {
-            $0.top.equalTo(navigationBar.snp.bottom)
-            $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(46)
-        }
-        
         messagePageViewController.view.snp.makeConstraints {
-            $0.top.equalTo(messageToggleView.snp.bottom)
+            $0.top.equalTo(navigationBar.snp.bottom)
             $0.horizontalEdges.bottom.equalToSuperview()
         }
     }
@@ -61,25 +55,16 @@ public final class MessageMainViewController: BaseViewController<MessageMainView
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
-        messageToggleView.homeButton
-            .rx.tap
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .map { Reactor.Action.didTapToggleButton(.home) }
+        Observable.just(())
+            .map { Reactor.Action.viewDidLoad }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        messageToggleView.storageButton
-            .rx.tap
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .map { Reactor.Action.didTapToggleButton(.storage) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        reactor.state
-            .map { $0.messageTypes == .home ? true : false }
-            .distinctUntilChanged()
-            .skip(1)
-            .bind(to: messageToggleView.rx.isSelected)
+        reactor.pulse(\.$isLoading)
+            .filter { $0 == true }
+            .bind(with: self) { owner, _ in
+
+            }
             .disposed(by: disposeBag)
     }
 }

@@ -22,8 +22,6 @@ let project = Project
                 .SPM.alamofire,
                 .SPM.swinject,
                 .SPM.kingfisher,
-                .SPM.kakaoSDKCommon,
-                .SPM.rxKakaoSDKCommon,
                 .SPM.kakaoSDKAuth,
                 .SPM.rxKakaoSDKAuth,
                 .SPM.kakaoSDKUser,

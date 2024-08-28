@@ -9,6 +9,7 @@ import Foundation
 import Networking
 import LoginDomain
 import Storage
+import Util
 
 import ReactorKit
 import AuthenticationServices
@@ -20,9 +21,11 @@ public final class SignInViewReactor: Reactor {
     
     private let createNewMemberUseCase: CreateNewMemberUseCaseProtocol
     private let createExistingUseCase: CreateExistingMemberUseCaseProtocol
+    private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     public var initialState: State
     
     public struct State {
+        @Pulse var isResign: Bool
         var signUpTokenResponse: CreateSignUpTokenResponseEntity?
         var accountResponse: CreateAccountResponseEntity?
         var accountRequest: CreateAccountRequest
@@ -36,13 +39,30 @@ public final class SignInViewReactor: Reactor {
     public enum Mutation {
         case setSignUpTokenResponse(CreateSignUpTokenResponseEntity)
         case setAccountResponse(CreateAccountResponseEntity)
+        case setResignResponse(Bool)
     }
     
     public init(createNewMemberUseCase: CreateNewMemberUseCaseProtocol,
                 createExistingUseCase: CreateExistingMemberUseCaseProtocol) {
         self.createNewMemberUseCase = createNewMemberUseCase
         self.createExistingUseCase = createExistingUseCase
-        self.initialState = State(accountRequest: CreateAccountRequest())
+        self.initialState = State(
+            isResign: false,
+            accountRequest: CreateAccountRequest()
+        )
+    }
+    
+    public func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
+        let responseResignStatus = globalService.event.flatMap { event -> Observable<Mutation> in
+            switch event {
+            case let .didShowSignInViewController(isSuccess):
+                return .just(.setResignResponse(isSuccess))
+            default:
+                return .empty()
+            }
+            
+        }
+        return .merge(mutation, responseResignStatus)
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
@@ -127,6 +147,8 @@ public final class SignInViewReactor: Reactor {
             newState.accountRequest.signUpToken = signUpTokenResponse.signUpToken
         case .setAccountResponse(let accountResponse):
             newState.accountResponse = accountResponse
+        case .setResignResponse(let isResign):
+            newState.isResign = isResign
         }
         return newState
     }

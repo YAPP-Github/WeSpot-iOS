@@ -11,7 +11,11 @@ import PackageDescription
         // productTypes: ["Alamofire": .framework,] 
         productTypes: [
             "Lottie"  : .framework,
-            "Kingfisher": .framework
+            "Kingfisher": .framework,
+            "KakaoSDKAuth": .framework,
+            "KakaoSDKUser": .framework,
+            "RxKakaoSDKAuth": .framework,
+            "RxKakaoSDKUser": .framework
         ],
         baseSettings: .settings(configurations: [
             .debug(name: .configuration("DEV")),
@@ -30,8 +34,8 @@ let package = Package(
         .package(url: "https://github.com/devxoul/Then", from: "3.0.0"),
         .package(url: "https://github.com/Alamofire/Alamofire", from: "5.9.1"),
         .package(url: "https://github.com/ReactorKit/ReactorKit", from: "3.2.0"),
-        .package(url: "https://github.com/kakao/kakao-ios-sdk", branch: "master"),
-        .package(url: "https://github.com/kakao/kakao-ios-sdk-rx", branch: "master"),
+        .package(url: "https://github.com/kakao/kakao-ios-sdk", branch: "2.22.0"),
+        .package(url: "https://github.com/kakao/kakao-ios-sdk-rx", branch: "2.22.0"),
         .package(url: "https://github.com/airbnb/lottie-ios", from: "4.5.0"),
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "10.24.0"),
         .package(url: "https://github.com/onevcat/Kingfisher", from: "7.12.0"),

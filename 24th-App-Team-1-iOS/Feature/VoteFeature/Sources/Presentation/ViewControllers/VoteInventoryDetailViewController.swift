@@ -191,6 +191,14 @@ public final class VoteInventoryDetailViewController: BaseViewController<VoteInv
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        detailConfirmButton
+            .rx.tap
+            .throttle(.microseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToKakaoTalk()
+            }
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$isLoading)
             .bind(to: loadingIndicator.rx.isHidden)
             .disposed(by: disposeBag)
