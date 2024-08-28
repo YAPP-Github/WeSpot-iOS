@@ -11,7 +11,11 @@ import PackageDescription
         // productTypes: ["Alamofire": .framework,] 
         productTypes: [
             "Lottie"  : .framework,
-            "Kingfisher": .framework
+            "Kingfisher": .framework,
+            "KakaoSDKAuth": .framework,
+            "KakaoSDKUser": .framework,
+            "RxKakaoSDKAuth": .framework,
+            "RxKakaoSDKUser": .framework
         ],
         baseSettings: .settings(configurations: [
             .debug(name: .configuration("DEV")),

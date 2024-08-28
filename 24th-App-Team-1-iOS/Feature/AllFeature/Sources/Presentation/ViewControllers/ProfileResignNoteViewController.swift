@@ -8,6 +8,7 @@
 import DesignSystem
 import UIKit
 import Util
+import Storage
 
 import Then
 import SnapKit
@@ -117,8 +118,9 @@ public final class ProfileResignNoteViewController: BaseViewController<ProfileRe
         }
         
         noteTitleLabel.do {
+            guard let userName = UserDefaultsManager.shared.userProfile?.name else { return }
             $0.textColor = DesignSystemAsset.Colors.gray100.color
-            $0.text = "김선희님\n위스팟을 떠나시나요? 너무 아쉬워요"
+            $0.text = "\(userName)님 위스팟을 떠나시나요? 너무 아쉬워요"
             $0.textAlignment = .left
         }
         
@@ -133,7 +135,7 @@ public final class ProfileResignNoteViewController: BaseViewController<ProfileRe
         }
         
         noteDescriptionLabel.do {
-            $0.text = "위스팟에서 친구들과 함께 했던 추억들\n(투표, 쪽지 등 모든 활동 정보)이 영구적으로 사라져요\n해당 데이터는 탈퇴 후 복구할 수 없어요"
+            $0.text = "위스팟에서 친구들과 함께 했던 추억들 (투표, 쪽지 등 모든 활동 정보)이 \n영구적으로 사라져요해당 데이터는 탈퇴 후 복구할 수 없어요"
             $0.textAlignment = .left
             $0.textColor = DesignSystemAsset.Colors.gray100.color
         }

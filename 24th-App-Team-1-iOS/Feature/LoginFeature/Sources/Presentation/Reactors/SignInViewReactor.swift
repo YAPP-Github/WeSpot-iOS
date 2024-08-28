@@ -9,6 +9,7 @@ import Foundation
 import Networking
 import LoginDomain
 import Storage
+import Util
 
 import ReactorKit
 import AuthenticationServices
@@ -20,9 +21,11 @@ public final class SignInViewReactor: Reactor {
     
     private let createNewMemberUseCase: CreateNewMemberUseCaseProtocol
     private let createExistingUseCase: CreateExistingMemberUseCaseProtocol
+    private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     public var initialState: State
     
     public struct State {
+        @Pulse var isResign: Bool
         var signUpTokenResponse: CreateSignUpTokenResponseEntity?
         var accountResponse: CreateAccountResponseEntity?
         var accountRequest: CreateAccountRequest

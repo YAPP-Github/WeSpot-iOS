@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import Util
 import VoteDomain
 import Extensions
 
@@ -15,6 +15,7 @@ import ReactorKit
 public final class VoteResultViewReactor: Reactor {
     
     private let fetchWinnerVoteOptionsUseCase: FetchWinnerVoteOptionsUseCaseProtocol
+    private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     public var initialState: State
     
     public struct State {
@@ -22,6 +23,7 @@ public final class VoteResultViewReactor: Reactor {
         @Pulse var winnerResponseEntity: VoteWinnerResponseEntity?
         var currentPage: Int = 0
         @Pulse var isLoading: Bool
+        @Pulse var isShowing: Bool
     }
     
     public enum Action {
@@ -31,6 +33,7 @@ public final class VoteResultViewReactor: Reactor {
     
     public enum Mutation {
         case setLoading(Bool)
+        case setShareBottonSheetView(Bool)
         case setResultSectionItems([VoteResultItem])
         case setWinnerItems(VoteWinnerResponseEntity)
         case setVisibleCellIndex(Int)
@@ -40,10 +43,25 @@ public final class VoteResultViewReactor: Reactor {
         self.initialState = State(
             resultSection: [
                 .voteResultInfo([])],
-            isLoading: false
+            isLoading: false,
+            isShowing: false
         )
         self.fetchWinnerVoteOptionsUseCase = fetchWinnerVoteOptionsUseCase
     }
+    
+    public func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
+        let didTappedResultButton = globalService.event.flatMap { event -> Observable<Mutation> in
+            switch event {
+            case let .didTappedFriendButton(isSelected):
+                return .just(.setShareBottonSheetView(isSelected))
+            default:
+                return .empty()
+            }
+        }
+        
+        return .merge(mutation, didTappedResultButton)
+    }
+    
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
@@ -96,6 +114,8 @@ public final class VoteResultViewReactor: Reactor {
             
         case let .setVisibleCellIndex(currentIndex):
             newState.currentPage = currentIndex
+        case let .setShareBottonSheetView(isShowing):
+            newState.isShowing = isShowing
         }
         return newState
     }

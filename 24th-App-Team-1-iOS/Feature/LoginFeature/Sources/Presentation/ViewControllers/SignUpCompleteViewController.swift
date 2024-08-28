@@ -108,6 +108,13 @@ public final class SignUpCompleteViewController: BaseViewController<SignUpComple
             }
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isExpired)
+            .filter { $0 == true }
+            .bind(with: self) { owner, _ in
+                //TODO: SigninViewController 화면 전환 로직 추가
+            }
+            .disposed(by: disposeBag)
+        
         startButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind { _ in

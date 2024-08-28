@@ -32,6 +32,7 @@ public enum WSGlobalStateType {
     case didTappedMarketingButton(_ isSelected: Bool)
     case didTappedAccountSuccessButton(_ isSelected: Bool)
     case didChangedAccountSchoolName(schoolName: String)
+    case didTappedFriendButton(_ isSelected: Bool)
     case didTappedResultButton
     case didTappedVoteButton(_ isSelected: Bool)
     case toogleMessageType(_ type: MessageTypes)

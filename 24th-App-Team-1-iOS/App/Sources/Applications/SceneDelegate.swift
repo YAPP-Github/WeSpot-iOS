@@ -77,7 +77,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         KeychainManager.shared.delete(type: .accessToken)
         let accessToken = KeychainManager.shared.get(type: .accessToken)
         
-        if accessToken?.isEmpty ?? true { // accessToken 값이 없으면 (회원가입 안됨)
+        if !(accessToken?.isEmpty ?? true) { // accessToken 값이 없으면 (회원가입 안됨)
             let signInViewController = DependencyContainer.shared.injector.resolve(SignInViewController.self)
             window?.rootViewController = UINavigationController(rootViewController: signInViewController)
             
@@ -137,6 +137,13 @@ extension SceneDelegate {
             guard let self else { return }
             let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
             self.window?.rootViewController = UINavigationController(rootViewController: voteMainViewController)
+            self.window?.makeKeyAndVisible()
+        }
+        
+        NotificationCenter.default.addObserver(forName: .showSignInViewController, object: nil, queue: .main) { [weak self] _ in
+            guard let self else { return }
+            let signInViewController = DependencyContainer.shared.injector.resolve(SignInViewController.self)
+            self.window?.rootViewController = UINavigationController(rootViewController: signInViewController)
             self.window?.makeKeyAndVisible()
         }
         

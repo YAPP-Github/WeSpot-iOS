@@ -21,7 +21,7 @@ final class MessageToggleView: UIView {
     private let selectedLine = UIView()
     var isSelected: Bool = true {
         didSet {
-            updateToggleLayout(isSelected)
+            
         }
     }
     
@@ -41,7 +41,7 @@ final class MessageToggleView: UIView {
     // MARK: - Functions
     private func setupUI() {
         
-        addSubviews(homeButton, storageButton, underLine, selectedLine)
+        addSubviews(homeButton, underLine)
     }
     
     private func setupAttributes() {
@@ -53,19 +53,8 @@ final class MessageToggleView: UIView {
             $0.setTitleColor(DesignSystemAsset.Colors.gray100.color, for: .normal)
         }
         
-        storageButton.do {
-            $0.backgroundColor = UIColor.clear
-            $0.titleLabel?.font = WSFont.Body03.font()
-            $0.setTitle("내 쪽지함", for: .normal)
-            $0.setTitleColor(DesignSystemAsset.Colors.gray400.color, for: .normal)
-        }
-        
         underLine.do {
             $0.backgroundColor = DesignSystemAsset.Colors.gray700.color
-        }
-        
-        selectedLine.do {
-            $0.backgroundColor = DesignSystemAsset.Colors.gray100.color
         }
     }
     
@@ -73,37 +62,14 @@ final class MessageToggleView: UIView {
         
         homeButton.snp.makeConstraints {
             $0.verticalEdges.equalToSuperview()
-            $0.left.equalToSuperview().inset(20)
-            $0.width.equalTo(self).multipliedBy(0.5).offset(-20)
+            $0.width.equalToSuperview()
         }
         
-        storageButton.snp.makeConstraints {
-            $0.verticalEdges.equalToSuperview()
-            $0.right.equalToSuperview().inset(20)
-            $0.width.equalTo(self).multipliedBy(0.5).offset(-20)
-        }
         
         underLine.snp.makeConstraints {
             $0.height.equalTo(1)
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalToSuperview().offset(-1)
-        }
-        
-        selectedLine.snp.makeConstraints {
-            $0.left.equalToSuperview().offset(20)
-            $0.height.equalTo(2)
-            $0.width.equalTo(self).multipliedBy(0.5).offset(-20)
-            $0.bottom.equalToSuperview().offset(-2)
-        }
-    }
-    
-    private func updateToggleLayout(_ isSelected: Bool) {
-        
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) { [weak self] in
-            guard let self else { return }
-            self.selectedLine.frame.origin.x = isSelected ? 20 : (self.frame.size.width - self.selectedLine.frame.size.width) - 20
-            self.homeButton.setTitleColor(isSelected ? DesignSystemAsset.Colors.gray100.color :  DesignSystemAsset.Colors.gray400.color, for: .normal)
-            self.storageButton.setTitleColor(isSelected ? DesignSystemAsset.Colors.gray400.color :  DesignSystemAsset.Colors.gray100.color, for: .normal)
         }
     }
 }

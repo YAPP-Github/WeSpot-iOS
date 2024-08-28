@@ -138,6 +138,13 @@ public final class VoteResultViewController: BaseViewController<VoteResultViewRe
             .bind(to: resultPageControl.rx.currentPage)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isShowing)
+            .filter { $0 == true}
+            .bind(with: self) { owner, _ in
+                owner.shareToKakaoTalk()
+            }
+            .disposed(by: disposeBag)
+        
         reactor.state
             .map { !$0.isLoading }
             .distinctUntilChanged()

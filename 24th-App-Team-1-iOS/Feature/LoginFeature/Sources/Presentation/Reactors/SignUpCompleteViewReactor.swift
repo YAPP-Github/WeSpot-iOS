@@ -19,6 +19,7 @@ public final class SignUpCompleteViewReactor: Reactor {
         @Pulse var accountEntity: CreateAccountResponseEntity?
         @Pulse var accountRequest: CreateAccountRequest
         @Pulse var isLoading: Bool
+        @Pulse var isExpired: Bool
     }
     
     public enum Action {
@@ -27,6 +28,7 @@ public final class SignUpCompleteViewReactor: Reactor {
     
     public enum Mutation {
         case setLoading(Bool)
+        case setExpiredDate(Bool)
         case setAccountToken(CreateAccountResponseEntity)
     }
     
@@ -44,17 +46,23 @@ public final class SignUpCompleteViewReactor: Reactor {
         
         switch action {
         case .viewDidLoad:
-            return createAccountUseCase
-                .execute(body: currentState.accountRequest)
-                .asObservable()
-                .flatMap { response -> Observable<Mutation> in
-                    guard let response else { return .empty() }
-                    return .concat(
-                        .just(.setLoading(false)),
-                        .just(.setAccountToken(response)),
-                        .just(.setLoading(true))
-                    )
-                }
+            guard let expiredDate = UserDefaultsManager.shared.expiredDate else { return .empty() }
+            
+            if expiredDate.isSameDay(as: Date.now) {
+                return .just(.setExpiredDate(true))
+            } else {
+                return createAccountUseCase
+                    .execute(body: currentState.accountRequest)
+                    .asObservable()
+                    .flatMap { response -> Observable<Mutation> in
+                        guard let response else { return .empty() }
+                        return .concat(
+                            .just(.setLoading(false)),
+                            .just(.setAccountToken(response)),
+                            .just(.setLoading(true))
+                        )
+                    }
+            }
         }
     }
     
@@ -70,6 +78,8 @@ public final class SignUpCompleteViewReactor: Reactor {
             UserDefaultsManager.shared.refreshToken = accountEntity.refreshToken
             
             print("accessToken Keychain : \(KeychainManager.shared.get(type: .accessToken))")
+        case let .setExpiredDate(isExpired):
+            newState.isExpired = isExpired
         }
         
         

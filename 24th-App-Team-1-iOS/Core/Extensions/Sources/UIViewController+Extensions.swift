@@ -22,7 +22,7 @@ public extension UIViewController {
     }
     
     func shareToInstagramStory(to view: UIView) {
-        guard let url = URL(string: "instagram-stories://share?source_application="+"123444") else { return }
+        guard let url = URL(string: "itms-apps://itunes.apple.com/app/"+"6661029016") else { return }
         
         view.setNeedsLayout()
         let image = view.asImage()
@@ -44,8 +44,7 @@ public extension UIViewController {
     }
     
     func shareToKakaoTalk() {
-        //TODO: 앱 설치 링크로 변경 및 문구 변경
-        let shareURL = URL(string: "https://apps.apple.com/kr/app/instagram/id389801252")!
+        let shareURL = URL(string: "itms-apps://itunes.apple.com/app/"+"6661029016")!
         
         
         let shareViewController = UIActivityViewController(activityItems: [WSURLItemSource(wespotAppURL: shareURL)], applicationActivities: nil)
