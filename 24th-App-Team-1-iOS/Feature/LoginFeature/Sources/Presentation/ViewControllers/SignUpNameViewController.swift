@@ -31,9 +31,6 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
     //MARK: - LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
-        nextButton.isEnabled = false
-        nameTextField.becomeFirstResponder()
     }
     
     //MARK: - Configure
@@ -99,6 +96,12 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
     
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
+        
+        self.rx.viewWillAppear
+            .bind(with: self) { owner, _ in
+                owner.nameTextField.becomeFirstResponder()
+            }
+            .disposed(by: disposeBag)
         
         nameTextField.rx.text.orEmpty
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)

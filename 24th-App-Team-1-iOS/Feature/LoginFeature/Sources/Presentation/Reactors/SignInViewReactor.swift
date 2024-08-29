@@ -25,8 +25,7 @@ public final class SignInViewReactor: Reactor {
     public var initialState: State
     
     public struct State {
-        @Pulse var isResign: Bool
-        var signUpTokenResponse: CreateSignUpTokenResponseEntity?
+        @Pulse var signUpTokenResponse: CreateSignUpTokenResponseEntity?
         var accountResponse: CreateAccountResponseEntity?
         var accountRequest: CreateAccountRequest
         @Pulse var isExisting: Bool
@@ -145,7 +144,9 @@ public final class SignInViewReactor: Reactor {
         case .setSignUpTokenResponse(let signUpTokenResponse):
             newState.signUpTokenResponse = signUpTokenResponse
             newState.accountRequest.signUpToken = signUpTokenResponse.signUpToken
-            let expiredDate = Date().addingTimeInterval(30 * 60)
+            let expiredDate = Date.now.addingTimeInterval(30 * 60)
+                .toFormatLocaleString(with: .dashYyyyMMddhhmmss)
+                .toLocalDate(with: .dashYyyyMMddhhmmss)
             UserDefaultsManager.shared.expiredDate = expiredDate
         case .setAccountExisting(let isExisting):
             newState.isExisting = isExisting

@@ -7,6 +7,7 @@
 
 import Foundation
 import AllDomain
+import Storage
 import Util
 import CommonDomain
 
@@ -27,8 +28,8 @@ public final class ProfileEditViewReactor: Reactor {
         var characterSection: [CharacterEditSection]
         @Pulse var isUpdate: Bool
         @Pulse var isLoading: Bool
-        var backgroundColor: String
-        var iconURL: String
+        @Pulse var backgroundColor: String
+        @Pulse var iconURL: URL?
         var isError: Bool
     }
     
@@ -48,7 +49,7 @@ public final class ProfileEditViewReactor: Reactor {
         case setUserUpdate(Bool)
         case setLoading(Bool)
         case setSelctedBackgroundColor(String)
-        case setSelectedIconURL(String)
+        case setSelectedIconURL(URL)
         case setError(Bool)
     }
     
@@ -69,7 +70,6 @@ public final class ProfileEditViewReactor: Reactor {
             isUpdate: false,
             isLoading: false,
             backgroundColor: "",
-            iconURL: "",
             isError: false
         )
         self.updateUserProfileUseCase = updateUserProfileUseCase
@@ -88,11 +88,13 @@ public final class ProfileEditViewReactor: Reactor {
                     var characterSectionItem: [CharacterEditItem] = []
                     
                     entity.characters.enumerated().forEach {
+                        let selectedItem = UserDefaultsManager.shared.userProfileImage == $0.element.iconUrl.absoluteString ? $0.offset : 9
                         characterSectionItem.append(
                             .profileCharacterItem(
                                 ProfileCharacterCellReactor(
                                     iconURL: $0.element.iconUrl,
-                                    item: $0.offset
+                                    item: $0.offset,
+                                    selectedItem: selectedItem
                                 )
                             )
                         )
@@ -115,11 +117,13 @@ public final class ProfileEditViewReactor: Reactor {
                     var backgroundSectionItem: [BackgroundEditItem] = []
                     
                     entity.backgrounds.enumerated().forEach {
+                        let selectedItem = UserDefaultsManager.shared.userBackgroundColor == $0.element.color ? $0.offset : 9
                         backgroundSectionItem.append(
                             .profileBackgroundItem(
                                 ProfileBackgroundCellReactor(
                                     backgroundColor: $0.element.color,
-                                    item: $0.offset
+                                    item: $0.offset,
+                                    selectedItem: selectedItem
                                 )
                             )
                         )
@@ -133,32 +137,34 @@ public final class ProfileEditViewReactor: Reactor {
                 }
         case let .didTappedCharacterItem(item):
             globalService.event.onNext(.didTappedCharacterItem(item))
-            let iconURL = currentState.fetchProfileImageResponseEntity?.characters[item].iconUrl.absoluteString
-            return .just(.setSelectedIconURL(iconURL ?? ""))
+            guard let iconURL = currentState.fetchProfileImageResponseEntity?.characters[item].iconUrl else { return .empty() }
+            return .just(.setSelectedIconURL(iconURL))
             
         case let .didTappedBackgroundItem(item):
             globalService.event.onNext(.didTappedBackgroundItem(item))
-            let backgroundColor = currentState.fetchProfileBackgroundsResponseEntity?.backgrounds[item].color
-            return .just(.setSelctedBackgroundColor(backgroundColor ?? ""))
+            guard let backgroundColor = currentState.fetchProfileBackgroundsResponseEntity?.backgrounds[item].color else { return .empty() }
+            return .just(.setSelctedBackgroundColor(backgroundColor))
         case .didTappedUpdateButton:
             
-            let updateUserProfileBody = UpdateUserProfileItemRequest(backgroundColor: currentState.backgroundColor, iconUrl: currentState.iconURL)
-            let updateUserBody = UpdateUserProfileRequest(introduction: currentState.userProfileEntity.introduction, profile: updateUserProfileBody)
+            guard let originalURL = currentState.iconURL else { return .empty() }
+            let updateUserBody = UpdateUserProfileRequest(introduction: currentState.userProfileEntity.introduction, backgroundColor: currentState.backgroundColor, iconUrl: originalURL.absoluteString)
             return updateUserProfileUseCase
                 .execute(body: updateUserBody)
                 .asObservable()
-                .flatMap { isUpdate -> Observable<Mutation> in
+                .withUnretained(self)
+                .flatMap { owner, isUpdate -> Observable<Mutation> in
                     if isUpdate {
                         return .concat(
                             .just(.setLoading(false)),
                             .just(.setError(false)),
                             .just(.setUserUpdate(isUpdate)),
+                            .just(.setSelctedBackgroundColor(owner.currentState.backgroundColor)),
+                            .just(.setSelectedIconURL(originalURL)),
                             .just(.setLoading(true))
                         )
                     } else {
                         return .just(.setError(true))
                     }
-                    
                 }
         }
     }
@@ -180,8 +186,10 @@ public final class ProfileEditViewReactor: Reactor {
             newState.isUpdate = isUpdate
         case let .setSelectedIconURL(iconURL):
             newState.iconURL = iconURL
+            UserDefaultsManager.shared.userProfileImage = iconURL.absoluteString
         case let .setSelctedBackgroundColor(backgroundColor):
             newState.backgroundColor = backgroundColor
+            UserDefaultsManager.shared.userBackgroundColor = backgroundColor
         case let .setError(isErorr):
             newState.isError = isErorr
         }

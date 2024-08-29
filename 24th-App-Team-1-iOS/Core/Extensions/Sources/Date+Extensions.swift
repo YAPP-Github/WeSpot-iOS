@@ -14,10 +14,18 @@ public extension Date {
         return dateFormatter.string(from: self)
     }
     
+    func toFormatLocaleString(with format: String = "yyyy-MM") -> String {
+        let dateFormatter = DateFormatter.withLocaleformat(format)
+        return dateFormatter.string(from: self)
+    }
+    
     func toFormatString(with format: DateFormatter.Format) -> String {
         return toFormatString(with: format.type)
     }
     
+    func toFormatLocaleString(with format: DateFormatter.Format) -> String {
+        return toFormatLocaleString(with: format.type)
+    }
     func toFormatRelative() -> String {
         
         let calendar = Calendar.current
@@ -99,6 +107,14 @@ public extension DateFormatter {
                 return "M월 dd일 EEEE"
             }
         }
+    }
+    
+    static func withLocaleformat(_ format: String) -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        formatter.timeZone = TimeZone.current
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter
     }
     
     static func withFormat(_ format: String) -> DateFormatter {

@@ -185,8 +185,6 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         scrollView.do {
             $0.canCancelContentTouches = true
         }
-        
-        
     }
     
     
@@ -216,18 +214,6 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .compactMap { $0 }
             .map { Reactor.Action.didUpdateIntroduceProfile($0)}
             .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        userIntroduceTextField.rx
-            .text.orEmpty
-            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
-            .scan("") { previous, new -> String in
-                if new.count > 20 {
-                  return previous
-                } else {
-                  return new
-                }
-            }.bind(to: userIntroduceTextField.rx.text)
             .disposed(by: disposeBag)
         
         userProfileEditButton
@@ -300,6 +286,22 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             }
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isEnabled)
+            .bind(to: editButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        
+        userIntroduceTextField
+            .rx.text.orEmpty
+            .scan("") { previous, new -> String in
+                if new.count <= 20 {
+                    return previous
+                }
+                return new
+            }
+            .distinctUntilChanged()
+            .bind(to: userIntroduceTextField.rx.text)
+            .disposed(by: disposeBag)
         
         reactor.state
             .compactMap{ $0.userProfileEntity?.name }
@@ -309,6 +311,7 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         
         reactor.state
             .compactMap{ $0.userProfileEntity?.gender }
+            .map { $0 == "MALE" ? "남" : "여"}
             .distinctUntilChanged()
             .bind(to: userGenderTextFiled.rx.placeholderText)
             .disposed(by: disposeBag)
@@ -320,10 +323,17 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .bind(to: userClassInfoTextField.rx.placeholderText)
             .disposed(by: disposeBag)
         
-        reactor.state
-            .compactMap{ $0.userProfileEntity?.introduction }
+        reactor.pulse(\.$userProfileEntity)
+            .compactMap { $0?.introduction }
             .distinctUntilChanged()
             .bind(to: userIntroduceTextField.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.userProfileEntity?.profile.backgroundColor }
+            .distinctUntilChanged()
+            .map { UIColor(hex: $0)}
+            .bind(to: userContainerView.rx.backgroundColor)
             .disposed(by: disposeBag)
         
         reactor.state
@@ -350,6 +360,7 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         reactor.state
             .map { $0.errorMessage }
             .distinctUntilChanged()
+            .observe(on: MainScheduler.asyncInstance)
             .bind(to: errorLabel.rx.text)
             .disposed(by: disposeBag)
         

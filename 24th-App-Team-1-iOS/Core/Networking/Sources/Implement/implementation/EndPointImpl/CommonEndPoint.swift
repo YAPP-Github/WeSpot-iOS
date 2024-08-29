@@ -32,9 +32,9 @@ public enum CommonEndPoint: WSNetworkEndPoint {
         case .createProfanityCheck:
             return "/check-profanity"
         case .fetchCharacters:
-            return "/users/signup/characters"
+            return "/users/characters"
         case .fetchBackgrounds:
-            return "/users/signup/backgrounds"
+            return "/users/backgrounds"
         case .createUserReport:
             return "/reports"
         }

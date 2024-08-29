@@ -118,9 +118,8 @@ public final class ProfileResignNoteViewController: BaseViewController<ProfileRe
         }
         
         noteTitleLabel.do {
-            guard let userName = UserDefaultsManager.shared.userProfile?.name else { return }
             $0.textColor = DesignSystemAsset.Colors.gray100.color
-            $0.text = "\(userName)님 위스팟을 떠나시나요? 너무 아쉬워요"
+            $0.text = "\(UserDefaultsManager.shared.userName)님 위스팟을 떠나시나요? 너무 아쉬워요"
             $0.textAlignment = .left
         }
         

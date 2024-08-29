@@ -9,29 +9,33 @@ import Foundation
 
 import ReactorKit
 
-final class SignUpIntroduceViewReactor: Reactor {
+public final class SignUpIntroduceViewReactor: Reactor {
     
     
-    struct State {
+    public struct State {
         
     }
     
-    enum Action {
+    public enum Action {
         
     }
     
-    enum Mutation {
+    public enum Mutation {
         
     }
     
-    let initialState: State = State()
+    public let initialState: State = State()
     
-    func mutate(action: Action) -> Observable<Mutation> {
+    public init() {
+        
+    }
+    
+    public func mutate(action: Action) -> Observable<Mutation> {
         
         return .empty()
     }
     
-    func reduce(state: State, mutation: Mutation) -> State {
+    public func reduce(state: State, mutation: Mutation) -> State {
         
         return state
     }

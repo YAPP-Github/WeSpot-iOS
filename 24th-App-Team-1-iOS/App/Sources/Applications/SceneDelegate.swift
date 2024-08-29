@@ -72,48 +72,20 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         ])
         
         window = UIWindow(windowScene: scene)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleUserDidLogin), name: .userDidLogin, object: nil)
         
-        KeychainManager.shared.delete(type: .accessToken)
         let accessToken = KeychainManager.shared.get(type: .accessToken)
         
-        if !(accessToken?.isEmpty ?? true) { // accessToken 값이 없으면 (회원가입 안됨)
+        if (accessToken?.isEmpty ?? true) { // accessToken 값이 없으면 (회원가입 안됨)
             let signInViewController = DependencyContainer.shared.injector.resolve(SignInViewController.self)
             window?.rootViewController = UINavigationController(rootViewController: signInViewController)
             
         } else { // accessToken 값이 있으면 (회원가입이 됨)
-            let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
-            let voteNavigationContoller = UINavigationController(rootViewController: voteMainViewController)
-            
-            let messageMainViewReactor = MessageMainViewReactor()
-            let messageMainViewController = MessageMainViewController(reactor: messageMainViewReactor)
-            let messageNavigationContoller = UINavigationController(rootViewController: messageMainViewController)
-            
-            let allMainViewController = DependencyContainer.shared.injector.resolve(AllMainViewController.self)
-            let allNavigationContoller = UINavigationController(rootViewController: allMainViewController)
-        
-            let tabbarcontroller = WSTabBarViewController()
-            tabbarcontroller.viewControllers = [voteNavigationContoller,messageNavigationContoller, allNavigationContoller]
-            window?.rootViewController = tabbarcontroller
+            setupMainViewController()
         }
         window?.makeKeyAndVisible()
         setupViewControllers()
     }
     
-    @objc private func handleUserDidLogin() {
-        let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
-        let voteNavigationContoller = UINavigationController(rootViewController: voteMainViewController)
-        
-        let messageMainViewReactor = MessageMainViewReactor()
-        let messageMainViewController = MessageMainViewController(reactor: messageMainViewReactor)
-        let messageNavigationContoller = UINavigationController(rootViewController: messageMainViewController)
-        
-        let allNavigationContoller = UINavigationController(rootViewController: UIViewController())
-        
-        let tabbarcontroller = WSTabBarViewController()
-        tabbarcontroller.viewControllers = [voteNavigationContoller,messageNavigationContoller, allNavigationContoller]
-        window?.rootViewController = tabbarcontroller
-    }
     
     // kakao login
     public func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
@@ -133,10 +105,15 @@ extension SceneDelegate {
             return
         }
         
+        NotificationCenter.default.addObserver(forName: .showProfileImageViewController, object: nil, queue: .main) { [weak self] _ in
+            guard let self else { return }
+            let setupProfileViewController = DependencyContainer.shared.injector.resolve(    SetUpProfileImageViewController.self)
+            topViewController.navigationController?.pushViewController(setupProfileViewController, animated: true)
+        }
+        
         NotificationCenter.default.addObserver(forName: .showVoteMainViewController, object: nil, queue: .main) { [weak self] _ in
             guard let self else { return }
-            let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
-            self.window?.rootViewController = UINavigationController(rootViewController: voteMainViewController)
+            setupMainViewController()
             self.window?.makeKeyAndVisible()
         }
         
@@ -177,4 +154,24 @@ extension SceneDelegate {
         }
     }
     
+}
+
+
+extension SceneDelegate {
+    private func setupMainViewController() {
+        let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
+        let voteNavigationContoller = UINavigationController(rootViewController: voteMainViewController)
+        
+        let messageMainViewReactor = MessageMainViewReactor()
+        let messageMainViewController = MessageMainViewController(reactor: messageMainViewReactor)
+        let messageNavigationContoller = UINavigationController(rootViewController: messageMainViewController)
+        
+        
+        let allMainViewController = DependencyContainer.shared.injector.resolve(AllMainViewController.self)
+        let allNavigationContoller = UINavigationController(rootViewController: allMainViewController)
+    
+        let tabbarcontroller = WSTabBarViewController()
+        tabbarcontroller.viewControllers = [voteNavigationContoller,messageNavigationContoller, allNavigationContoller]
+        window?.rootViewController = tabbarcontroller
+    }
 }

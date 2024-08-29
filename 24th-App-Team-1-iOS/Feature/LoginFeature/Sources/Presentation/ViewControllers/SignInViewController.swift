@@ -220,8 +220,8 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             .bind(to: loadingIndicatorView.rx.isHidden)
             .disposed(by: disposeBag)
         
-        reactor.state
-            .filter { $0.signUpTokenResponse != nil }
+        reactor.pulse(\.$signUpTokenResponse)
+            .filter { $0 != nil }
             .withLatestFrom(reactor.state.map { $0.accountRequest })
             .bind(with: self) { owner, response in
                 let signUpSchoolViewController = DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self, arguments: response, "")

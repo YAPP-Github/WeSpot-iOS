@@ -80,15 +80,19 @@ public final class VoteInventoryViewReactor: Reactor {
                 .flatMap { entity -> Observable<Mutation> in
                     guard let originalEntity = entity else {
                         return .concat(
+                            .just(.setLoading(false)),
                             .just(.setInventoryType(.receive)),
-                            .just(.setEmptyItems(false))
+                            .just(.setEmptyItems(false)),
+                            .just(.setLoading(true))
                         )
                     }
                     
                     if originalEntity.response.isEmpty {
                         return .concat(
+                            .just(.setLoading(false)),
                             .just(.setInventoryType(.receive)),
-                            .just(.setEmptyItems(false))
+                            .just(.setEmptyItems(false)),
+                            .just(.setLoading(true))
                         )
                     } else {
                         let receiveSection: [VoteInventorySection] = originalEntity.response.map { response in

@@ -147,5 +147,15 @@ struct SignUpCompletePresentationAssembly: Assembly {
             let reactor = resolver.resolve(SignUpCompleteViewReactor.self, argument: accountRequest)!
             return SignUpCompleteViewController(reactor: reactor)
         }
+        
+        container.register(SignUpIntroduceViewReactor.self) { _ in
+            return SignUpIntroduceViewReactor()
+        }
+        
+        container.register(SignUpIntroduceViewController.self) { resolver in
+            let reactor = resolver.resolve(SignUpIntroduceViewReactor.self)!
+            
+            return SignUpIntroduceViewController(reactor: reactor)
+        }
     }
 }

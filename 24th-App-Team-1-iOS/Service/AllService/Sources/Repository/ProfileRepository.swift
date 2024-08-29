@@ -35,8 +35,7 @@ public final class ProfileRepository: ProfileRepositoryProtocol {
     
     public func updateUserProfileItem(body: UpdateUserProfileRequest) -> Single<Bool> {
         
-        let profileBody = UpdateUserProfileItemRequestDTO(backgroundColor: body.profile.backgroundColor, iconUrl: body.profile.iconUrl)
-        let body = UpdateUserProfileRequestDTO(introduction: body.introduction, profile: profileBody)
+        let body = UpdateUserProfileRequestDTO(introduction: body.introduction, backgroundColor: body.backgroundColor, iconUrl: body.iconUrl)
         let endPoint = ProfileEndPoint.updateUserProfile(body)
         return networkService.request(endPoint: endPoint)
             .asObservable()

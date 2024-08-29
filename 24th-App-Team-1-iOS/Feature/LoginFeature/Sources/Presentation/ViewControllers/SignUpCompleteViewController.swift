@@ -111,7 +111,7 @@ public final class SignUpCompleteViewController: BaseViewController<SignUpComple
         reactor.pulse(\.$isExpired)
             .filter { $0 == true }
             .bind(with: self) { owner, _ in
-                //TODO: SigninViewController 화면 전환 로직 추가
+                NotificationCenter.default.post(name: .showSignInViewController, object: nil)
             }
             .disposed(by: disposeBag)
         

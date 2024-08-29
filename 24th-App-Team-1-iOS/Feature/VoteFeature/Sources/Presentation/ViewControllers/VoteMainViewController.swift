@@ -7,6 +7,7 @@
 
 import UIKit
 import Util
+import Storage
 
 import Then
 import SnapKit
@@ -85,7 +86,7 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
         
         navigationBar.rightBarButton
             .rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 NotificationCenter.default.post(name: .showNotifcationViewController, object: nil)
             }

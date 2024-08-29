@@ -7,6 +7,7 @@
 
 import Foundation
 import Storage
+import Extensions
 import LoginDomain
 
 import ReactorKit
@@ -38,7 +39,8 @@ public final class SignUpCompleteViewReactor: Reactor {
         self.createAccountUseCase = createAccountUseCase
         self.initialState = State(
             accountRequest: accountRequest,
-            isLoading: false
+            isLoading: false,
+            isExpired: false
         )
     }
     
@@ -47,8 +49,11 @@ public final class SignUpCompleteViewReactor: Reactor {
         switch action {
         case .viewDidLoad:
             guard let expiredDate = UserDefaultsManager.shared.expiredDate else { return .empty() }
+            let currentDate = Date.now
+                .toFormatLocaleString(with: .dashYyyyMMddhhmmss)
+                .toLocalDate(with: .dashYyyyMMddhhmmss)
             
-            if expiredDate.isSameDay(as: Date.now) {
+            if expiredDate <= currentDate {
                 return .just(.setExpiredDate(true))
             } else {
                 return createAccountUseCase
@@ -76,6 +81,7 @@ public final class SignUpCompleteViewReactor: Reactor {
             print("accountEntity: \(accountEntity)")
             KeychainManager.shared.set(value: accountEntity.accessToken, type: .accessToken)
             UserDefaultsManager.shared.refreshToken = accountEntity.refreshToken
+            UserDefaultsManager.shared.userName = accountEntity.name
             
             print("accessToken Keychain : \(KeychainManager.shared.get(type: .accessToken))")
         case let .setExpiredDate(isExpired):

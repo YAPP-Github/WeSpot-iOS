@@ -17,6 +17,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 import RxDataSources
+import Kingfisher
 
 public final class SetUpProfileImageViewController: BaseViewController<SetUpProfileImageViewReactor> {
     
@@ -25,26 +26,40 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
     private let collectionViewStateLabel = WSLabel(wsFont: .Body06)
     private let characterButton = WSToggleProfileTableViewButton(profileButtonType: .character)
     private let backgroundButton = WSToggleProfileTableViewButton(profileButtonType: .background)
+    private let loadingIndicator: WSLottieIndicatorView = WSLottieIndicatorView()
     private let characterCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
     private let backgroundCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
     private let userCharacterImageView = UIImageView()
     private let userBackgroundView = UIView()
     private let comfirmButton = WSButton(wsButtonType: .default(12))
-    private lazy var characterCollectionViewDataSources = RxCollectionViewSectionedReloadDataSource<CharacterSection>(configureCell: { _, collectionView, indexPath, item in
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProfileCharacterImageViewCollectionViewCell.identifier, for: indexPath) as? ProfileCharacterImageViewCollectionViewCell else {
-            return UICollectionViewCell()
+    private lazy var characterCollectionViewDataSources = RxCollectionViewSectionedReloadDataSource<SignUpCharacterSection>(configureCell: { _, collectionView, indexPath, sectionItem in
+        
+        switch sectionItem {
+        case let .characterItem(cellReactor):
+            guard let signUpCharacterCell = collectionView.dequeueReusableCell(withReuseIdentifier: "SignUpProfileCharacterCollectionViewCell", for: indexPath) as? SignUpProfileCharacterCollectionViewCell else {
+                return UICollectionViewCell()
+            }
+            signUpCharacterCell.reactor = cellReactor
+            return signUpCharacterCell
         }
-        cell.configureCell(image: item.iconUrl)
-        return cell
     })
-    private lazy var backgroundCollectionViewDataSources = RxCollectionViewSectionedReloadDataSource<BackgroundSection>(configureCell: { _, collectionView, indexPath, item in
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProfileBackgroundColorCollectionViewCell.identifier, for: indexPath) as? ProfileBackgroundColorCollectionViewCell else {
-            return UICollectionViewCell()
+    private lazy var backgroundCollectionViewDataSources = RxCollectionViewSectionedReloadDataSource<SignUpBackgroundSection>(configureCell: { _, collectionView, indexPath, sectionItem in
+        
+        switch sectionItem {
+        case let .backgroundItem(cellReactor):
+            guard let signUpBackgroundCell = collectionView.dequeueReusableCell(withReuseIdentifier: "SignUpProfileBackgroundCollectionViewCell", for: indexPath) as? SignUpProfileBackgroundCollectionViewCell else {
+                return UICollectionViewCell()
+            }
+            signUpBackgroundCell.reactor = cellReactor
+            return signUpBackgroundCell
         }
-        cell.configureCell(background: item.color)
-        return cell
     })
     
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.post(name: .hideTabBar, object: nil)
+    }
     
     //MARK: - Configure
     public override func setupUI() {
@@ -111,13 +126,13 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
         super.setupAttributes()
         
         navigationBar.do {
-            $0.setNavigationBarUI(property: .leftIcon(DesignSystemAsset.Images.arrow.image))
-            $0.setNavigationBarAutoLayout(property: .leftIcon)
+            $0.setNavigationBarUI(property: .rightItem("닫기"))
+            $0.setNavigationBarAutoLayout(property: .rightIcon(28, 24))
         }
         
         titleLabel.do {
             $0.textColor = DesignSystemAsset.Colors.gray100.color
-            $0.text = "\(UserDefaultsManager.shared.userProfile?.name ?? "User")님을 잘 나타낼 수 있는\n프로필을 선택해 주세요"
+            $0.text = "\(UserDefaultsManager.shared.userName ?? "User")님을 잘 나타낼 수 있는\n프로필을 선택해 주세요"
         }
         
         collectionViewStateLabel.do {
@@ -144,12 +159,12 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
         
         characterCollectionView.do {
             $0.backgroundColor = DesignSystemAsset.Colors.gray600.color
-            $0.register(ProfileCharacterImageViewCollectionViewCell.self, forCellWithReuseIdentifier: ProfileCharacterImageViewCollectionViewCell.identifier)
+            $0.register(SignUpProfileCharacterCollectionViewCell.self, forCellWithReuseIdentifier: "SignUpProfileCharacterCollectionViewCell")
         }
         
         backgroundCollectionView.do {
             $0.backgroundColor = DesignSystemAsset.Colors.gray600.color
-            $0.register(ProfileBackgroundColorCollectionViewCell.self, forCellWithReuseIdentifier: ProfileBackgroundColorCollectionViewCell.identifier)
+            $0.register(SignUpProfileBackgroundCollectionViewCell.self, forCellWithReuseIdentifier: "SignUpProfileBackgroundCollectionViewCell")
         }
         
         comfirmButton.do {
@@ -166,99 +181,101 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
-        reactor.action.onNext(.fetchProfileImages)
-        reactor.action.onNext(.fetchProfileBackgrounds)
-        
-        reactor.pulse(\.$profileImages)
-            .compactMap { $0?.characters }
-            .map { [CharacterSection(items: $0)] }
-            .bind(to: characterCollectionView.rx.items(dataSource: characterCollectionViewDataSources))
+        Observable.just(())
+            .map { Reactor.Action.fetchProfileImages }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$profileBackgrounds)
-            .compactMap { $0?.backgrounds }
-            .map { [BackgroundSection(items: $0)] }
-            .bind(to: backgroundCollectionView.rx.items(dataSource: backgroundCollectionViewDataSources))
+        Observable.just(())
+            .map { Reactor.Action.fetchProfileBackgrounds }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.state
-            .map { $0.profileImages?.characters }
-            .filter { $0 != nil && !$0!.isEmpty }
-            .take(1)
-            .observe(on: MainScheduler.asyncInstance)
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicator.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        backgroundButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let indexPath = IndexPath(item: 0, section: 0)
-                owner.characterCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                owner.characterCollectionView.delegate?.collectionView?(owner.characterCollectionView, didSelectItemAt: indexPath)
+                owner.toggleCollections(showCharacter: false)
             }
             .disposed(by: disposeBag)
         
-        reactor.state
-            .map { $0.profileBackgrounds?.backgrounds }
-            .filter { $0 != nil && !$0!.isEmpty }
-            .take(1)
-            .observe(on: MainScheduler.asyncInstance)
-            .bind(with: self) { owner, _ in
-                let indexPath = IndexPath(item: 0, section: 0)
-                owner.backgroundCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                owner.backgroundCollectionView.delegate?.collectionView?(owner.backgroundCollectionView, didSelectItemAt: indexPath)
-            }
-            .disposed(by: disposeBag)
-        
-        backgroundCollectionView.rx.itemSelected
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .withLatestFrom(reactor.state.map { $0.profileBackgrounds }) { indexPath, profileBackgrounds in
-                return (indexPath, profileBackgrounds?.backgrounds[indexPath.row])
-            }
-            .compactMap { $0.1 }
-            .bind(with: self) { owner, background in
-                owner.userBackgroundView.backgroundColor = UIColor(hex: background.color)
-            }
-            .disposed(by: disposeBag)
-        
-        backgroundCollectionView.rx.itemSelected
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, indexPath in
-                guard let cell = owner.backgroundCollectionView.cellForItem(at: indexPath) as? ProfileBackgroundColorCollectionViewCell else { return }
-                cell.selectedCell()
-            }
-            .disposed(by: disposeBag)
-        
-        backgroundCollectionView.rx.itemDeselected
-            .bind(with: self) { owner, indexPath in
-                guard let cell = owner.backgroundCollectionView.cellForItem(at: indexPath) as? ProfileBackgroundColorCollectionViewCell else { return }
-                cell.deselectCell()
-            }
-            .disposed(by: disposeBag)
-        
-        characterCollectionView.rx.itemSelected
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, indexPath in
-                guard let cell = owner.characterCollectionView.cellForItem(at: indexPath) as? ProfileCharacterImageViewCollectionViewCell else { return }
-                cell.selectedCell()
-            }
-            .disposed(by: disposeBag)
-        
-        characterCollectionView.rx.itemDeselected
-            .bind(with: self) { owner, indexPath in
-                guard let cell = owner.characterCollectionView.cellForItem(at: indexPath) as? ProfileCharacterImageViewCollectionViewCell else { return }
-                cell.deselectCell()
-            }
-            .disposed(by: disposeBag)
-        
-        characterButton.rx.tap
+        characterButton
+            .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.toggleCollections(showCharacter: true)
             }
             .disposed(by: disposeBag)
         
-        backgroundButton.rx.tap
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                owner.toggleCollections(showCharacter: false)
+        
+        backgroundCollectionView
+            .rx.itemSelected
+            .map { Reactor.Action.didTappedBackgroundItem($0.item) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+ 
+        characterCollectionView
+            .rx.itemSelected
+            .map { Reactor.Action.didTappedCharacterItem($0.item) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map{ $0.backgroundSection }
+            .observe(on: MainScheduler.instance)
+            .asDriver(onErrorJustReturn: [])
+            .drive(backgroundCollectionView.rx.items(dataSource: backgroundCollectionViewDataSources))
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.characterSection }
+            .observe(on: MainScheduler.instance)
+            .asDriver(onErrorJustReturn: [])
+            .drive(characterCollectionView.rx.items(dataSource: characterCollectionViewDataSources))
+            .disposed(by: disposeBag)
+            
+        
+        reactor.state
+            .map { UIColor(hex: $0.backgroundColor) }
+            .bind(to: userBackgroundView.rx.backgroundColor)
+            .disposed(by: disposeBag)
+            
+        
+        reactor.state
+            .map { $0.iconURL }
+            .bind(with: self) { owner, iconURL in
+                owner.userCharacterImageView.kf.setImage(with: iconURL)
             }
             .disposed(by: disposeBag)
+        
+        navigationBar.rightBarButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                WSAlertBuilder(showViewController: owner)
+                    .setAlertType(type: .titleWithMeesage)
+                    .setTitle(title: "프로필 설정을 중단하시나요?", titleAlignment: .left)
+                    .setMessage(message: "선택하셨던 캐릭터와 배경색은 저장되지 않으며 \n기본 캐릭터와 배경색으로 자동 설정됩니다")
+                    .setCancel(text: "닫기")
+                    .setConfirm(text: "네 중단할래요")
+                    .show()
+            }
+            .disposed(by: disposeBag)
+        
+        comfirmButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                let signUpIntroduceViewController = DependencyContainer.shared.injector.resolve(SignUpIntroduceViewController.self)
+                self.navigationController?.pushViewController(signUpIntroduceViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        
+
     }
     
     private static func createCollectionViewLayout() -> UICollectionViewFlowLayout {

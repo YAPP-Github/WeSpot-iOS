@@ -1,8 +1,8 @@
 //
-//  ProfileBackgroundCellReactor.swift
-//  AllFeature
+//  SignUpProfileCharacterCellReactor.swift
+//  LoginFeature
 //
-//  Created by Kim dohyun on 8/13/24.
+//  Created by Kim dohyun on 8/29/24.
 //
 
 import Foundation
@@ -11,13 +11,15 @@ import Util
 import ReactorKit
 
 
-public final class ProfileBackgroundCellReactor: Reactor {
+public final class SignUpProfileCharacterCellReactor: Reactor {
+    
     public typealias Action = NoAction
     private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     public var initialState: State
     
+    
     public struct State {
-        var backgroundColor: String
+        var iconURL: URL
         var item: Int
         var selectedItem: Int = 0
     }
@@ -30,7 +32,7 @@ public final class ProfileBackgroundCellReactor: Reactor {
         let didSelectedItem = globalService.event
             .flatMap { event -> Observable<Mutation> in
                 switch event {
-                case let .didTappedBackgroundItem(item):
+                case let .didTappedCharacterItem(item):
                     return .just(.setSelectedItem(item))
                 default:
                     return .empty()
@@ -40,13 +42,14 @@ public final class ProfileBackgroundCellReactor: Reactor {
         return .merge(mutation, didSelectedItem)
     }
     
-    init(backgroundColor: String, item: Int, selectedItem: Int = 0) {
-        self.initialState = State(backgroundColor: backgroundColor, item: item, selectedItem: selectedItem)
+    
+    init(iconURL: URL, item: Int) {
+        self.initialState = State(iconURL: iconURL, item: item)
     }
+    
     
     public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
-        
         switch mutation {
         case let .setSelectedItem(selectedItem):
             newState.selectedItem = selectedItem
@@ -54,5 +57,6 @@ public final class ProfileBackgroundCellReactor: Reactor {
         
         return newState
     }
+    
     
 }

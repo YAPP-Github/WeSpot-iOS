@@ -41,10 +41,6 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
     //MARK: - LifeCycle
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        schoolTextField.becomeFirstResponder()
-        warningLabel.isHidden = true
-        hideKeyboard()
     }
     
     //MARK: - Configure
@@ -122,6 +118,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         
         warningLabel.do {
             $0.textColor = DesignSystemAsset.Colors.destructive.color
+            $0.isHidden = true
         }
         
         additionalButton.do {
@@ -149,6 +146,14 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
     
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
+        
+        self.rx.viewWillAppear
+            .delay(.microseconds(100), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.schoolTextField.becomeFirstResponder()
+                owner.hideKeyboard()
+            }
+            .disposed(by: disposeBag)
         
         schoolTextField.rx.controlEvent([.editingDidBegin, .editingDidEnd])
             .map { self.schoolTextField.isEditing }

@@ -18,7 +18,9 @@ public class UserDefaultsManager {
         case isAccessed // 앱에 처음 접근했는지 확인(Bool)
         case accessToken // access token
         case refreshToken // 재발행 토큰
-        case userProfile // 사용자 프로필
+        case userName // 사용자 이름
+        case userProfileImage
+        case userBackgroundColor
         case fcmToken
         case expiredDate
     }
@@ -32,8 +34,14 @@ public class UserDefaultsManager {
     @UserDefaultsWrapper(key: Key.refreshToken.rawValue, defaultValue: "")
         public var refreshToken: String?
     
-    @UserDefaultsWrapper(key: Key.userProfile.rawValue, defaultValue: nil)
-        public var userProfile: UserProfileResponseEntity?
+    @UserDefaultsWrapper(key: Key.userName.rawValue, defaultValue: "")
+        public var userName: String?
+    
+    @UserDefaultsWrapper(key: Key.userProfileImage.rawValue, defaultValue: "")
+        public var userProfileImage: String?
+    
+    @UserDefaultsWrapper(key: Key.userBackgroundColor.rawValue, defaultValue: "")
+        public var userBackgroundColor: String?
     
     @UserDefaultsWrapper(key: Key.expiredDate.rawValue, defaultValue: nil)
         public var expiredDate: Date?

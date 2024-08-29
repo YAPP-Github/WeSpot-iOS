@@ -1,8 +1,8 @@
 //
-//  ProfileBackgroundCellReactor.swift
-//  AllFeature
+//  SignUpProfileBackgroundCellReactor.swift
+//  LoginFeature
 //
-//  Created by Kim dohyun on 8/13/24.
+//  Created by Kim dohyun on 8/29/24.
 //
 
 import Foundation
@@ -11,9 +11,10 @@ import Util
 import ReactorKit
 
 
-public final class ProfileBackgroundCellReactor: Reactor {
+public final class SignUpProfileBackgroundCellReactor: Reactor {
     public typealias Action = NoAction
     private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
+    
     public var initialState: State
     
     public struct State {
@@ -24,6 +25,10 @@ public final class ProfileBackgroundCellReactor: Reactor {
     
     public enum Mutation {
         case setSelectedItem(Int)
+    }
+    
+    init(backgroundColor: String, item: Int) {
+        self.initialState = State(backgroundColor: backgroundColor, item: item)
     }
     
     public func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
@@ -40,10 +45,6 @@ public final class ProfileBackgroundCellReactor: Reactor {
         return .merge(mutation, didSelectedItem)
     }
     
-    init(backgroundColor: String, item: Int, selectedItem: Int = 0) {
-        self.initialState = State(backgroundColor: backgroundColor, item: item, selectedItem: selectedItem)
-    }
-    
     public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         
@@ -54,5 +55,4 @@ public final class ProfileBackgroundCellReactor: Reactor {
         
         return newState
     }
-    
 }

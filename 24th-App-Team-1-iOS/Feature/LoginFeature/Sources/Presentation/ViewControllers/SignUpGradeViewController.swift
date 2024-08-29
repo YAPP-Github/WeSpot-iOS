@@ -33,9 +33,6 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
     //MARK: - LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
-        setupBottomSheet()
-        showBottomSheet()
     }
     
     //MARK: - Configure
@@ -111,6 +108,13 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
     
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
+        
+        self.rx.viewDidLoad
+            .bind(with: self) { owner, _ in
+                owner.setupBottomSheet()
+                owner.showBottomSheet()
+            }
+            .disposed(by: disposeBag)
         
         reactor.state
             .map { $0.isGradeSelected }
