@@ -38,7 +38,6 @@ public final class NotificationRepository: NotificationRepositoryProtocol {
         
         return networkService.request(endPoint: endPoint)
             .asObservable()
-            .debug("notifiaction patch api")
             .map { _ in true }
             .catchAndReturn(false)
             .logErrorIfDetected(category: Network.error)

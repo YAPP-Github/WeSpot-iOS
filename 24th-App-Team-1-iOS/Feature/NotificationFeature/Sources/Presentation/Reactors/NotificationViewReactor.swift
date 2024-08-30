@@ -110,7 +110,7 @@ public final class NotificationViewReactor: Reactor {
             return fetchUserNotificationItemsUseCase
                 .execute(query: query)
                 .asObservable()
-                .filter { $0?.hasNext == false }
+                .filter { $0?.hasNext != false }
                 .withUnretained(self)
                 .flatMap { owner ,entity -> Observable<Mutation> in
                     guard let entity else { return .empty() }

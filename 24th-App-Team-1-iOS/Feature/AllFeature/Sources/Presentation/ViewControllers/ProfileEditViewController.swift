@@ -289,6 +289,7 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
         
         reactor.pulse(\.$backgroundColor)
             .map { UIColor(hex: $0) }
+            .observe(on: MainScheduler.asyncInstance)
             .bind(to: profileContainerView.rx.backgroundColor)
             .disposed(by: disposeBag)
     }

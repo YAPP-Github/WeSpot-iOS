@@ -146,20 +146,22 @@ public final class ProfileEditViewReactor: Reactor {
             return .just(.setSelctedBackgroundColor(backgroundColor))
         case .didTappedUpdateButton:
             
-            guard let originalURL = currentState.iconURL else { return .empty() }
-            let updateUserBody = UpdateUserProfileRequest(introduction: currentState.userProfileEntity.introduction, backgroundColor: currentState.backgroundColor, iconUrl: originalURL.absoluteString)
+            let originalURL = currentState.iconURL?.absoluteString == nil ? UserDefaultsManager.shared.userProfileImage : currentState.iconURL?.absoluteString
+            let updateUserBody = UpdateUserProfileRequest(introduction: currentState.userProfileEntity.introduction, backgroundColor: currentState.backgroundColor, iconUrl: originalURL ?? "")
             return updateUserProfileUseCase
                 .execute(body: updateUserBody)
                 .asObservable()
                 .withUnretained(self)
                 .flatMap { owner, isUpdate -> Observable<Mutation> in
                     if isUpdate {
+                        guard let selectedURLString = originalURL,
+                              let selectedURL = URL(string: selectedURLString) else { return .empty() }
                         return .concat(
                             .just(.setLoading(false)),
                             .just(.setError(false)),
                             .just(.setUserUpdate(isUpdate)),
                             .just(.setSelctedBackgroundColor(owner.currentState.backgroundColor)),
-                            .just(.setSelectedIconURL(originalURL)),
+                            .just(.setSelectedIconURL(selectedURL)),
                             .just(.setLoading(true))
                         )
                     } else {

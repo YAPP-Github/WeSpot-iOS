@@ -106,19 +106,13 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
                 owner.navigationController?.pushViewController(voteEffectViewController, animated: true)
             }
             .disposed(by: disposeBag)
-                
+        
+        
         reactor.pulse(\.$isSelected)
             .filter { $0 == true }
-            .withLatestFrom(reactor.pulse(\.$voteClassMateEntity).compactMap { $0?.user.isEmpty})
-            .bind(with: self) { owner, isCheck in
-                if isCheck {
-                    let voteBegingViewController = DependencyContainer.shared.injector.resolve(VoteBeginViewController.self)
-                    owner.navigationController?.pushViewController(voteBegingViewController, animated: true)
-                    
-                } else {
-                    let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self)
-                    owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
-                }
+            .bind(with: self) { owner, _ in
+                let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self)
+                owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
             }
             .disposed(by: disposeBag)
     }

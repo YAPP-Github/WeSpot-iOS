@@ -26,6 +26,7 @@ public final class VoteProcessViewReactor: Reactor {
         @Pulse var processCount: Int
         @Pulse var reportEntity: CreateReportUserEntity?
         @Pulse var isLoading: Bool
+        @Pulse var isInviteView: Bool
         var voteItemEntity: VoteItemEntity?
         var createVoteEntity: CreateVoteEntity?
     }
@@ -41,6 +42,7 @@ public final class VoteProcessViewReactor: Reactor {
         case setLoading(Bool)
         case setQuestionRowItems([VoteProcessItem])
         case setVoteOptionItems(VoteItemEntity)
+        case setVoteInviteView(Bool)
         case addVoteOptionStub(CreateVoteItemReqeuest)
         case updateVoteOptionStub(Int, CreateVoteItemReqeuest)
         case setVoteUserItems(VoteUserEntity)
@@ -64,7 +66,8 @@ public final class VoteProcessViewReactor: Reactor {
             voteResponseEntity: voteResponseEntity,
             voteOptionsStub: voteOptionStub,
             processCount: processCount,
-            isLoading: false
+            isLoading: false,
+            isInviteView: false
         )
         self.createVoteUseCase = createVoteUseCase
         self.createUserReportUseCase = createUserReportUseCase
@@ -79,7 +82,13 @@ public final class VoteProcessViewReactor: Reactor {
             
             guard currentState.processCount == 1 else {
                 
-                guard let response = currentState.voteResponseEntity?.response[index] else { return .empty() }
+                guard let response = currentState.voteResponseEntity?.response[index] else {
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setVoteInviteView(false)),
+                        .just(.setLoading(true))
+                    )
+                }
                 
                 response.voteInfo.forEach {
                     voteSectionItems.append(
@@ -94,6 +103,7 @@ public final class VoteProcessViewReactor: Reactor {
                 
                 return .concat(
                     .just(.setLoading(false)),
+                    .just(.setVoteInviteView(true)),
                     .just(.setQuestionRowItems(voteSectionItems)),
                     .just(.setVoteUserItems(response.userInfo)),
                     .just(.setVoteResponseItems(currentState.voteResponseEntity)),
@@ -105,7 +115,17 @@ public final class VoteProcessViewReactor: Reactor {
                 .execute()
                 .asObservable()
                 .flatMap { entity -> Observable<Mutation> in
-                    guard let response = entity?.response[index] else { return .empty() }
+                    
+                    guard let entity,
+                          !entity.response.isEmpty else {
+                        return .concat(
+                            .just(.setLoading(false)),
+                            .just(.setVoteInviteView(false)),
+                            .just(.setLoading(true))
+                        )
+                    }
+                    
+                    let response = entity.response[index]
                     response.voteInfo.forEach {
                         voteSectionItems.append(
                             .voteQuestionItem(
@@ -117,8 +137,10 @@ public final class VoteProcessViewReactor: Reactor {
                         )
                     }
                     
+                    
                     return .concat(
                         .just(.setLoading(false)),
+                        .just(.setVoteInviteView(true)),
                         .just(.setQuestionRowItems(voteSectionItems)),
                         .just(.setVoteUserItems(response.userInfo)),
                         .just(.setVoteResponseItems(entity)),
@@ -127,7 +149,9 @@ public final class VoteProcessViewReactor: Reactor {
                 }
             
         case let .didTappedQuestionItem(row):
-            guard let request = currentState.voteResponseEntity?.response[row] else { return .empty() }
+
+            let index =  currentState.processCount - 1
+            guard let request = currentState.voteResponseEntity?.response[index] else { return .empty() }
             
             let voteOption = CreateVoteItemReqeuest(
                 userId: request.userInfo.id,
@@ -192,8 +216,12 @@ public final class VoteProcessViewReactor: Reactor {
             
         case let .setCreateVoteItems(createVoteEntity):
             newState.createVoteEntity = createVoteEntity
+            
         case let .setReportItem(reportEntity):
             newState.reportEntity = reportEntity
+            
+        case let .setVoteInviteView(isInviteView):
+            newState.isInviteView = isInviteView
         }
         return newState
     }

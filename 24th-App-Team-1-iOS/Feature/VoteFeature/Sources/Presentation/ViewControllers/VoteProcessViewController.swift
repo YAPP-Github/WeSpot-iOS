@@ -30,7 +30,7 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
     private let loadingIndicator: WSLottieIndicatorView = WSLottieIndicatorView()
     private let questionTableView: UITableView = UITableView()
     private let resultButton: WSButton = WSButton(wsButtonType: .default(12))
-    private let processInjector: Injector = DependencyInjector(container: Container())
+    private let voteBeginView: VoteBeginView = VoteBeginView()
     private let questionDataSources: RxTableViewSectionedReloadDataSource<VoteProcessSection> = .init { dataSources, tableView, indexPath, sectionItem in
         
         switch sectionItem {
@@ -44,8 +44,6 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
 
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
-        profileView.layer.cornerRadius = profileView.frame.height / 2
     }
     
     //MARK: - LifeCycle
@@ -63,7 +61,7 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
     public override func setupUI() {
         super.setupUI()
         profileView.addSubview(faceImageView)
-        view.addSubviews(questionLabel, profileView, questionTableView, resultButton)
+        view.addSubviews(questionLabel, profileView, questionTableView, resultButton, voteBeginView)
     }
     
     public override func setupAutoLayout() {
@@ -95,6 +93,10 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             $0.height.equalTo(52)
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(12)
         }
+        
+        voteBeginView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
     
     public override func setupAttributes() {
@@ -117,12 +119,14 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         }
         
         profileView.do {
+            $0.layer.cornerRadius = 120 / 2
             $0.clipsToBounds = true
             $0.backgroundColor = DesignSystemAsset.Colors.primary100.color
         }
         
         faceImageView.do {
             $0.image = DesignSystemAsset.Images.icCommonProfile427323024.image
+            $0.contentMode = .scaleToFill
         }
         
         questionTableView.do {
@@ -138,6 +142,11 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             $0.setupFont(font: .Body03)
             $0.isHidden = true
         }
+        
+        voteBeginView.do {
+            $0.isHidden = true
+            $0.backgroundColor = DesignSystemAsset.Colors.gray900.color
+        }
     }
     
     public override func bind(reactor: Reactor) {
@@ -147,6 +156,19 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             .take(1)
             .map { Reactor.Action.viewDidLoad }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isInviteView)
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: voteBeginView.rx.isHidden)
+            .disposed(by: disposeBag)
+
+        voteBeginView.inviteButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToKakaoTalk()
+            }
             .disposed(by: disposeBag)
         
         navigationBar.rightBarButton
@@ -160,7 +182,7 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         questionTableView.rx
             .itemSelected
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .map { Reactor.Action.didTappedQuestionItem($0.row) }
+            .map { Reactor.Action.didTappedQuestionItem($0.item) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -183,9 +205,14 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             .bind(to: navigationBar.navigationTitleLabel.rx.text)
             .disposed(by: disposeBag)
         
-        reactor.state
-            .map { $0.processCount != 5 }
-            .observe(on: MainScheduler.asyncInstance)
+        
+        Observable
+            .zip(
+                reactor.state.compactMap { $0.voteResponseEntity?.response.count },
+                reactor.state.map { $0.processCount }
+            )
+            .map { $0.0 != $0.1 }
+            .observe(on: MainScheduler.asyncInstance )
             .distinctUntilChanged()
             .bind(to: resultButton.rx.isHidden)
             .disposed(by: disposeBag)

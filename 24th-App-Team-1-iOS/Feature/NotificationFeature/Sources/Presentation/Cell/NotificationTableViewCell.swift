@@ -58,7 +58,7 @@ public final class NotificationTableViewCell: UITableViewCell {
     
         dateLabel.do {
             $0.textColor = DesignSystemAsset.Colors.gray400.color
-            $0.textAlignment = .left
+            $0.textAlignment = .right
         }
         
         alarmAccessoryView.do {
@@ -97,7 +97,7 @@ public final class NotificationTableViewCell: UITableViewCell {
         dateLabel.snp.makeConstraints {
             $0.right.equalToSuperview()
             $0.top.equalToSuperview().offset(18)
-            $0.width.equalTo(40)
+            $0.width.equalTo(80)
             $0.height.equalTo(15)
         }
         

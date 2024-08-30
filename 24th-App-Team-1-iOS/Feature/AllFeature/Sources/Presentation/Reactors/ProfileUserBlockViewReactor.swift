@@ -115,7 +115,7 @@ public final class ProfileUserBlockViewReactor: Reactor {
             let query = UserBlockRequestQuery(cursorId: cursorId)
             return fetchUserBlockUseCase.execute(query: query)
                 .asObservable()
-                .filter { $0?.hasNext == false }
+                .filter { $0?.hasNext != false }
                 .compactMap { $0 }
                 .withUnretained(self)
                 .flatMap { owner, entity -> Observable<Mutation> in
