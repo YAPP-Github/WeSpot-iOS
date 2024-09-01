@@ -8,6 +8,7 @@
 import DesignSystem
 import UIKit
 import Util
+import Storage
 
 import Then
 import SnapKit
@@ -141,6 +142,8 @@ public final class ProfileResignViewController: BaseViewController<ProfileResign
             .filter { $0 == true}
             .bind(with: self) { owner, _ in
                 NotificationCenter.default.post(name: .showSignInViewController, object: nil)
+                KeychainManager.shared.allClear()
+                UserDefaultsManager.shared.clearAllData()
             }
             .disposed(by: disposeBag)
         

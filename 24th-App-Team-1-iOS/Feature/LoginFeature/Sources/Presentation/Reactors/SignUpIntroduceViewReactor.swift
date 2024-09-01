@@ -6,11 +6,13 @@
 //
 
 import Foundation
+import CommonDomain
 
 import ReactorKit
 
 public final class SignUpIntroduceViewReactor: Reactor {
     
+    private let updateUserProfileUseCase: UpdateUserProfileUseCaseProtocol
     
     public struct State {
         
@@ -26,8 +28,8 @@ public final class SignUpIntroduceViewReactor: Reactor {
     
     public let initialState: State = State()
     
-    public init() {
-        
+    public init(updateUserProfileUseCase: UpdateUserProfileUseCaseProtocol) {
+        self.updateUserProfileUseCase = updateUserProfileUseCase
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {

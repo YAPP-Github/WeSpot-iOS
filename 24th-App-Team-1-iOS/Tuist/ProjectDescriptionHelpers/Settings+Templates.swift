@@ -24,4 +24,11 @@ extension Settings {
         
         return self.settings(base: libraryPaths)
     }
+    
+    public static func makeAppSettings() -> Self {
+        return .settings(configurations: [
+            .build(.dev, name: "DEV"),
+            .build(.prd, name: "PRD")
+        ])
+    }
 }

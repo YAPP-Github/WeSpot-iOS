@@ -40,8 +40,8 @@ public final class ProfileBackgroundCellReactor: Reactor {
         return .merge(mutation, didSelectedItem)
     }
     
-    init(backgroundColor: String, item: Int, selectedItem: Int = 0) {
-        self.initialState = State(backgroundColor: backgroundColor, item: item, selectedItem: selectedItem)
+    init(backgroundColor: String, item: Int) {
+        self.initialState = State(backgroundColor: backgroundColor, item: item)
     }
     
     public func reduce(state: State, mutation: Mutation) -> State {

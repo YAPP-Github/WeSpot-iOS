@@ -85,7 +85,7 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         }
         
         faceImageView.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.edges.equalToSuperview()
         }
         
         resultButton.snp.makeConstraints {
@@ -125,8 +125,7 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         }
         
         faceImageView.do {
-            $0.image = DesignSystemAsset.Images.icCommonProfile427323024.image
-            $0.contentMode = .scaleToFill
+            $0.contentMode = .scaleAspectFit
         }
         
         questionTableView.do {
@@ -272,7 +271,7 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         
         reactor.state
             .compactMap { $0.voteUserEntity?.profileInfo.iconUrl }
-            .distinctUntilChanged()
+            .observe(on: MainScheduler.asyncInstance)
             .bind(with: self) { owner, imageURL in
                 owner.faceImageView.kf.setImage(with: imageURL)
             }

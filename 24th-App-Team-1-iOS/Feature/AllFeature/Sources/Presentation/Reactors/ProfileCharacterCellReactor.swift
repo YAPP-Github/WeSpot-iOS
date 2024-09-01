@@ -42,9 +42,9 @@ public final class ProfileCharacterCellReactor: Reactor {
         return .merge(mutation, didSelectedItem)
     }
     
-    init(iconURL: URL, item: Int, selectedItem: Int = 0) {
+    init(iconURL: URL, item: Int) {
         print()
-        self.initialState = State(iconURL: iconURL, item: item, selectedItem: selectedItem)
+        self.initialState = State(iconURL: iconURL, item: item)
     }
     
     

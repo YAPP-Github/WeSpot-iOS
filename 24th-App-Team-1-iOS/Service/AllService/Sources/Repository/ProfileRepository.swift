@@ -33,18 +33,6 @@ public final class ProfileRepository: ProfileRepositoryProtocol {
             .asSingle()
     }
     
-    public func updateUserProfileItem(body: UpdateUserProfileRequest) -> Single<Bool> {
-        
-        let body = UpdateUserProfileRequestDTO(introduction: body.introduction, backgroundColor: body.backgroundColor, iconUrl: body.iconUrl)
-        let endPoint = ProfileEndPoint.updateUserProfile(body)
-        return networkService.request(endPoint: endPoint)
-            .asObservable()
-            .map { _ in true }
-            .catchAndReturn(false)
-            .logErrorIfDetected(category: Network.error)
-            .asSingle()
-    }
-    
     public func fetchUserAlarmItems() -> Single<UserAlarmEntity?> {
         let endPoint = ProfileEndPoint.fetchNotification
         return networkService.request(endPoint: endPoint)

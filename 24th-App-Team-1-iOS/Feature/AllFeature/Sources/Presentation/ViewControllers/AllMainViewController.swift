@@ -231,8 +231,7 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let contentURL = URL(string: "https://forms.gle/eiKdpjmwdxzvqm947")!
-                let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: contentURL)
+                let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.addQuestion.urlString)
                 owner.navigationController?.pushViewController(profileWebViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -245,29 +244,24 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
                 switch owner.mainDataSources[indexPath] {
                 case .movementItem:
                     if indexPath.item == 0 {
-                        let googleURL = URL(string: "https://pf.kakao.com/_SEDcG")!
-                        let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: googleURL)
+                        let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.kakaoChaanel.urlString)
                         owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                     } else {
-                        let channelURL = URL(string: "https://www.instagram.com/wespot.official/")!
-                        let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: channelURL)
+                        let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.accountOfficial.urlString)
                         owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                     }
                 case .appInfoItem:
                     if indexPath.item == 0  {
                         
                     } else if indexPath.item == 1 {
-                        let opinionURL = URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSdObjdp0fJa-rwNNcsf9wGRJwSizxQKDM7t5JHV-n9-5DIO6g/viewform")!
-                        let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: opinionURL)
+                        let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.wespotOpinion.urlString)
                         owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                     } else {
-                        let researchURL = URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSfkN2b752gRKtFRk9IUreFRacNXnj5jh4tlHWKp0n51IaObyw/viewform?usp=sf_link")!
-                        let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: researchURL)
+                        let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.wespotResearch.urlString)
                         owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                     }
                 case .makerInfoItem:
-                    let makersURL = URL(string: "https://www.notion.so/WeSpot-Makers-87e988ab3c9e47f28c141ad1aa663b80")!
-                    let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: makersURL)
+                    let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.wespotMakers.urlString)
                     owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                 }
             }

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AllFeature
+import DesignSystem
 
 import Swinject
 
@@ -14,14 +14,14 @@ import Swinject
 struct AllMainProfileWebPresentationAssembly: Assembly {
     
     func assemble(container: Container) {
-        container.register(ProfileWebViewReactor.self) { (_, contentURL: URL) in
-            return ProfileWebViewReactor(contentURL: contentURL)
+        container.register(WSWebViewReactor.self) { (_, contentURL: URL) in
+            return WSWebViewReactor(contentURL: contentURL)
         }
         
-        container.register(ProfileWebViewController.self) { (resovler, contentURL: URL) in
-            let reactor = resovler.resolve(ProfileWebViewReactor.self, argument: contentURL)
+        container.register(WSWebViewController.self) { (resovler, contentURL: URL) in
+            let reactor = resovler.resolve(WSWebViewReactor.self, argument: contentURL)
             
-            return ProfileWebViewController(reactor: reactor)
+            return WSWebViewController(reactor: reactor)
         }
     }
     

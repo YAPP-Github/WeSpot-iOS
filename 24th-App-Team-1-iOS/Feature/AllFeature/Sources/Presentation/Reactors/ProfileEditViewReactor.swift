@@ -88,13 +88,11 @@ public final class ProfileEditViewReactor: Reactor {
                     var characterSectionItem: [CharacterEditItem] = []
                     
                     entity.characters.enumerated().forEach {
-                        let selectedItem = UserDefaultsManager.shared.userProfileImage == $0.element.iconUrl.absoluteString ? $0.offset : 9
                         characterSectionItem.append(
                             .profileCharacterItem(
                                 ProfileCharacterCellReactor(
                                     iconURL: $0.element.iconUrl,
-                                    item: $0.offset,
-                                    selectedItem: selectedItem
+                                    item: $0.offset
                                 )
                             )
                         )
@@ -117,13 +115,11 @@ public final class ProfileEditViewReactor: Reactor {
                     var backgroundSectionItem: [BackgroundEditItem] = []
                     
                     entity.backgrounds.enumerated().forEach {
-                        let selectedItem = UserDefaultsManager.shared.userBackgroundColor == $0.element.color ? $0.offset : 9
                         backgroundSectionItem.append(
                             .profileBackgroundItem(
                                 ProfileBackgroundCellReactor(
                                     backgroundColor: $0.element.color,
-                                    item: $0.offset,
-                                    selectedItem: selectedItem
+                                    item: $0.offset
                                 )
                             )
                         )

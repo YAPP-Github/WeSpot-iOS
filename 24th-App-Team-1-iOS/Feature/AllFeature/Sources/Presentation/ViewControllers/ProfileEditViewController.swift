@@ -263,7 +263,10 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
         reactor.pulse(\.$isUpdate)
             .filter { $0 == true }
             .bind(with: self) { owner, _ in
-                owner.showWSToast(image: .check, message: "수정 완료")
+                owner.showWSToast(image: .check, message: "수정 완료", delay: 1.0) {
+                    owner.navigationController?.popViewController(animated: true)
+                }
+
             }
             .disposed(by: disposeBag)
         
@@ -281,13 +284,14 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
             .drive(characterCollectionView.rx.items(dataSource: characterDataSouces))
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$iconURL)
+        reactor.state
+            .compactMap { $0.iconURL }
             .bind(with: self) { owner, iconURL in
                 owner.profileImageView.kf.setImage(with: iconURL)
             }
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$backgroundColor)
+        reactor.state.map{ $0.backgroundColor }
             .map { UIColor(hex: $0) }
             .observe(on: MainScheduler.asyncInstance)
             .bind(to: profileContainerView.rx.backgroundColor)

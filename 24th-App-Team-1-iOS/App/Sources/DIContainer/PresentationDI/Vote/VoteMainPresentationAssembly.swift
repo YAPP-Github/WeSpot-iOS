@@ -17,13 +17,21 @@ struct VoteMainPresentationAssembly: Assembly {
     func assemble(container: Container) {
         
         container.register(VoteMainViewReactor.self) { resolver in
-            let fetchClassMatesUseCase = resolver.resolve(FetchClassMatesUseCaseProtocol.self)!
-            return VoteMainViewReactor(fetchClassMatesUseCase: fetchClassMatesUseCase)
+            return VoteMainViewReactor()
         }
         
         container.register(VoteMainViewController.self) { resolver in
             let reactor = resolver.resolve(VoteMainViewReactor.self)!
         
+            return VoteMainViewController(reactor: reactor)
+        }
+        
+        container.register(VoteMainViewReactor.self) { (resolver, isProfileChanged: Bool)  in
+            return VoteMainViewReactor(isProfileChanged: isProfileChanged)
+        }
+        
+        container.register(VoteMainViewController.self) { (resolver, isProfileChanged: Bool) in
+            let reactor = resolver.resolve(VoteMainViewReactor.self, argument: isProfileChanged)!
             return VoteMainViewController(reactor: reactor)
         }
     }

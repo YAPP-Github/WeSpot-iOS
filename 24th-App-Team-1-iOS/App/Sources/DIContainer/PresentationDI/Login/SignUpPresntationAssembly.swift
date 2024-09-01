@@ -148,8 +148,9 @@ struct SignUpCompletePresentationAssembly: Assembly {
             return SignUpCompleteViewController(reactor: reactor)
         }
         
-        container.register(SignUpIntroduceViewReactor.self) { _ in
-            return SignUpIntroduceViewReactor()
+        container.register(SignUpIntroduceViewReactor.self) { resolver in
+            let updateUserProfileUseCase = resolver.resolve(UpdateUserProfileUseCaseProtocol.self)!
+            return SignUpIntroduceViewReactor(updateUserProfileUseCase: updateUserProfileUseCase)
         }
         
         container.register(SignUpIntroduceViewController.self) { resolver in

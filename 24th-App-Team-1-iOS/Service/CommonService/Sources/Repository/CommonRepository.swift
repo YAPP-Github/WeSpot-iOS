@@ -22,6 +22,18 @@ public final class CommonRepository: CommonRepositoryProtocol {
     public init() { }
     
     
+    public func updateUserProfileItem(body: UpdateUserProfileRequest) -> Single<Bool> {
+        
+        let body = UpdateUserProfileRequestDTO(introduction: body.introduction, backgroundColor: body.backgroundColor, iconUrl: body.iconUrl)
+        let endPoint = CommonEndPoint.updateUserProfile(body)
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .map { _ in true }
+            .catchAndReturn(false)
+            .logErrorIfDetected(category: Network.error)
+            .asSingle()
+    }
+    
     public func createCheckProfanity(body: CreateCheckProfanityRequest) -> Single<Bool> {
         let query = CreateCheckProfanityRequestDTO(message: body.message)
         let endPoint = CommonEndPoint.createProfanityCheck(query)

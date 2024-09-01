@@ -15,10 +15,10 @@ import RxCocoa
 final public class SelectPolicyAgreementView: UIView {
 
     //MARK: - Properties
-    public let checkButton = UIButton()
-    private let titleLabel = WSLabel(wsFont: .Body06)
-    public let moreDetailButton = UIButton()
-    public var isChecked: Bool = false {
+    let checkButton = UIButton()
+    let policyButton = UIButton(type: .custom)
+    let moreDetailButton = UIButton()
+    var isChecked: Bool = false {
         didSet {
             checkButton.isSelected = isChecked
         }
@@ -31,8 +31,8 @@ final public class SelectPolicyAgreementView: UIView {
         
         setupUI()
         setupAutoLayout()
-        setupAttributes()
-        setupDetail(text: text, font: font, isHidden: isHiddenDetailButton)
+        setupAttributes(text: text, font: font)
+        setupDetail(isHidden: isHiddenDetailButton)
     }
     
     required init?(coder: NSCoder) {
@@ -42,7 +42,7 @@ final public class SelectPolicyAgreementView: UIView {
     //MARK: - Functions
     private func setupUI() {
         
-        addSubviews(checkButton, titleLabel, moreDetailButton)
+        addSubviews(checkButton, policyButton, moreDetailButton)
     }
     
     private func setupAutoLayout() {
@@ -52,7 +52,7 @@ final public class SelectPolicyAgreementView: UIView {
             $0.leading.equalToSuperview().offset(7)
             $0.size.equalTo(25)
         }
-        titleLabel.snp.makeConstraints {
+        policyButton.snp.makeConstraints {
             $0.centerY.equalTo(checkButton)
             $0.leading.equalTo(checkButton.snp.trailing).offset(7)
         }
@@ -63,20 +63,25 @@ final public class SelectPolicyAgreementView: UIView {
         }
     }
     
-    private func setupAttributes() {
+    private func setupAttributes(text: String, font: WSFont) {
+        policyButton.do {
+            $0.configuration = .filled()
+            $0.configuration?.baseBackgroundColor = .clear
+            $0.configuration?.baseForegroundColor = DesignSystemAsset.Colors.gray100.color
+            $0.configuration?.attributedTitle = AttributedString(NSAttributedString(string: text, attributes: [
+                .font: font.font(),
+            ]))
+        }
         
-        titleLabel.textColor = DesignSystemAsset.Colors.gray100.color
         
         moreDetailButton.setImage(DesignSystemAsset.Images.arrowRight.image, for: .normal)
     }
     
-    private func setupDetail(text: String, font: WSFont, isHidden: Bool) {
+    private func setupDetail(isHidden: Bool) {
     
         checkButton.setImage(DesignSystemAsset.Images.check.image, for: .normal)
         checkButton.setImage(DesignSystemAsset.Images.checkSelected.image, for: .selected)
         
-        titleLabel.text = text
-        titleLabel.font = font.font()
         
         moreDetailButton.isHidden = isHidden
     }

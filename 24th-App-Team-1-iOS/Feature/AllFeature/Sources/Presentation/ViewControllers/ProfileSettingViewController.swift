@@ -230,9 +230,8 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let accountURL = URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSdFlTCYbGL4QDYJlzt8jeeeA-E3ITWIBeYS2B5cAZs2j8wosQ/viewform")!
-                let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: accountURL)
-                owner.navigationController?.pushViewController(profileWebViewController, animated: true)
+                let privacyWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.accountInfo.urlString)
+                owner.navigationController?.pushViewController(privacyWebViewController, animated: true)
             }
             .disposed(by: disposeBag)
         

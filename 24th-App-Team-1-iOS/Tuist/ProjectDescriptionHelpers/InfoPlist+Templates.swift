@@ -26,14 +26,14 @@ extension InfoPlist {
             "UILaunchStoryboardName": .string("LaunchScreen"),
             "UIApplicationSceneManifest": .dictionary([
                 "UIApplicationSupportsMultipleScenes": .boolean(false),
-                "UISceneConfigurations": [
-                    "UIWindowSceneSessionRoleApplication": .array([
+                "UISceneConfigurations": .dictionary([
+                    "UIWindowSceneSessionRoleApplication" : .array([
                         .dictionary([
-                            "UISceneConfigurationName": .string("Default Configuration"),
-                            "UISceneDelegateClassName": .string("$(PRODUCT_MODULE_NAME).SceneDelegate")
+                            "UISceneConfigurationName" : .string("Default Configuration"),
+                            "UISceneDelegateClassName" : .string("$(PRODUCT_MODULE_NAME).SceneDelegate")
                         ])
                     ])
-                ]
+                ])
             ]),
             "LSApplicationQueriesSchemes": [
                 "kakaokompassauth",
@@ -41,12 +41,12 @@ extension InfoPlist {
                 "kakaoplus",
                 "instagram-stories"
             ],
-            "KAKAO_NATIVE_APP_KEY": .string("${KAKAO_NATIVE_APP_KEY}"),
+            "KAKAO_NATIVE_APP_KEY": .string("$(KAKAO_NATIVE_APP_KEY)"),
             "CFBundleURLTypes": .array([
                 .dictionary([
                     "CFBundleTypeRole": .string("Editor"),
                     "CFBundleURLSchemes": .array([
-                        .string("kakao${KAKAO_NATIVE_APP_KEY}")
+                        .string("$(KAKAO_API_KEY)")
                     ])
                 ])
             ]),

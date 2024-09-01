@@ -13,6 +13,7 @@ public extension Notification.Name {
     static let FCMToken = Notification.Name("FCMToken")
     static let userDidLogin = Notification.Name("userDidLogin")
     static let showVoteMainViewController = Notification.Name("showVoteMainViewController")
+    static let showSignUpMainViewController = Notification.Name("showSignUpMainViewController")
     static let showSignInViewController = Notification.Name("showSignInViewController")
     static let showNotifcationViewController = Notification.Name("showNotificationViewController")
     static let showVoteProccessController = Notification.Name("showVoteProccssViewController")

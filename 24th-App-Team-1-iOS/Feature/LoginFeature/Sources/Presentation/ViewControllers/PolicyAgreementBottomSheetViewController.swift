@@ -10,6 +10,7 @@ import Util
 import DesignSystem
 
 import ReactorKit
+import SafariServices
 
 
 public final class PolicyAgreementBottomSheetViewController: BaseViewController<PolicyAgreementBottomSheetViewReactor> {
@@ -198,5 +199,40 @@ public final class PolicyAgreementBottomSheetViewController: BaseViewController<
             .distinctUntilChanged()
             .bind(to: confirmButton.rx.isEnabled)
             .disposed(by: disposeBag)
+        
+        serviceAgreementButton
+            .policyButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                let serviceViewController = SFSafariViewController(url: WSURLType.serviceTerms.urlString)
+                serviceViewController.transitioningDelegate = owner
+                owner.present(serviceViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        privacyAgreementButton
+            .policyButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                let privacyViewController = SFSafariViewController(url: WSURLType.privacyTerms.urlString)
+                privacyViewController.transitioningDelegate = owner
+                owner.present(privacyViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        marketingAgreementButton
+            .policyButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                let marketingViewController = SFSafariViewController(url: WSURLType.marketingTerms.urlString)
+                marketingViewController.transitioningDelegate = owner
+                owner.present(marketingViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
     }
+}
+
+
+extension PolicyAgreementBottomSheetViewController: UIViewControllerTransitioningDelegate {
+    
 }

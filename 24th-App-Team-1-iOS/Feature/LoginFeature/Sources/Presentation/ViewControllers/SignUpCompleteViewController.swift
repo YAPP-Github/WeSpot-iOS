@@ -110,8 +110,10 @@ public final class SignUpCompleteViewController: BaseViewController<SignUpComple
         
         reactor.pulse(\.$isExpired)
             .filter { $0 == true }
-            .bind(with: self) { owner, _ in
-                NotificationCenter.default.post(name: .showSignInViewController, object: nil)
+            .withLatestFrom(reactor.state.compactMap { $0.accountEntity?.isProfileChanged})
+            .bind(with: self) { owner, isProfileChanged in
+                let userInfo: [AnyHashable: Any] = ["isProfileChanged": isProfileChanged]
+                NotificationCenter.default.post(name: .showSignUpMainViewController, object: nil, userInfo: userInfo)
             }
             .disposed(by: disposeBag)
         

@@ -48,4 +48,13 @@ public class UserDefaultsManager {
     
     @UserDefaultsWrapper(key: Key.fcmToken.rawValue, defaultValue: "")
         public var fcmToken: String?
+    
+    
+    public func clearAllData() {
+        let defaults = UserDefaults.standard
+        let dictionary = defaults.dictionaryRepresentation()
+        dictionary.keys.forEach { key in
+            defaults.removeObject(forKey: key)
+        }
+    }
 }
