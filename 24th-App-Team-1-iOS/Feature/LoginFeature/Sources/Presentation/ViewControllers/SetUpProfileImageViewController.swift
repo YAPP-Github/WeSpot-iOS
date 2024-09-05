@@ -265,11 +265,17 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
                     .show()
             }
             .disposed(by: disposeBag)
+    
         
-        comfirmButton.rx.tap
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                let signUpIntroduceViewController = DependencyContainer.shared.injector.resolve(SignUpIntroduceViewController.self)
+        Observable
+            .combineLatest(
+                reactor.state.compactMap { $0.iconURL?.absoluteString } ,
+                reactor.state.map { $0.backgroundColor },
+                comfirmButton.rx.tap.throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            )
+            .bind(with: self) { owner, response in
+                
+                let signUpIntroduceViewController = DependencyContainer.shared.injector.resolve(SignUpIntroduceViewController.self, arguments: response.0, response.1)
                 self.navigationController?.pushViewController(signUpIntroduceViewController, animated: true)
             }
             .disposed(by: disposeBag)

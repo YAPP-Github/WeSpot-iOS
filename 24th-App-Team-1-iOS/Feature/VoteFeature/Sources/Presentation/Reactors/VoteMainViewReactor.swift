@@ -13,11 +13,9 @@ import ReactorKit
 
 public final class VoteMainViewReactor: Reactor {
     public var initialState: State
-    private let fetchClassMatesUseCase: FetchClassMatesUseCaseProtocol
     private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
         
     public enum Action {
-        case viewDidLoad
         case didTapToggleButton(VoteTypes)
     }
     
@@ -25,23 +23,25 @@ public final class VoteMainViewReactor: Reactor {
         var voteTypes: VoteTypes
         @Pulse var isShowEffectView: Bool
         @Pulse var isSelected: Bool
-        @Pulse var voteClassMateEntity: VoteClassMatesEntity?
+        @Pulse var isProfileChanged: Bool
+        @Pulse var isProfileUpdate: Bool
     }
     
     public enum Mutation {
         case setVoteTypes(VoteTypes)
-        case setVoteClassMateItems(VoteClassMatesEntity)
         case setSelectedVoteButton(Bool)
         case setShowEffectView(Bool)
+        case setUserProfileUpdate(Bool)
     }
     
-    public init(fetchClassMatesUseCase: FetchClassMatesUseCaseProtocol) {
+    public init(isProfileChanged: Bool = true) {
         self.initialState = State(
             voteTypes: .main,
             isShowEffectView: false,
-            isSelected: false
+            isSelected: false,
+            isProfileChanged: isProfileChanged,
+            isProfileUpdate: false
         )
-        self.fetchClassMatesUseCase = fetchClassMatesUseCase
     }
     
     public func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
@@ -52,6 +52,8 @@ public final class VoteMainViewReactor: Reactor {
                     return .just(.setSelectedVoteButton(isSelected))
                 case .didTappedResultButton:
                     return .just(.setShowEffectView(true))
+                case let .updateUserProfile(isUpdate):
+                    return .just(.setUserProfileUpdate(isUpdate))
                 default:
                     return .empty()
                 }
@@ -61,15 +63,6 @@ public final class VoteMainViewReactor: Reactor {
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .viewDidLoad:
-            return fetchClassMatesUseCase
-                .execute()
-                .asObservable()
-                .flatMap { entity -> Observable<Mutation> in
-                    guard let entity else { return .empty() }
-                    return .just(.setVoteClassMateItems(entity))
-                }
-            
         case let .didTapToggleButton(voteTypes):
             return .just(.setVoteTypes(voteTypes))
         }
@@ -78,8 +71,6 @@ public final class VoteMainViewReactor: Reactor {
     public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case let .setVoteClassMateItems(voteClassMateEntity):
-            newState.voteClassMateEntity = voteClassMateEntity
         case let .setSelectedVoteButton(isSelected):
             newState.isSelected = isSelected
         case let .setVoteTypes(voteTypes):
@@ -87,6 +78,8 @@ public final class VoteMainViewReactor: Reactor {
             newState.voteTypes = voteTypes
         case let .setShowEffectView(isShowEffectView):
             newState.isShowEffectView = isShowEffectView
+        case let .setUserProfileUpdate(isUpdate):
+            newState.isProfileUpdate = isUpdate
         }
         
         return newState

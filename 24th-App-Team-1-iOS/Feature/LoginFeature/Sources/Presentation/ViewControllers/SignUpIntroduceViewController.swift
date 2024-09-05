@@ -21,8 +21,10 @@ public final class SignUpIntroduceViewController: BaseViewController<SignUpIntro
     //MARK: - Properties
     private let introduceLabel: WSLabel = WSLabel(wsFont: .Header01)
     private let introduceTextField: WSTextField = WSTextField(placeholder: "안녕 나는 1반의 비타민")
+    private let loadingIndicatorView: WSLottieIndicatorView = WSLottieIndicatorView()
     private let confirmButton: WSButton = WSButton(wsButtonType: .default(12))
     private let introduceCountLabel: WSLabel = WSLabel(wsFont: .Body07)
+    private let errorLabel: WSLabel = WSLabel(wsFont: .Body07)
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
@@ -33,7 +35,7 @@ public final class SignUpIntroduceViewController: BaseViewController<SignUpIntro
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
-        view.addSubviews(introduceLabel, introduceTextField, introduceCountLabel, confirmButton)
+        view.addSubviews(introduceLabel, introduceTextField, errorLabel, introduceCountLabel, confirmButton)
         
     }
     
@@ -51,6 +53,13 @@ public final class SignUpIntroduceViewController: BaseViewController<SignUpIntro
             $0.height.equalTo(60)
         }
         
+        errorLabel.snp.makeConstraints {
+            $0.top.equalTo(introduceTextField.snp.bottom).offset(4)
+            $0.left.equalTo(introduceTextField.snp.left).offset(10)
+            $0.width.equalTo(150)
+            $0.height.equalTo(24)
+        }
+        
         introduceCountLabel.snp.makeConstraints {
             $0.top.equalTo(introduceTextField.snp.bottom).offset(4)
             $0.right.equalTo(introduceTextField)
@@ -60,7 +69,7 @@ public final class SignUpIntroduceViewController: BaseViewController<SignUpIntro
         confirmButton.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(20)
             $0.height.equalTo(52)
-            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.bottom).offset(12)
+            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-12)
         }
         
     }
@@ -88,16 +97,81 @@ public final class SignUpIntroduceViewController: BaseViewController<SignUpIntro
             $0.textColor = DesignSystemAsset.Colors.gray700.color
             $0.textAlignment = .right
         }
+        
+        errorLabel.do {
+            $0.isHidden = true
+            $0.textColor = DesignSystemAsset.Colors.destructive.color
+        }
+        
+        confirmButton.do {
+            $0.setupFont(font: .Body03)
+            $0.setupButton(text: "작성 완료")
+            $0.isEnabled = false
+        }
     }
     
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
         
+        self.rx.viewWillAppear
+            .bind(with: self) { owner, _ in
+                owner.introduceTextField.becomeFirstResponder()
+            }
+            .disposed(by: disposeBag)
+        
+        introduceTextField.rx.text
+            .changed
+            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
+            .do(onNext: { [weak self] _ in
+                self?.introduceTextField.updateBorder()
+            })
+            .compactMap { $0 }
+            .map { Reactor.Action.didUpdateIntroduce($0)}
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        confirmButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTappedConfirmButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        
         introduceTextField
             .rx.text.orEmpty
             .map { "\($0.count)/20"}
             .bind(to: introduceCountLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        
+        reactor.state
+            .map { $0.isValidation }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: errorLabel.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.errorMessage }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: errorLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isEnabled)
+            .bind(to: confirmButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicatorView.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isUpdate)
+            .filter { $0 == true }
+            .bind(with: self) { owner, _ in
+                owner.navigationController?.popToRootViewController(animated: true)
+            }
             .disposed(by: disposeBag)
         
         navigationBar.rightBarButton

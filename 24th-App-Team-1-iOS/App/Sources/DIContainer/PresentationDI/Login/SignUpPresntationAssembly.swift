@@ -148,13 +148,19 @@ struct SignUpCompletePresentationAssembly: Assembly {
             return SignUpCompleteViewController(reactor: reactor)
         }
         
-        container.register(SignUpIntroduceViewReactor.self) { resolver in
+        container.register(SignUpIntroduceViewReactor.self) { (resolver, imageURL: String, backgroundColor: String) in
             let updateUserProfileUseCase = resolver.resolve(UpdateUserProfileUseCaseProtocol.self)!
-            return SignUpIntroduceViewReactor(updateUserProfileUseCase: updateUserProfileUseCase)
+            let createCheckProfanityUseCase = resolver.resolve(CreateCheckProfanityUseCaseProtocol.self)!
+            return SignUpIntroduceViewReactor(
+                updateUserProfileUseCase: updateUserProfileUseCase,
+                createCheckProfanityUseCase: createCheckProfanityUseCase,
+                imageURL: imageURL,
+                backgroundColor: backgroundColor
+            )
         }
         
-        container.register(SignUpIntroduceViewController.self) { resolver in
-            let reactor = resolver.resolve(SignUpIntroduceViewReactor.self)!
+        container.register(SignUpIntroduceViewController.self) { (resolver, imageURL: String, backgroundColor: String) in
+            let reactor = resolver.resolve(SignUpIntroduceViewReactor.self, arguments: imageURL, backgroundColor)!
             
             return SignUpIntroduceViewController(reactor: reactor)
         }

@@ -60,7 +60,7 @@ public enum WSURLType {
         case .addSchool:
             return URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSdwSzjNp4e3FFHLE3DgEpDG13NyLvEpADbGgBjzv9Fni1680Q/viewform?usp=send_form")!
         case .serviceTerms:
-            return URL(string: "https://www.notion.so/08f77951919d42cc876a13792f887995")!
+            return URL(string: "https://www.notion.so/08f77951919d42cc876a13792f887995?pvs=21")!
         case .privacyTerms:
             return URL(string: "https://www.notion.so/2fa1c3002e14460f91462204b0daefbf")!
         case .marketingTerms:

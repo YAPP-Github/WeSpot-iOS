@@ -20,6 +20,8 @@ final class VoteHighCollectionViewCell: UICollectionViewCell {
     private let profileImageView: UIImageView = UIImageView()
     private let voteCountLabel: WSLabel = WSLabel(wsFont: .Body01)
     private let userNameLabel: WSLabel = WSLabel(wsFont: .Body02)
+    private let effectView: UIBlurEffect = UIBlurEffect(style: .dark)
+    private lazy var visualEffectView: WSIntensityVisualEffectView = WSIntensityVisualEffectView(effect: effectView, intensity: 0.15)
     private let profileIntroduceLabel: WSLabel = WSLabel(wsFont: .Badge)
     var disposeBag: DisposeBag = DisposeBag()
     
@@ -39,7 +41,7 @@ final class VoteHighCollectionViewCell: UICollectionViewCell {
         
         profileContainerView.addSubview(profileImageView)
         highContainerView.addSubviews(profileContainerView, voteCountLabel, profileIntroduceLabel, userNameLabel, rankerImageView)
-        contentView.addSubviews(highContainerView)
+        contentView.addSubviews(highContainerView, visualEffectView)
     }
     
     private func setupAutoLayout() {
@@ -69,8 +71,12 @@ final class VoteHighCollectionViewCell: UICollectionViewCell {
         }
         
         profileImageView.snp.makeConstraints {
-            $0.size.equalTo(30)
-            $0.center.equalToSuperview()
+            $0.edges.equalToSuperview()
+        }
+        
+        visualEffectView.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(-20)
+            $0.left.right.bottom.equalToSuperview()
         }
         
         userNameLabel.snp.makeConstraints {
@@ -109,6 +115,11 @@ final class VoteHighCollectionViewCell: UICollectionViewCell {
             $0.backgroundColor = DesignSystemAsset.Colors.primary100.color
             $0.clipsToBounds = true
             $0.layer.cornerRadius = 48 / 2
+        }
+        
+        visualEffectView.do {
+            $0.isHidden = true
+            $0.clipsToBounds = true
         }
         
         profileImageView.do {
@@ -177,6 +188,18 @@ extension VoteHighCollectionViewCell: ReactorKit.View {
             .bind(to: rankerImageView.rx.image)
             .disposed(by: disposeBag)
         
+        reactor.state
+            .filter { $0.voteCount == 0 }
+            .withUnretained(self)
+            .map { $0.0.updateHighRankerBackgroundImage(ranker: $0.1.ranker)}
+            .bind(to: profileImageView.rx.image)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.voteCount != 0 }
+            .bind(to: visualEffectView.rx.isHidden)
+            .disposed(by: disposeBag)
+        
     }
 }
 
@@ -190,6 +213,19 @@ extension VoteHighCollectionViewCell {
             return DesignSystemAsset.Images.icCompleteGoldCrownFiled.image
         case 2:
             return DesignSystemAsset.Images.icCompleteBrozeCrwonFiled.image
+        default:
+            return UIImage()
+        }
+    }
+    
+    private func updateHighRankerBackgroundImage(ranker: Int) -> UIImage {
+        switch ranker {
+        case 0:
+            return DesignSystemAsset.Images.imgVoteProfileBlueFiled.image
+        case 1:
+            return DesignSystemAsset.Images.imgVoteProfileYellowFiled.image
+        case 2:
+            return DesignSystemAsset.Images.imgVoteProfileTangerineFiled.image
         default:
             return UIImage()
         }

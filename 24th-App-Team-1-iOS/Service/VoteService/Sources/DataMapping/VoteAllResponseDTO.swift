@@ -74,9 +74,37 @@ extension VoteAllResponseDTO {
 
 extension VoteAllResponseDTO.VoteAllItemReponseDTO {
     func toDomain() -> VoteAllEntity {
+        
+        var transformResults: [VoteAllResultEntity] = results.map { $0.toDomain() }
+        
+        if results.isEmpty {
+            return .init(
+                options: options.toDomain(),
+                results: results.map { $0.toDomain() }
+            )
+        }
+        
+        var transformMockName:[String] = ["김도현", "박주현", "이지호", "김선희", "정진호"]
+        let transformAllEntity: [VoteAllResultEntity] = (1...(5 - transformResults.count)).map { index in
+            return .init(
+                user: VoteAllUserEntity(
+                    id: index,
+                    name: transformMockName[index - 1],
+                    introduction: "안녕하세요 저는 \(transformMockName[index - 1])이에요",
+                    profile: VoteAllProfileEntity(
+                        backgroundColor: "",
+                        iconUrl: URL(fileURLWithPath: "")
+                    )
+                ),
+                voteCount: 0
+            )
+        }
+        
+        transformResults.append(contentsOf: transformAllEntity)
+        
         return .init(
             options: options.toDomain(),
-            results: results.map { $0.toDomain() }
+            results: transformResults
         )
     }
 }
