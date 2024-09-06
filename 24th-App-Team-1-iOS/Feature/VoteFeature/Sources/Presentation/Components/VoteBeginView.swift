@@ -8,6 +8,7 @@
 import DesignSystem
 import UIKit
 import Util
+import Storage
 
 import Then
 import SnapKit
@@ -19,7 +20,7 @@ fileprivate typealias VoteBeginStr = VoteStrings
 public final class VoteBeginView: UIView {
 
     //MARK: - Properties
-    private let beginInfoLabel: WSLabel = WSLabel(wsFont: .Header01, text: VoteBeginStr.voteBeginInfoText)
+    private let beginInfoLabel: WSLabel = WSLabel(wsFont: .Header01)
     let inviteButton: WSButton = WSButton(wsButtonType: .default(12))
     private let beginImageView: UIImageView = UIImageView()
     
@@ -64,6 +65,9 @@ public final class VoteBeginView: UIView {
     public func setupAttributes() {
         
         beginInfoLabel.do {
+            guard let grade = UserDefaultsManager.shared.grade,
+                  let classNumber = UserDefaultsManager.shared.classNumber else { return }
+            $0.text = "투표할 수 있는\n\(grade)학년 \(classNumber)반 친구들이 부족해요"
             $0.textColor = DesignSystemAsset.Colors.gray100.color
         }
         

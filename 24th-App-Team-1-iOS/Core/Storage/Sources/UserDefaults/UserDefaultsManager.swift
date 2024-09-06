@@ -19,6 +19,9 @@ public class UserDefaultsManager {
         case accessToken // access token
         case refreshToken // 재발행 토큰
         case userName // 사용자 이름
+        case socialType // 사용자 로그인 타입
+        case grade
+        case classNumber
         case userProfileImage
         case userBackgroundColor
         case fcmToken
@@ -36,6 +39,15 @@ public class UserDefaultsManager {
     
     @UserDefaultsWrapper(key: Key.userName.rawValue, defaultValue: "")
         public var userName: String?
+    
+    @UserDefaultsWrapper(key: Key.socialType.rawValue, defaultValue: "")
+        public var socialType: String?
+    
+    @UserDefaultsWrapper(key: Key.grade.rawValue, defaultValue: 0)
+        public var grade: Int?
+    
+    @UserDefaultsWrapper(key: Key.classNumber.rawValue, defaultValue: 0)
+        public var classNumber: Int?
     
     @UserDefaultsWrapper(key: Key.userProfileImage.rawValue, defaultValue: "")
         public var userProfileImage: String?

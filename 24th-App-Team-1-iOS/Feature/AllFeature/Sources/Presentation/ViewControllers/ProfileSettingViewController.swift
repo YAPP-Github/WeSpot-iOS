@@ -10,6 +10,7 @@ import UIKit
 import Util
 
 import Then
+import Storage
 import SnapKit
 import RxSwift
 import RxCocoa
@@ -119,7 +120,7 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         }
         
         editButton.snp.makeConstraints {
-            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-12)
+            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-24)
             $0.horizontalEdges.equalToSuperview().inset(20)
             $0.height.equalTo(52)
         }
@@ -221,7 +222,8 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .withLatestFrom(reactor.state.compactMap { $0.userProfileEntity})
             .bind(with: self) { owner, entity in
-                let profileEditViewController = DependencyContainer.shared.injector.resolve(ProfileEditViewController.self, argument: entity)
+                guard let backgroundcolor = UserDefaultsManager.shared.userBackgroundColor else { return }
+                let profileEditViewController = DependencyContainer.shared.injector.resolve(ProfileEditViewController.self, arguments: entity, backgroundcolor)
                 owner.navigationController?.pushViewController(profileEditViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -263,24 +265,29 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .disposed(by: disposeBag)
         
         
-        NotificationCenter.default
-            .rx.notification(UIResponder.keyboardWillShowNotification, object: nil)
-            .compactMap { $0.userInfo }
-            .map { userInfo -> CGFloat in
-                return (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue.height ?? 0
-            }
-            .bind(with: self) { owner, height in
-                if owner.userIntroduceTextField.isEditing {
-                    owner.containerView.frame.origin.y -= (height - 52)
-                    owner.didChangeButton(true)
-                }
-            }
-            .disposed(by: disposeBag)
+        NotificationCenter.default.rx
+            .notification(UIResponder.keyboardWillChangeFrameNotification)
+                   .compactMap { $0.userInfo }
+                   .map { userInfo -> CGFloat in
+                       let keyboardFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue ?? .zero
+                       let keyboardHeight = UIScreen.main.bounds.height - keyboardFrame.origin.y
+                       return keyboardHeight
+                   }
+                   .bind(with: self) { owner, keyboardHeight in
+                       let spacing: CGFloat = keyboardHeight == 384 ? 140 : 130
+                       owner.scrollView.contentInset.bottom = (keyboardHeight + spacing)
+                       owner.scrollView.verticalScrollIndicatorInsets.bottom = (keyboardHeight + spacing)
+                       owner.didChangeButton(true)
+                   }
+                   .disposed(by: disposeBag)
+        
         
         NotificationCenter.default
             .rx.notification(UIResponder.keyboardWillHideNotification, object: nil)
+            .observe(on: MainScheduler.asyncInstance)
             .bind(with: self) { owner, _ in
-                owner.containerView.frame.origin.y = 0
+                owner.scrollView.contentInset.bottom = .zero
+                owner.scrollView.verticalScrollIndicatorInsets.bottom = .zero
                 owner.didChangeButton(false)
             }
             .disposed(by: disposeBag)

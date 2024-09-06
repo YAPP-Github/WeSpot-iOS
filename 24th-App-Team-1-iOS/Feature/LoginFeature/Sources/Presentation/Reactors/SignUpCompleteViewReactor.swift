@@ -81,6 +81,8 @@ public final class SignUpCompleteViewReactor: Reactor {
             KeychainManager.shared.set(value: accountEntity.accessToken, type: .accessToken)
             UserDefaultsManager.shared.refreshToken = accountEntity.refreshToken
             UserDefaultsManager.shared.userName = accountEntity.name
+            UserDefaultsManager.shared.classNumber = currentState.accountRequest.classNumber
+            UserDefaultsManager.shared.grade = currentState.accountRequest.grade
         case let .setExpiredDate(isExpired):
             newState.isExpired = isExpired
         }

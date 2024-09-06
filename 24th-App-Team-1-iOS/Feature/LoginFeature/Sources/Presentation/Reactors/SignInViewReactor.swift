@@ -67,12 +67,13 @@ public final class SignInViewReactor: Reactor {
             else {
                 return .empty()
             }
-            
-            return executeSignUp(socialType: "APPLE", authorizationCode: authorizationCode, identityToken: identityToken)
+            UserDefaultsManager.shared.socialType = SocialTypes.kakao.rawValue
+            return executeSignUp(socialType: SocialTypes.apple.rawValue.uppercased(), authorizationCode: authorizationCode, identityToken: identityToken)
         case .signInWithKakao:
-            
+            UserDefaultsManager.shared.socialType = SocialTypes.kakao.rawValue
             return handleKakaoLogin()
-                .flatMap { self.executeSignUp(socialType: "KAKAO", authorizationCode: "", identityToken: $0) }
+                .flatMap { self.executeSignUp(socialType: SocialTypes.kakao.rawValue.uppercased(), authorizationCode: "", identityToken: $0) }
+            
         }
     }
     

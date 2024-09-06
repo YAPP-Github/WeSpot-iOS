@@ -45,6 +45,25 @@ public extension Date {
         
         return self.toFormatString(with: .dashYyyyMMdd)
     }
+    
+    func toCustomFormatRelative() -> String {
+        let relativeDateformatter: RelativeDateTimeFormatter = RelativeDateTimeFormatter()
+        relativeDateformatter.unitsStyle = .full
+        relativeDateformatter.locale = Locale(identifier: "ko_KR")
+        relativeDateformatter.calendar = .autoupdatingCurrent
+        relativeDateformatter.dateTimeStyle = .numeric
+        
+        
+        let calendar = Calendar.current
+        let now = Date()
+        
+        let components = calendar.dateComponents([.second], from: self, to: now)
+        if let second = components.second, second < 60 {
+            return "방금"
+        }
+        
+        return relativeDateformatter.localizedString(for: self, relativeTo: now)
+    }
       
     func isSameDay(as otherDate: Date) -> Bool {
         let calendar = Calendar.current
@@ -80,6 +99,8 @@ public extension DateFormatter {
         case ahhmmss
         case MddEEE
         case yyyyMMddYhhmmssXXX
+        case yyyyMMddTHHmmssSSSSSS
+        case yyyyMMddTHHmmssZ
         
         public var type: String {
             switch self {
@@ -103,6 +124,10 @@ public extension DateFormatter {
                 return "a hh:mm:ss"
             case .yyyyMMddYhhmmssXXX:
                 return "yyyy-MM-dd'T'HH:mm:ssXXX"
+            case .yyyyMMddTHHmmssSSSSSS:
+                return "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+            case .yyyyMMddTHHmmssZ:
+                return "yyyy-MM-dd'T'HH:mm:ssZ"
             case .MddEEE:
                 return "M월 dd일 EEEE"
             }

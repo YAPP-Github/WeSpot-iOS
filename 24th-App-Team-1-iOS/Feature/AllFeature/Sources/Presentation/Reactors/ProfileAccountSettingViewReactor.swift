@@ -7,7 +7,10 @@
 
 import Foundation
 
+import Storage
 import ReactorKit
+import KakaoSDKUser
+import RxKakaoSDKCommon
 
 public final class ProfileAccountSettingViewReactor: Reactor {
     
@@ -41,7 +44,18 @@ public final class ProfileAccountSettingViewReactor: Reactor {
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .didTappedLogoutButton:
-            return .just(.setUserLogout(true))
+            guard let socialTypes = UserDefaultsManager.shared.socialType else { return .empty() }
+            
+            switch socialTypes {
+            case "KAKAO":
+                return kakaoLogout()
+                    .asObservable()
+                    .flatMap { _ -> Observable<Mutation> in
+                        return .just(.setUserLogout(true))
+                    }
+            default:
+                return .just(.setUserLogout(true))
+            }
         }
     }
     
@@ -54,5 +68,22 @@ public final class ProfileAccountSettingViewReactor: Reactor {
         }
         
         return newState
+    }
+}
+
+
+//TODO: KakaoLogout로직 UseCase로 빼기
+extension ProfileAccountSettingViewReactor {
+    private func kakaoLogout() -> Observable<Void> {
+        Observable<Void>.create { observer in
+            UserApi.shared.logout { error in
+                if let error = error {
+                    observer.onError(error)
+                } else {
+                    observer.onNext(())
+                }
+            }
+            return Disposables.create()
+        }
     }
 }

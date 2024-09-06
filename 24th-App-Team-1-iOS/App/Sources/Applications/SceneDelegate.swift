@@ -74,7 +74,7 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         
         let accessToken = KeychainManager.shared.get(type: .accessToken)
         
-        if (accessToken?.isEmpty ?? true) { // accessToken 값이 없으면 (회원가입 안됨)
+        if accessToken == nil { // accessToken 값이 없으면 (회원가입 안됨)
             let signInViewController = DependencyContainer.shared.injector.resolve(SignInViewController.self)
             window?.rootViewController = UINavigationController(rootViewController: signInViewController)
             
@@ -168,8 +168,7 @@ extension SceneDelegate {
         let signUpMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self, argument: isProfileChanged)
         let voteNavigationContoller = UINavigationController(rootViewController: signUpMainViewController)
         
-        let messageMainViewReactor = MessageMainViewReactor()
-        let messageMainViewController = MessageMainViewController(reactor: messageMainViewReactor)
+        let messageMainViewController = DependencyContainer.shared.injector.resolve(MessageMainViewController.self)
         let messageNavigationContoller = UINavigationController(rootViewController: messageMainViewController)
         
         let allMainViewController = DependencyContainer.shared.injector.resolve(AllMainViewController.self)
@@ -177,7 +176,7 @@ extension SceneDelegate {
         
         
         let tabbarcontroller = WSTabBarViewController()
-        tabbarcontroller.viewControllers = [voteNavigationContoller,messageNavigationContoller, allNavigationContoller]
+        tabbarcontroller.viewControllers = [voteNavigationContoller, messageNavigationContoller, allNavigationContoller]
         window?.rootViewController = tabbarcontroller
         
     }
@@ -186,8 +185,7 @@ extension SceneDelegate {
         let voteMainViewController = DependencyContainer.shared.injector.resolve(VoteMainViewController.self)
         let voteNavigationContoller = UINavigationController(rootViewController: voteMainViewController)
         
-        let messageMainViewReactor = MessageMainViewReactor()
-        let messageMainViewController = MessageMainViewController(reactor: messageMainViewReactor)
+        let messageMainViewController = DependencyContainer.shared.injector.resolve(MessageMainViewController.self)
         let messageNavigationContoller = UINavigationController(rootViewController: messageMainViewController)
         
         

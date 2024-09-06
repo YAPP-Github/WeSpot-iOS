@@ -23,7 +23,8 @@ extension InfoPlist {
             "UIUserInterfaceStyle": .string("Dark"),
             "CFBundleShortVersionString": .string("1.0"),
             "CFBundleVersion": .string("1"),
-            "UILaunchStoryboardName": .string("LaunchScreen"),
+            "UILaunchStoryboardName": .string("LaunchScreen.storyboard"),
+            "UISupportedInterfaceOrientations": .array([.string("UIInterfaceOrientationPortrait")]),
             "UIApplicationSceneManifest": .dictionary([
                 "UIApplicationSupportsMultipleScenes": .boolean(false),
                 "UISceneConfigurations": .dictionary([

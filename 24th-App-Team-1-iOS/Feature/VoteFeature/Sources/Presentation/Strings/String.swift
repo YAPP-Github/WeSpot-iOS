@@ -27,7 +27,6 @@ extension String.VoteResult {
     static let voteCompleteText = "우리 반에서 모르는게생기면\n물어보고싶은은은은은은은은 친구는?"
     static let voteNoticeText = "친구에게 알려주기"
     static let voteInviteButtonText: String = "친구 초대하기"
-    static let voteBeginInfoText: String = "투표할 수 있는\n1학년 6반 친구들이 부족해요"
     static let voteProcessTopText: String = "제보하기"
     static let voteReportAlertText: String = "우리 반 친구가 아니에요"
     static let voteChoiceAlertText: String = "더 다양한 선택지를 원해요"

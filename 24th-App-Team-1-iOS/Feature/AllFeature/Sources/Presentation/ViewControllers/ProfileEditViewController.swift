@@ -136,8 +136,6 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
         }
         
         profileContainerView.do {
-            guard let backgroundColor = UserDefaultsManager.shared.userBackgroundColor else { return }
-            $0.backgroundColor = UIColor(hex: backgroundColor)
             $0.layer.cornerRadius = 120 / 2
             $0.clipsToBounds = true
         }
@@ -246,7 +244,7 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
         
         reactor.state
             .compactMap { $0.userProfileEntity.profile.backgroundColor }
-            .map {UIColor(hex: $0) }
+            .map { UIColor(hex: $0) }
             .bind(to: profileContainerView.rx.backgroundColor)
             .disposed(by: disposeBag)
         
@@ -292,6 +290,7 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
             .disposed(by: disposeBag)
         
         reactor.state.map{ $0.backgroundColor }
+            .filter { !$0.isEmpty }
             .map { UIColor(hex: $0) }
             .observe(on: MainScheduler.asyncInstance)
             .bind(to: profileContainerView.rx.backgroundColor)

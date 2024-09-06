@@ -45,8 +45,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Messaging.messaging().delegate = self
         return true
     }
-    
-    
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {

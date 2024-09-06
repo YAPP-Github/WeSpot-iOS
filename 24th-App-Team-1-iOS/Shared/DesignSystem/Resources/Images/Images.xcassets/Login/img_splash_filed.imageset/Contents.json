@@ -1,6 +1,7 @@
 {
-  "colors" : [
+  "images" : [
     {
+      "filename" : "img_splash_filed.svg",
       "idiom" : "universal"
     }
   ],

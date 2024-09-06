@@ -165,13 +165,13 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         
         onbardingLottieView.do {
             $0.isHidden = true
-            $0.isStauts = false
+            $0.isStatus = false
         }
         
         firstLottieView.do {
-            $0.lottieView.loopMode = .playOnce
+            $0.lottieView.loopMode = .loop
             $0.lottieView.animation = DesignSystemAnimationAsset.onboarding01.animation
-            $0.isStauts = true
+            $0.isStatus = true
         }
         
         firstBackgroundView.do {
@@ -180,15 +180,15 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
         }
         
         secondLottieView.do {
-            $0.lottieView.loopMode = .playOnce
+            $0.lottieView.loopMode = .loop
             $0.lottieView.animation = DesignSystemAnimationAsset.onboarding.animation
-            $0.isStauts = true
+            $0.isStatus = true
         }
         
         thirdLottieView.do {
-            $0.lottieView.loopMode = .playOnce
+            $0.lottieView.loopMode = .loop
             $0.lottieView.animation = DesignSystemAnimationAsset.onboarding03.animation
-            $0.isStauts = true
+            $0.isStatus = true
         }
     }
     

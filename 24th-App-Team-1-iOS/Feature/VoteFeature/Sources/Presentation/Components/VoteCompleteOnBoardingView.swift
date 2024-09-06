@@ -54,7 +54,7 @@ final class VoteCompleteOnBoardingView: UIView {
         onboardingLottieView.do {
             $0.lottieView.animation = DesignSystemAnimationAsset.bgVoteFindAnimate.animation
             $0.lottieView.loopMode = .loop
-            $0.isStauts = true
+            $0.isStatus = true
         }
         
         descrptionLabel.do {

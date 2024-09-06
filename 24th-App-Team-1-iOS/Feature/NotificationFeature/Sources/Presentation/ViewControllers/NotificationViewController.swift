@@ -26,6 +26,7 @@ public final class NotificationViewController: BaseViewController<NotificationVi
         case let .userNotificationItem(cellReactor):
             guard let notificationCell = tableView.dequeueReusableCell(withIdentifier: "NotificationTableViewCell", for: indexPath) as? NotificationTableViewCell else { return UITableViewCell() }
             notificationCell.reactor = cellReactor
+            notificationCell.selectionStyle = .none
             return notificationCell
         }
     }
@@ -74,6 +75,7 @@ public final class NotificationViewController: BaseViewController<NotificationVi
             $0.estimatedRowHeight = 80
             $0.separatorStyle = .none
             $0.backgroundColor = .clear
+            $0.showsVerticalScrollIndicator = false
         }
         
     }
@@ -101,6 +103,7 @@ public final class NotificationViewController: BaseViewController<NotificationVi
         
         notificationTableView
             .rx.prefetchRows
+            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
             .map { _ in Reactor.Action.fetchMoreItems }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

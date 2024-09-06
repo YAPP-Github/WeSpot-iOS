@@ -22,8 +22,8 @@ public final class NotificationRepository: NotificationRepositoryProtocol {
     
     
     public func fetchUserNotificationItems(query: NotificationReqeustQuery) -> Single<NotificationEntity?> {
-        let endPoint = NotificationEndPoint.fetchNotificationItems(query.cursorId)
-        
+        let query = NotificationRequestDTO(cursorId: query.cursorId)
+        let endPoint = NotificationEndPoint.fetchNotificationItems(query)
         return networkService.request(endPoint: endPoint)
             .asObservable()
             .decodeMap(NotificationResponseDTO.self)

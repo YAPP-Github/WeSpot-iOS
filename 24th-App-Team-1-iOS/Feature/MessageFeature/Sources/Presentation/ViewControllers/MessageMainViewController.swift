@@ -55,16 +55,22 @@ public final class MessageMainViewController: BaseViewController<MessageMainView
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
-        Observable.just(())
-            .map { Reactor.Action.viewDidLoad }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$isLoading)
-            .filter { $0 == true }
+        self.rx.viewWillAppear
             .bind(with: self) { owner, _ in
-
+                owner.noticeAlertViewController()
             }
             .disposed(by: disposeBag)
+
+    }
+}
+
+extension MessageMainViewController {
+    private func noticeAlertViewController() {
+        let noticeAlertController = UIAlertController(title: "다음 버전에 출시될 기능입니다.", message: "", preferredStyle: .alert)
+        let confirmAlertAction = UIAlertAction(title: "확인", style: .default)
+        noticeAlertController.addAction(confirmAlertAction)
+        
+        
+        self.present(noticeAlertController, animated: true)
     }
 }

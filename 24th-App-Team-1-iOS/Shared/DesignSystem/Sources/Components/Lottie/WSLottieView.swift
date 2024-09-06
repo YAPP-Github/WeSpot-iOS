@@ -15,8 +15,8 @@ public final class WSLottieView: UIView {
     
     //MARK: - Properties
     public let lottieView: LottieAnimationView = LottieAnimationView()
-    public var isStauts: Bool = true {
-        didSet { toggleAnimation(isStatus: isStauts) }
+    public var isStatus: Bool = true {
+        didSet { toggleAnimation(isStatus: isStatus) }
     }
     public var wsAnimation: LottieAnimation?
     

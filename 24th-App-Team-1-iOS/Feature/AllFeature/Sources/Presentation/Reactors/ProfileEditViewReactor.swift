@@ -59,7 +59,8 @@ public final class ProfileEditViewReactor: Reactor {
         updateUserProfileUseCase: UpdateUserProfileUseCaseProtocol,
         fetchProfileBackgroundUseCase: FetchProfileBackgroundsUseCaseProtocol,
         fetchProfileImageUseCase: FetchProfileImagesUseCaseProtocol,
-        userProfileEntity: UserProfileEntity
+        userProfileEntity: UserProfileEntity,
+        backgroundColor: String
     ) {
         self.initialState = State(
             userProfileEntity: userProfileEntity,
@@ -69,7 +70,7 @@ public final class ProfileEditViewReactor: Reactor {
             characterSection: [],
             isUpdate: false,
             isLoading: false,
-            backgroundColor: "",
+            backgroundColor: backgroundColor,
             isError: false
         )
         self.updateUserProfileUseCase = updateUserProfileUseCase
