@@ -104,7 +104,7 @@ public final class VoteEffectViewController: BaseViewController<VoteEffectViewRe
         }
         
         effectPageControl.snp.makeConstraints {
-            $0.top.equalTo(effectCollectionView.snp.bottom).offset(56)
+            $0.bottom.equalTo(shareButton.snp.top).offset(-36)
             $0.centerX.equalToSuperview()
         }
         
