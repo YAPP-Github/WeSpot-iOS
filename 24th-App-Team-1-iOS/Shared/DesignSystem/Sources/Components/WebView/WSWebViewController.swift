@@ -55,6 +55,10 @@ public final class WSWebViewController: UIViewController, ReactorKit.View {
     }
     
     public func setupAttributes() {
+        view.do {
+            $0.backgroundColor = DesignSystemAsset.Colors.gray900.color
+        }
+        
         navigationBar.do {
             $0.setNavigationBarUI(property: .leftIcon(DesignSystemAsset.Images.arrow.image))
             $0.setNavigationBarAutoLayout(property: .leftIcon)

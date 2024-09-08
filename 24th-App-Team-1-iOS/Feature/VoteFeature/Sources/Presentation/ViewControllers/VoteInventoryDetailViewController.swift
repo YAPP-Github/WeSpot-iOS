@@ -23,10 +23,10 @@ public final class VoteInventoryDetailViewController: BaseViewController<VoteInv
     private let detailContainerView: UIView = UIView()
     private let detailRankView: VoteRankView = VoteRankView()
     private let detailFaceView: UIImageView = UIImageView()
-    private let detailTitleLabel: WSLabel = WSLabel(wsFont: .Body06)
+    private let detailTitleLabel: WSLabel = WSLabel(wsFont: .Body02)
     private let detailDescrptionLabel: WSLabel = WSLabel(wsFont: .Body03)
-    private let detailNameLabel: WSLabel = WSLabel(wsFont: .Header01)
-    private let detailIntroduceLabel: WSLabel = WSLabel(wsFont: .Body07)
+    private let detailNameLabel: WSLabel = WSLabel(wsFont: .Header04)
+    private let detailIntroduceLabel: WSLabel = WSLabel(wsFont: .Body06)
     private let detailLogoImageView: UIImageView = UIImageView()
     private let detailConfirmButton: WSButton = WSButton(wsButtonType: .default(12))
     private let detailSharedButton: UIButton = UIButton(type: .custom)
@@ -69,7 +69,6 @@ public final class VoteInventoryDetailViewController: BaseViewController<VoteInv
             $0.top.equalTo(detailRankView.snp.bottom).offset(14)
             $0.left.equalToSuperview().inset(24)
             $0.width.equalTo(233)
-            $0.height.equalTo(54)
         }
         
         detailFaceView.snp.makeConstraints {
@@ -148,6 +147,7 @@ public final class VoteInventoryDetailViewController: BaseViewController<VoteInv
         
         detailTitleLabel.do {
             $0.textColor = DesignSystemAsset.Colors.gray100.color
+            $0.textAlignment = .left
         }
         
         detailFaceView.do {

@@ -101,7 +101,7 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         }
         
         completePageControl.snp.makeConstraints {
-            $0.top.equalTo(completeCollectionView.snp.bottom).offset(56)
+            $0.top.equalTo(completeCollectionView.snp.bottom).offset(46)
             $0.centerX.equalToSuperview()
         }
         

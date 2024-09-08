@@ -9,6 +9,7 @@ import DesignSystem
 import UIKit
 
 import ReactorKit
+import Kingfisher
 import RxCocoa
 
 
@@ -112,6 +113,14 @@ extension VoteSentTableViewCell: ReactorKit.View {
             .map { $0.title }
             .distinctUntilChanged()
             .bind(to: sentDescriptionLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.profileImage }
+            .distinctUntilChanged()
+            .bind(with: self) { owner, imageURL in
+                owner.sentImageView.kf.setImage(with: imageURL)
+            }
             .disposed(by: disposeBag)
     }
 }

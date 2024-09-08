@@ -131,7 +131,7 @@ extension VoteEffectViewReactor {
         entity.response
             .enumerated()
             .forEach {
-                if $1.results.isEmpty {
+                if $1.results.count < 5 {
                     completeSectionitem.append(
                         .voteAllEmptyItem(
                             VoteEmptyCellReactor(

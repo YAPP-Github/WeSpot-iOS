@@ -77,7 +77,7 @@ extension VoteAllResponseDTO.VoteAllItemReponseDTO {
         
         var transformResults: [VoteAllResultEntity] = results.map { $0.toDomain() }
         
-        if results.isEmpty {
+        if results.isEmpty || results.count == 5 {
             return .init(
                 options: options.toDomain(),
                 results: results.map { $0.toDomain() }
@@ -85,7 +85,7 @@ extension VoteAllResponseDTO.VoteAllItemReponseDTO {
         }
         
         var transformMockName:[String] = ["김도현", "박주현", "이지호", "김선희", "정진호"]
-        let transformAllEntity: [VoteAllResultEntity] = (1...(5 - transformResults.count)).map { index in
+        let transformAllEntity: [VoteAllResultEntity] = ( 1...(5 - transformResults.count)).map { index in
             return .init(
                 user: VoteAllUserEntity(
                     id: index,
