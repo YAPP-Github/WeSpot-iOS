@@ -170,7 +170,10 @@ public final class SignUpIntroduceViewController: BaseViewController<SignUpIntro
         reactor.pulse(\.$isUpdate)
             .filter { $0 == true }
             .bind(with: self) { owner, _ in
-                owner.navigationController?.popToRootViewController(animated: true)
+                NotificationCenter.default.post(name: .showVoteMainViewController, object: nil)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    owner.reactor?.globalService.event.onNext(.didTappedIntroduceButton(true))
+                }
             }
             .disposed(by: disposeBag)
         
@@ -184,6 +187,9 @@ public final class SignUpIntroduceViewController: BaseViewController<SignUpIntro
                     .setMessage(message: "선택하셨던 캐릭터와 배경색은 저장되지 않으며 \n기본 캐릭터와 배경색으로 자동 설정됩니다")
                     .setCancel(text: "취소")
                     .setConfirm(text: "네 그만할래요")
+                    .action(.confirm) {
+                        NotificationCenter.default.post(name: .showVoteMainViewController, object: nil)
+                    }
                     .show()
             }
             .disposed(by: disposeBag)

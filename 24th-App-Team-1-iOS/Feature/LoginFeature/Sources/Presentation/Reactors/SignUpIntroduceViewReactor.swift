@@ -14,7 +14,7 @@ import ReactorKit
 public final class SignUpIntroduceViewReactor: Reactor {
     
     private let updateUserProfileUseCase: UpdateUserProfileUseCaseProtocol
-    private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
+    let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     private let createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol
     
     public struct State {
@@ -127,9 +127,7 @@ public final class SignUpIntroduceViewReactor: Reactor {
         case let .setLoading(isLoading):
             newState.isLoading = isLoading
         case let .setUpdateProfile(isUpdate):
-            globalService.event.onNext(.updateUserProfile(isUpdate))
             newState.isUpdate = isUpdate
-            print("inital isUpdate: \(isUpdate)")
         }
         
         return newState

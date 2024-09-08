@@ -64,7 +64,6 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
-        
         view.addSubviews(titleLabel, userBackgroundView, userCharacterImageView, characterButton, backgroundButton, backgroundCollectionView, characterCollectionView, collectionViewStateLabel, comfirmButton)
     }
     
@@ -141,12 +140,12 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
         }
         
         userCharacterImageView.do {
-            $0.image = DesignSystemAsset.Images.icCommonProfile427323024.image
+            $0.image = DesignSystemAsset.Images.icDefaultProfile.image
             $0.contentMode = .scaleAspectFit
         }
         
         userBackgroundView.do {
-            $0.backgroundColor = DesignSystemAsset.Colors.gray400.color
+            $0.backgroundColor = DesignSystemAsset.Colors.gray700.color
         }
         
         backgroundButton.do {
@@ -240,13 +239,17 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
             
         
         reactor.state
-            .map { UIColor(hex: $0.backgroundColor) }
+            .map { $0.backgroundColor }
+            .filter { !$0.isEmpty }
+            .map { UIColor(hex: $0) }
+            .observe(on: MainScheduler.asyncInstance)
             .bind(to: userBackgroundView.rx.backgroundColor)
             .disposed(by: disposeBag)
             
         
         reactor.state
             .map { $0.iconURL }
+            .filter { $0 != nil }
             .bind(with: self) { owner, iconURL in
                 owner.userCharacterImageView.kf.setImage(with: iconURL)
             }
@@ -262,6 +265,9 @@ public final class SetUpProfileImageViewController: BaseViewController<SetUpProf
                     .setMessage(message: "선택하셨던 캐릭터와 배경색은 저장되지 않으며 \n기본 캐릭터와 배경색으로 자동 설정됩니다")
                     .setCancel(text: "닫기")
                     .setConfirm(text: "네 중단할래요")
+                    .action(.confirm) {
+                        NotificationCenter.default.post(name: .showVoteMainViewController, object: nil)
+                    }
                     .show()
             }
             .disposed(by: disposeBag)

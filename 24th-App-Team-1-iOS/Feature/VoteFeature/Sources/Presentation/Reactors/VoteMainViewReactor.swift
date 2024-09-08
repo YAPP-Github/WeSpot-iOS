@@ -52,7 +52,7 @@ public final class VoteMainViewReactor: Reactor {
                     return .just(.setSelectedVoteButton(isSelected))
                 case .didTappedResultButton:
                     return .just(.setShowEffectView(true))
-                case let .updateUserProfile(isUpdate):
+                case let .didTappedIntroduceButton(isUpdate):
                     return .just(.setUserProfileUpdate(isUpdate))
                 default:
                     return .empty()

@@ -223,9 +223,8 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
         
         reactor.state
             .filter { $0.inventoryType == .sent }
-            .withLatestFrom(reactor.state.map { $0.isEmpty})
-            .filter { $0 == true }
-            .distinctUntilChanged()
+            .withLatestFrom(reactor.state.map { $0.isEmpty })
+            .filter { $0 == false }
             .map { _ in "반 친구들에 대해 알려주세요"}
             .bind(to: inventorySubTitleLabel.rx.text)
             .disposed(by: disposeBag)
@@ -233,26 +232,15 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
         reactor.state
             .filter { $0.inventoryType == .sent }
             .withLatestFrom(reactor.state.map { $0.isEmpty})
-            .filter { $0 == true }
-            .distinctUntilChanged()
+            .filter { $0 == false }
             .map { _ in "아직 보낸 투표가 없어요"}
             .bind(to: inventoryTitleLabel.rx.text)
             .disposed(by: disposeBag)
         
         reactor.state
-            .filter { $0.inventoryType == .sent }
-            .withLatestFrom(reactor.state.map { $0.isEmpty})
-            .filter { $0 == true }
-            .distinctUntilChanged()
-            .map { _ in "반 친구들에 대해 알려주세요"}
-            .bind(to: inventorySubTitleLabel.rx.text)
-            .disposed(by: disposeBag)
-        
-        reactor.state
             .filter { $0.inventoryType == .receive }
             .withLatestFrom(reactor.state.map { $0.isEmpty})
-            .filter { $0 == true }
-            .distinctUntilChanged()
+            .filter { $0 == false }
             .map { _ in "아직 받은 투표가 없어요"}
             .bind(to: inventoryTitleLabel.rx.text)
             .disposed(by: disposeBag)
@@ -260,8 +248,7 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
         reactor.state
             .filter { $0.inventoryType == .receive }
             .withLatestFrom(reactor.state.map { $0.isEmpty})
-            .filter { $0 == true }
-            .distinctUntilChanged()
+            .filter { $0 == false }
             .map { _ in "친구들을 초대하면 투표를 받을 확률이 높아져요"}
             .bind(to: inventorySubTitleLabel.rx.text)
             .disposed(by: disposeBag)

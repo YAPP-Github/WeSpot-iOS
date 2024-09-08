@@ -88,7 +88,7 @@ final class VoteHighCollectionViewCell: UICollectionViewCell {
         profileIntroduceLabel.snp.makeConstraints {
             $0.top.equalTo(userNameLabel.snp.bottom).offset(4)
             $0.centerX.equalToSuperview()
-            $0.horizontalEdges.equalToSuperview().inset(7)
+            $0.horizontalEdges.equalToSuperview().inset(8)
             $0.height.equalTo(36)
         }
         
@@ -124,7 +124,7 @@ final class VoteHighCollectionViewCell: UICollectionViewCell {
         
         profileImageView.do {
             $0.contentMode = .scaleAspectFill
-            $0.image = DesignSystemAsset.Images.icCommonProfile427323024.image
+            $0.image = DesignSystemAsset.Images.imgVoteProfileBlueFiled.image
         }
         
         userNameLabel.do {
@@ -134,6 +134,7 @@ final class VoteHighCollectionViewCell: UICollectionViewCell {
         
         profileIntroduceLabel.do {
             $0.text = "안녕하세요저는아아박주현이에요..."
+            $0.textAlignment = .center
             $0.textColor = DesignSystemAsset.Colors.gray300.color
             $0.lineBreakStrategy = .hangulWordPriority
             $0.lineBreakMode = .byTruncatingTail

@@ -56,7 +56,6 @@ public final class SetUpProfileImageViewReactor: Reactor {
             characterSection: [],
             isLoading: false,
             backgroundColor: ""
-            
         )
         self.fetchProfileImagesUseCase = fetchProfileImagesUseCase
         self.fetchProfileBackgroundsUseCase = fetchProfileBackgroundsUseCase

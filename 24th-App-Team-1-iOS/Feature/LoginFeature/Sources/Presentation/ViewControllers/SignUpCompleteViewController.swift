@@ -110,17 +110,17 @@ public final class SignUpCompleteViewController: BaseViewController<SignUpComple
         
         reactor.pulse(\.$isExpired)
             .filter { $0 == true }
-            .withLatestFrom(reactor.state.compactMap { $0.accountEntity?.isProfileChanged})
-            .bind(with: self) { owner, isProfileChanged in
-                let userInfo: [AnyHashable: Any] = ["isProfileChanged": isProfileChanged]
-                NotificationCenter.default.post(name: .showSignUpMainViewController, object: nil, userInfo: userInfo)
+            .bind(with: self) { owner, _ in
+                NotificationCenter.default.post(name: .showSignInViewController, object: nil)
             }
             .disposed(by: disposeBag)
         
         startButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind { _ in
-                NotificationCenter.default.post(name: .showVoteMainViewController, object: nil)
+            .withLatestFrom(reactor.state.compactMap { $0.accountEntity?.isProfileChanged})
+            .bind { isProfileChanged in
+                let userInfo: [AnyHashable: Any] = ["isProfileChanged": isProfileChanged]
+                NotificationCenter.default.post(name: .showSignUpMainViewController, object: nil, userInfo: userInfo)
             }
             .disposed(by: disposeBag)
     }

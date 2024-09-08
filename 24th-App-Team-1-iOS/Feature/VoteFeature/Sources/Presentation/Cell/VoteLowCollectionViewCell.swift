@@ -93,7 +93,7 @@ final class VoteLowCollectionViewCell: UICollectionViewCell {
         }
         
         userProfileImageView.do {
-            $0.image = DesignSystemAsset.Images.icCommonProfile427323024.image
+            $0.image = DesignSystemAsset.Images.imgVoteProfileBlueFiled.image
             $0.contentMode = .scaleAspectFill
         }
         

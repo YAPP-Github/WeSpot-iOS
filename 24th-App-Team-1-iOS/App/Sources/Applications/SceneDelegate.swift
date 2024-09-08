@@ -106,8 +106,8 @@ extension SceneDelegate {
         
         NotificationCenter.default.addObserver(forName: .showProfileImageViewController, object: nil, queue: .main) { [weak self] _ in
             guard let self else { return }
-            let setupProfileViewController = DependencyContainer.shared.injector.resolve(    SetUpProfileImageViewController.self)
-            topViewController.navigationController?.pushViewController(setupProfileViewController, animated: true)
+            let setupProfileViewController = DependencyContainer.shared.injector.resolve(SetUpProfileImageViewController.self)
+            self.window?.rootViewController = UINavigationController(rootViewController: setupProfileViewController)
         }
         
         NotificationCenter.default.addObserver(forName: .showVoteMainViewController, object: nil, queue: .main) { [weak self] _ in
@@ -118,7 +118,6 @@ extension SceneDelegate {
         NotificationCenter.default.addObserver(forName: .showSignUpMainViewController, object: nil, queue: .main) { [weak self] notification in
             guard let self = self,
                   let userInfo = notification.userInfo?["isProfileChanged"] as? Bool else { return }
-            
             setupSignUpViewController(isProfileChanged: userInfo)
         }
         

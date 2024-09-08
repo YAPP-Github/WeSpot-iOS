@@ -121,7 +121,6 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         profileView.do {
             $0.layer.cornerRadius = 120 / 2
             $0.clipsToBounds = true
-            $0.backgroundColor = DesignSystemAsset.Colors.primary100.color
         }
         
         faceImageView.do {
