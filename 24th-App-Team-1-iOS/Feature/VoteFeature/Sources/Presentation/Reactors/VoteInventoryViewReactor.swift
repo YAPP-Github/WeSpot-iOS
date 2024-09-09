@@ -59,8 +59,8 @@ public final class VoteInventoryViewReactor: Reactor {
             sentEntity: nil,
             receiveEntity: nil,
             inventorySection: [
-                .voteSentInfo(header: "", items: []),
-                .voteReceiveInfo(header: "", items: [])
+                .voteSentInfo(items: []),
+                .voteReceiveInfo(items: [])
             ],
             isLoading: false,
             isEmpty: true,
@@ -107,7 +107,7 @@ public final class VoteInventoryViewReactor: Reactor {
                                 )
                             }
                             
-                            return .voteReceiveInfo(header: dateToString, items: receiveItem)
+                            return .voteReceiveInfo(items: receiveItem)
                         }
                         
                         return .concat(
@@ -144,7 +144,6 @@ public final class VoteInventoryViewReactor: Reactor {
                         )
                     } else {
                         let sentSection: [VoteInventorySection] = originalEntity.response.map { response in
-                            let dateToString = response.date.toDate(with: .dashYyyyMMdd).toFormatRelative()
                             let sentItem: [VoteInventoryItem] = response.sentResponse.map {
                                 return .voteSentItem(
                                     VoteSentCellReactor(
@@ -154,7 +153,7 @@ public final class VoteInventoryViewReactor: Reactor {
                                     )
                                 )
                             }
-                            return .voteSentInfo(header: dateToString, items: sentItem)
+                            return .voteSentInfo(items: sentItem)
                         }
                         return .concat(
                             .just(.setLoading(false)),
@@ -188,7 +187,6 @@ public final class VoteInventoryViewReactor: Reactor {
                             )
                         }
                         let receiveSection: [VoteInventorySection] = entity.response.map { response in
-                            let dateToString = response.date.toDate(with: .dashYyyyMMdd).toFormatRelative()
                             
                             let receiveItem: [VoteInventoryItem] = response.receiveResponse.map {
                                 return .voteReceiveItem(
@@ -199,7 +197,7 @@ public final class VoteInventoryViewReactor: Reactor {
                                     )
                                 )
                             }
-                            return .voteReceiveInfo(header: dateToString, items: receiveItem)
+                            return .voteReceiveInfo(items: receiveItem)
                         }
                         
                         originalSection.append(contentsOf: receiveSection)
@@ -233,7 +231,6 @@ public final class VoteInventoryViewReactor: Reactor {
                         }
                         
                         let sentSection: [VoteInventorySection] = entity.response.map { response in
-                            let dateToString = response.date.toDate(with: .dashYyyyMMdd).toFormatRelative()
                             let sentItem: [VoteInventoryItem] = response.sentResponse.map {
                                 return .voteSentItem(
                                     VoteSentCellReactor(
@@ -243,7 +240,7 @@ public final class VoteInventoryViewReactor: Reactor {
                                     )
                                 )
                             }
-                            return .voteSentInfo(header: dateToString, items: sentItem)
+                            return .voteSentInfo(items: sentItem)
                         }
                         
                         originalSection.append(contentsOf: sentSection)

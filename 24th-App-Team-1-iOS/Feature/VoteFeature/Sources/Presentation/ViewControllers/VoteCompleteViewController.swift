@@ -97,11 +97,11 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
         completeCollectionView.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(500)
+            $0.height.equalTo(480)
         }
         
         completePageControl.snp.makeConstraints {
-            $0.bottom.equalTo(shareButton.snp.top).offset(-36)
+            $0.top.equalTo(completeCollectionView.snp.bottom).offset(10)
             $0.centerX.equalToSuperview()
         }
         
@@ -236,14 +236,14 @@ public final class VoteCompleteViewController: BaseViewController<VoteCompleteVi
     private func createRankerAllLayoutSection() -> NSCollectionLayoutSection {
         let rankerAllItemSize: NSCollectionLayoutSize = .init(
             widthDimension: .absolute(view.frame.width),
-            heightDimension: .absolute(500)
+            heightDimension: .absolute(480)
         )
         
         let rankerAllItem: NSCollectionLayoutItem = NSCollectionLayoutItem(layoutSize: rankerAllItemSize)
         
         let rankerGroupSize: NSCollectionLayoutSize = .init(
             widthDimension: .absolute(view.frame.width),
-            heightDimension: .absolute(500)
+            heightDimension: .absolute(480)
         )
         
         let rankerAllGroup: NSCollectionLayoutGroup = NSCollectionLayoutGroup.horizontal(

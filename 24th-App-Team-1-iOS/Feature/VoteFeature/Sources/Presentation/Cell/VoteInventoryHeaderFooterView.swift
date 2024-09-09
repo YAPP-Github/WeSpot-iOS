@@ -42,8 +42,12 @@ final class VoteInventoryHeaderFooterView: UITableViewHeaderFooterView {
     private func setupAutoLayout() {
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.left.equalToSuperview().offset(24)
+            $0.left.equalToSuperview()
             $0.height.equalTo(24)
         }
+    }
+    
+    func bind(text: String) {
+        titleLabel.text = text
     }
 }
