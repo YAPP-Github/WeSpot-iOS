@@ -30,7 +30,6 @@ public final class WSIntensityVisualEffectView: UIVisualEffectView {
     
     public override func draw(_ rect: CGRect) {
         super.draw(rect)
-        super.draw(rect)
         animator = UIViewPropertyAnimator(duration: 1, curve: .linear) { [weak self] in
             guard let self else { return }
             self.effect = theEffect

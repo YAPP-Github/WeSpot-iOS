@@ -9,6 +9,7 @@ import DesignSystem
 import UIKit
 
 import ReactorKit
+import Kingfisher
 import RxCocoa
 
 
@@ -34,7 +35,7 @@ final class VoteSentTableViewCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 6, left: 0, bottom: 16, right: 0))
+        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0))
     }
     
     private func setupUI() {
@@ -112,6 +113,14 @@ extension VoteSentTableViewCell: ReactorKit.View {
             .map { $0.title }
             .distinctUntilChanged()
             .bind(to: sentDescriptionLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.profileImage }
+            .distinctUntilChanged()
+            .bind(with: self) { owner, imageURL in
+                owner.sentImageView.kf.setImage(with: imageURL)
+            }
             .disposed(by: disposeBag)
     }
 }

@@ -58,7 +58,7 @@ public final class NotificationTableViewCell: UITableViewCell {
     
         dateLabel.do {
             $0.textColor = DesignSystemAsset.Colors.gray400.color
-            $0.textAlignment = .left
+            $0.textAlignment = .right
         }
         
         alarmAccessoryView.do {
@@ -105,7 +105,7 @@ public final class NotificationTableViewCell: UITableViewCell {
             $0.top.equalTo(titleLabel.snp.bottom).offset(5)
             $0.left.equalTo(alarmImageView.snp.right).offset(9)
             $0.bottom.equalTo(lineView.snp.top).offset(-18)
-            $0.right.equalTo(dateLabel.snp.left).offset(-10)
+            $0.right.equalTo(dateLabel.snp.left)
         }
         
         lineView.snp.makeConstraints {
@@ -127,7 +127,7 @@ extension NotificationTableViewCell: ReactorKit.View {
             .disposed(by: disposeBag)
         
         reactor.state
-            .map { $0.date.toDate(with: .dashYyyyMMdd).toFormatRelative() }
+            .map { $0.date }
             .distinctUntilChanged()
             .bind(to: dateLabel.rx.text)
             .disposed(by: disposeBag)

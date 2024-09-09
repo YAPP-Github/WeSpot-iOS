@@ -74,7 +74,7 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
         }
         
         inventoryTableView.snp.makeConstraints {
-            $0.top.equalTo(toggleView.snp.bottom)
+            $0.top.equalTo(toggleView.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview().inset(20)
             $0.bottom.equalToSuperview()
         }
@@ -122,7 +122,7 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
             $0.register(VoteSentTableViewCell.self, forCellReuseIdentifier: VoteInventoryId.voteSentCell)
             $0.register(VoteInventoryHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: VoteInventoryId.voteInventoryHeaderCell)
             $0.separatorStyle = .none
-            $0.rowHeight = 106
+            $0.rowHeight = 96
             $0.showsVerticalScrollIndicator = false
             $0.backgroundColor = .clear
         }
@@ -159,9 +159,6 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
-        inventoryTableViewDataSources.titleForHeaderInSection = { dataSources, index in
-            return dataSources.sectionModels[index].headerTitle
-        }
         
         Observable.just(())
             .map { Reactor.Action.fetchReceiveItems }
@@ -196,8 +193,13 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
         
         inventoryTableView.rx
             .prefetchRows
+            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
             .map { _ in Reactor.Action.fetchMoreItems }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        inventoryTableView
+            .rx.setDelegate(self)
             .disposed(by: disposeBag)
        
         reactor.pulse(\.$voteId)
@@ -221,6 +223,38 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
             .disposed(by: disposeBag)
         
         reactor.state
+            .filter { $0.inventoryType == .sent }
+            .withLatestFrom(reactor.state.map { $0.isEmpty })
+            .filter { $0 == false }
+            .map { _ in "반 친구들에 대해 알려주세요"}
+            .bind(to: inventorySubTitleLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .filter { $0.inventoryType == .sent }
+            .withLatestFrom(reactor.state.map { $0.isEmpty})
+            .filter { $0 == false }
+            .map { _ in "아직 보낸 투표가 없어요"}
+            .bind(to: inventoryTitleLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .filter { $0.inventoryType == .receive }
+            .withLatestFrom(reactor.state.map { $0.isEmpty})
+            .filter { $0 == false }
+            .map { _ in "아직 받은 투표가 없어요"}
+            .bind(to: inventoryTitleLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .filter { $0.inventoryType == .receive }
+            .withLatestFrom(reactor.state.map { $0.isEmpty})
+            .filter { $0 == false }
+            .map { _ in "친구들을 초대하면 투표를 받을 확률이 높아져요"}
+            .bind(to: inventorySubTitleLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
             .map { $0.isEmpty }
             .distinctUntilChanged()
             .withUnretained(self)
@@ -229,6 +263,27 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
     }
 }
 
+
+extension VoteInventoryViewController: UITableViewDelegate {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let titleView = tableView.dequeueReusableHeaderFooterView(withIdentifier: VoteInventoryId.voteInventoryHeaderCell) as? VoteInventoryHeaderFooterView else { return UITableViewHeaderFooterView() }
+        switch inventoryTableViewDataSources[section] {
+        case .voteReceiveInfo:
+            guard let dateToString = self.reactor?.currentState.receiveEntity?.response[section].date.toDate(with: .dashYyyyMMdd).toFormatRelative() else { return UITableViewHeaderFooterView() }
+            titleView.bind(text: dateToString)
+            return titleView
+        case .voteSentInfo:
+            guard let dateSentString = self.reactor?.currentState.sentEntity?.response[section].date.toDate(with: .dashYyyyMMdd).toFormatRelative() else { return UITableViewHeaderFooterView() }
+            titleView.bind(text: dateSentString)
+            return titleView
+        }
+    }
+    
+    
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 30
+    }
+}
 
 extension VoteInventoryViewController {
     private func setupEmptyLayout(isEmpty: Bool) {

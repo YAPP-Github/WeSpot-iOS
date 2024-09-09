@@ -1,30 +1,35 @@
 //
-//  ProfileWebViewController.swift
+//  WSWebViewController.swift
 //  AllFeature
 //
 //  Created by Kim dohyun on 8/14/24.
 //
 
-import DesignSystem
 import UIKit
-import Util
 import WebKit
 
-import Then
 import SnapKit
-import RxSwift
 import RxCocoa
 import ReactorKit
 
-public final class ProfileWebViewController: BaseViewController<ProfileWebViewReactor> {
-
+public final class WSWebViewController: UIViewController, ReactorKit.View {
     //MARK: - Properties
+    public var disposeBag: DisposeBag = DisposeBag()
+    public var navigationBar: WSNavigationBar = WSNavigationBar()
     private let webView: WKWebView = WKWebView()
     
     //MARK: - LifeCycle
+    
+    public convenience init(reactor: WSWebViewReactor? = nil) {
+        self.init()
+        self.reactor = reactor
+    }
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
+        setupUI()
+        setupAttributes()
+        setupAutoLayout()
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -33,29 +38,34 @@ public final class ProfileWebViewController: BaseViewController<ProfileWebViewRe
     }
     
     //MARK: - Configure
-    public override func setupUI() {
-        super.setupUI()
-        view.addSubviews(webView)
+    public func setupUI() {
+        view.addSubviews(navigationBar, webView)
     }
     
-    public override func setupAutoLayout() {
-        super.setupAutoLayout()
+    public func setupAutoLayout() {
+        navigationBar.snp.makeConstraints {
+            $0.horizontalEdges.top.equalTo(view.safeAreaLayoutGuide)
+            $0.height.equalTo(60)
+        }
+        
         webView.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom)
             $0.left.right.bottom.equalToSuperview()
         }
     }
     
-    public override func setupAttributes() {
-        super.setupAttributes()
+    public func setupAttributes() {
+        view.do {
+            $0.backgroundColor = DesignSystemAsset.Colors.gray900.color
+        }
+        
         navigationBar.do {
             $0.setNavigationBarUI(property: .leftIcon(DesignSystemAsset.Images.arrow.image))
             $0.setNavigationBarAutoLayout(property: .leftIcon)
         }
     }
     
-    public override func bind(reactor: Reactor) {
-        super.bind(reactor: reactor)
+    public func bind(reactor: WSWebViewReactor) {
         reactor.state
             .compactMap { $0.contentURL }
             .distinctUntilChanged()

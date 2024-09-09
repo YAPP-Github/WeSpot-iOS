@@ -149,7 +149,7 @@ extension VoteEffectViewReactor {
                         )
                     )
                 }
-        }
+            }
         return completeSectionitem
     }
 }

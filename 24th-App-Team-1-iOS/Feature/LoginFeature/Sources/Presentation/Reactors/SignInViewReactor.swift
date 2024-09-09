@@ -25,10 +25,11 @@ public final class SignInViewReactor: Reactor {
     public var initialState: State
     
     public struct State {
-        @Pulse var isResign: Bool
-        var signUpTokenResponse: CreateSignUpTokenResponseEntity?
+        @Pulse var signUpTokenResponse: CreateSignUpTokenResponseEntity?
         var accountResponse: CreateAccountResponseEntity?
         var accountRequest: CreateAccountRequest
+        @Pulse var isExisting: Bool
+        @Pulse var isLoading: Bool
     }
     
     public enum Action {
@@ -38,8 +39,8 @@ public final class SignInViewReactor: Reactor {
     
     public enum Mutation {
         case setSignUpTokenResponse(CreateSignUpTokenResponseEntity)
-        case setAccountResponse(CreateAccountResponseEntity)
-        case setResignResponse(Bool)
+        case setAccountExisting(Bool)
+        case setLoading(Bool)
     }
     
     public init(createNewMemberUseCase: CreateNewMemberUseCaseProtocol,
@@ -47,22 +48,10 @@ public final class SignInViewReactor: Reactor {
         self.createNewMemberUseCase = createNewMemberUseCase
         self.createExistingUseCase = createExistingUseCase
         self.initialState = State(
-            isResign: false,
-            accountRequest: CreateAccountRequest()
+            accountRequest: CreateAccountRequest(),
+            isExisting: false,
+            isLoading: false
         )
-    }
-    
-    public func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
-        let responseResignStatus = globalService.event.flatMap { event -> Observable<Mutation> in
-            switch event {
-            case let .didShowSignInViewController(isSuccess):
-                return .just(.setResignResponse(isSuccess))
-            default:
-                return .empty()
-            }
-            
-        }
-        return .merge(mutation, responseResignStatus)
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
@@ -78,12 +67,13 @@ public final class SignInViewReactor: Reactor {
             else {
                 return .empty()
             }
-            
-            return executeSignUp(socialType: "APPLE", authorizationCode: authorizationCode, identityToken: identityToken)
+            UserDefaultsManager.shared.socialType = SocialTypes.kakao.rawValue
+            return executeSignUp(socialType: SocialTypes.apple.rawValue.uppercased(), authorizationCode: authorizationCode, identityToken: identityToken)
         case .signInWithKakao:
-            
+            UserDefaultsManager.shared.socialType = SocialTypes.kakao.rawValue
             return handleKakaoLogin()
-                .flatMap { self.executeSignUp(socialType: "KAKAO", authorizationCode: "", identityToken: $0) }
+                .flatMap { self.executeSignUp(socialType: SocialTypes.kakao.rawValue.uppercased(), authorizationCode: "", identityToken: $0) }
+            
         }
     }
     
@@ -122,20 +112,30 @@ public final class SignInViewReactor: Reactor {
                                             fcmToken: fcmToken)
         
         let accessToken = KeychainManager.shared.get(type: .accessToken)
-        
         if (accessToken?.isEmpty ?? true) {
             return createNewMemberUseCase
                 .execute(body: body)
                 .asObservable()
                 .compactMap { $0 }
-                .map { .setSignUpTokenResponse($0) }
+                .flatMap { response -> Observable<Mutation> in
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setSignUpTokenResponse(response)),
+                        .just(.setLoading(true))
+                    )
+                }
             
         } else {
             return createExistingUseCase
                 .execute(body: body)
                 .asObservable()
-                .compactMap { $0 }
-                .map { .setAccountResponse($0) }
+                .flatMap { response -> Observable<Mutation> in
+                    return .concat(
+                        .just(.setLoading(false)),
+                        .just(.setAccountExisting(response)),
+                        .just(.setLoading(true))
+                    )
+                }
         }
     }
     
@@ -145,10 +145,14 @@ public final class SignInViewReactor: Reactor {
         case .setSignUpTokenResponse(let signUpTokenResponse):
             newState.signUpTokenResponse = signUpTokenResponse
             newState.accountRequest.signUpToken = signUpTokenResponse.signUpToken
-        case .setAccountResponse(let accountResponse):
-            newState.accountResponse = accountResponse
-        case .setResignResponse(let isResign):
-            newState.isResign = isResign
+            let expiredDate = Date.now.addingTimeInterval(30 * 60)
+                .toFormatLocaleString(with: .dashYyyyMMddhhmmss)
+                .toLocalDate(with: .dashYyyyMMddhhmmss)
+            UserDefaultsManager.shared.expiredDate = expiredDate
+        case .setAccountExisting(let isExisting):
+            newState.isExisting = isExisting
+        case .setLoading(let isLoading):
+            newState.isLoading = isLoading
         }
         return newState
     }

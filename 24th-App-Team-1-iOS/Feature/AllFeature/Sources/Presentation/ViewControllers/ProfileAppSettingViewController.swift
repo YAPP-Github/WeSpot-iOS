@@ -93,12 +93,10 @@ public final class ProfileAppSettingViewController: BaseViewController<ProfileAp
                     owner.navigationController?.pushViewController(alarmViewController, animated: true)
                 case .privacyItem:
                     if indexPath.item == 0 {
-                        let privacyInfoURL = URL(string: "https://www.notion.so/2fa1c3002e14460f91462204b0daefbf")!
-                        let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: privacyInfoURL)
+                        let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.privacyTerms.urlString)
                         owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                     } else if indexPath.item == 1 {
-                        let serviceInfoURL = URL(string: "https://www.notion.so/yapp-workspace/0826c1435e0b4eba95ce62beb0aea425")!
-                        let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: serviceInfoURL)
+                        let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.serviceTerms.urlString)
                         owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                     } else {
                         // TODO 최신 버전 링크 여쭤보기

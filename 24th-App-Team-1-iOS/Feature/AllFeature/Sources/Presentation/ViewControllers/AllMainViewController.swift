@@ -26,6 +26,7 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
     private let profileNameLabel: WSLabel = WSLabel(wsFont: .Body02)
     private let profileClassLabel: WSLabel = WSLabel(wsFont: .Body06)
     private let profileEditButton: WSButton = WSButton(wsButtonType: .secondaryButton)
+    private let loadingIndicatorView: WSLottieIndicatorView = WSLottieIndicatorView()
     private let voteAddBanner: WSBanner = WSBanner(image: DesignSystemAsset.Images.icProfileVoteFiled.image, titleText: "선택지 추가하기", subText: "다양한 선택지로 더 재밌게 투표해 보세요")
     private let mainTableView: UITableView = UITableView()
     private let mainDataSources: RxTableViewSectionedReloadDataSource<AllMainSection> = .init { dataSources, tableView, indexPath, sectionItem in
@@ -92,7 +93,6 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
             $0.top.equalTo(profileNameLabel.snp.bottom)
             $0.left.equalTo(profileNameLabel)
             $0.width.equalTo(180)
-            $0.height.equalTo(21)
         }
         
         profileEditButton.snp.makeConstraints {
@@ -129,23 +129,14 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
             $0.clipsToBounds = true
         }
         
-        profileImageView.do {
-            guard let profileImage = URL(string: UserDefaultsManager.shared.userProfile?.profileImages.profileImage ?? "") else { return }
-            $0.kf.setImage(with: profileImage)
-        }
         
         profileNameLabel.do {
-            guard let name = UserDefaultsManager.shared.userProfile?.name else { return }
-            $0.text = name
             $0.textAlignment = .left
         }
         
         profileClassLabel.do {
-            guard let schoolName = UserDefaultsManager.shared.userProfile?.schoolName,
-                  let grade = UserDefaultsManager.shared.userProfile?.grade,
-                  let classNumber = UserDefaultsManager.shared.userProfile?.classNumber else { return }
-            $0.text = "\(schoolName) \(grade)학년 \(classNumber)반"
             $0.textAlignment = .left
+            $0.numberOfLines = 0
             $0.lineBreakMode = .byTruncatingTail
         }
         
@@ -173,8 +164,8 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
-        Observable.just(())
-            .map { Reactor.Action.viewDidLoad }
+        self.rx.viewWillAppear
+            .map { _ in Reactor.Action.viewWillAppear }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -189,6 +180,40 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
         reactor.pulse(\.$mainAllSection)
             .asDriver(onErrorJustReturn: [])
             .drive(mainTableView.rx.items(dataSource: mainDataSources))
+            .disposed(by: disposeBag)
+        
+        
+        reactor.pulse(\.$accountProfileEntity)
+            .compactMap { $0?.profile }
+            .map { $0.iconUrl }
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(with: self) { owner, imageURL in
+                owner.profileImageView.kf.setImage(with: imageURL)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicatorView.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$accountProfileEntity)
+            .compactMap { $0?.profile }
+            .map { UIColor(hex: $0.backgroundColor) }
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: profileContainerView.rx.backgroundColor)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$accountProfileEntity)
+            .compactMap {$0 }
+            .map { "\($0.schoolName) \($0.grade)학년 \($0.classNumber)반"}
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: profileClassLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$accountProfileEntity)
+            .compactMap { $0?.name }
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: profileNameLabel.rx.text)
             .disposed(by: disposeBag)
         
         profileEditButton
@@ -206,8 +231,7 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let contentURL = URL(string: "https://forms.gle/eiKdpjmwdxzvqm947")!
-                let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: contentURL)
+                let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.addQuestion.urlString)
                 owner.navigationController?.pushViewController(profileWebViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -220,29 +244,24 @@ public final class AllMainViewController: BaseViewController<AllMainViewReactor>
                 switch owner.mainDataSources[indexPath] {
                 case .movementItem:
                     if indexPath.item == 0 {
-                        let googleURL = URL(string: "https://pf.kakao.com/_SEDcG")!
-                        let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: googleURL)
+                        let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.kakaoChaanel.urlString)
                         owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                     } else {
-                        let channelURL = URL(string: "https://www.instagram.com/wespot.official/")!
-                        let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: channelURL)
+                        let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.accountOfficial.urlString)
                         owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                     }
                 case .appInfoItem:
                     if indexPath.item == 0  {
                         
                     } else if indexPath.item == 1 {
-                        let opinionURL = URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSdObjdp0fJa-rwNNcsf9wGRJwSizxQKDM7t5JHV-n9-5DIO6g/viewform")!
-                        let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: opinionURL)
+                        let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.wespotOpinion.urlString)
                         owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                     } else {
-                        let researchURL = URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSfkN2b752gRKtFRk9IUreFRacNXnj5jh4tlHWKp0n51IaObyw/viewform?usp=sf_link")!
-                        let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: researchURL)
+                        let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.wespotResearch.urlString)
                         owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                     }
                 case .makerInfoItem:
-                    let makersURL = URL(string: "https://www.notion.so/WeSpot-Makers-87e988ab3c9e47f28c141ad1aa663b80")!
-                    let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: makersURL)
+                    let profileWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.wespotMakers.urlString)
                     owner.navigationController?.pushViewController(profileWebViewController, animated: true)
                 }
             }

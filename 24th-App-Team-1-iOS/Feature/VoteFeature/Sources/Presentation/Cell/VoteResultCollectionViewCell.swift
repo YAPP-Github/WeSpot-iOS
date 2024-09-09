@@ -17,6 +17,7 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
     private let rankView: VoteRankView = VoteRankView()
     private let descriptionLabel: WSLabel = WSLabel(wsFont: .Body03)
+    private let faceView: UIView = UIView()
     private let faceImageView: UIImageView = UIImageView()
     private let nameLabel: WSLabel = WSLabel(wsFont: .Header01)
     private let introduceLabel: WSLabel = WSLabel(wsFont: .Body07)
@@ -37,7 +38,8 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
     
     private func setupUI() {
         resultContainerView.addSubview(resultDescriptionLabel)
-        addSubviews(rankView, descriptionLabel, faceImageView, nameLabel, introduceLabel, resultContainerView)
+        faceView.addSubview(faceImageView)
+        addSubviews(rankView, descriptionLabel, faceView, nameLabel, introduceLabel, resultContainerView)
     }
     
     //MARK: - Configure
@@ -56,10 +58,14 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
             $0.width.equalTo(207)
         }
         
-        faceImageView.snp.makeConstraints {
+        faceView.snp.makeConstraints {
             $0.top.equalTo(descriptionLabel.snp.bottom).offset(11)
             $0.width.height.equalTo(120)
             $0.centerX.equalToSuperview()
+        }
+        
+        faceImageView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
         
         nameLabel.snp.makeConstraints {
@@ -126,6 +132,12 @@ final class VoteResultCollectionViewCell: UICollectionViewCell {
             $0.layer.borderWidth = 1
         }
         
+        faceView.do {
+            $0.layer.cornerRadius = 120 / 2
+            $0.clipsToBounds = true
+            $0.backgroundColor = .clear
+        }
+        
         faceImageView.do {
             $0.image = DesignSystemAsset.Images.imgResultCharacter.image
         }
@@ -182,6 +194,13 @@ extension VoteResultCollectionViewCell: ReactorKit.View {
             .disposed(by: disposeBag)
         
         reactor.state
+            .compactMap { $0.winnerUser?.profile.backgroundColor }
+            .map { UIColor(hex: $0) }
+            .distinctUntilChanged()
+            .bind(to: faceView.rx.backgroundColor)
+            .disposed(by: disposeBag)
+        
+        reactor.state
             .filter { $0.winnerUser == nil }
             .map { _ in "분석 중이에요"}
             .distinctUntilChanged()
@@ -207,6 +226,13 @@ extension VoteResultCollectionViewCell: ReactorKit.View {
             .map { _ in DesignSystemAsset.Images.icVoteAnalyze.image }
             .distinctUntilChanged()
             .bind(to: faceImageView.rx.image)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .filter { $0.winnerUser == nil }
+            .map { _ in UIColor.clear }
+            .distinctUntilChanged()
+            .bind(to: faceView.rx.backgroundColor)
             .disposed(by: disposeBag)
         
         reactor.state

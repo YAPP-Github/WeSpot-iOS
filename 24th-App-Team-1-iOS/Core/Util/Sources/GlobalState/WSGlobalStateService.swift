@@ -23,6 +23,16 @@ public final class WSGlobalStateService: WSGlobalServiceProtocol {
 
 public enum WSGlobalStateType {
     case toggleStatus(_ type: VoteTypes)
+    case didTappedAccountEditButton(_ isSelected: Bool)
+    case didTappedIntroduceButton(_ isUpdate: Bool)
+    case didTappedAccountConfirmButton(_ isSelected: Bool)
+    case didTappedAccountGenderButton(gender: String)
+    case didChangedAccountClass(classNumber: Int)
+    case didTappedAccountNickNameButton(nickName: String)
+    case didChangedAccountGrade(grade: Int)
+    case didTappedMarketingButton(_ isSelected: Bool)
+    case didTappedAccountSuccessButton(_ isSelected: Bool)
+    case didChangedAccountSchoolName(schoolName: String)
     case didTappedFriendButton(_ isSelected: Bool)
     case didTappedResultButton
     case didTappedVoteButton(_ isSelected: Bool)

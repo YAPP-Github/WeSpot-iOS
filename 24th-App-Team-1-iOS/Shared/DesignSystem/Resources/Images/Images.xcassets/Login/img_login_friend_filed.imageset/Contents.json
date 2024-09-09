@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "ic_common_profile427323024.png",
+      "filename" : "img_login_friend_filed.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "ic_common_profile427323024 1.png",
+      "filename" : "img_login_friend_filed 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "ic_common_profile427323024 2.png",
+      "filename" : "img_login_friend_filed 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

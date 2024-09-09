@@ -40,35 +40,33 @@ public final class SchoolSearchTableViewCell: UITableViewCell {
     //MARK: - Functions
     private func setupUI() {
         
-        addSubviews(schoolCellView)
         schoolCellView.addSubviews(schoolImageView, titleLabel, subTitleLabel, checkButton)
+        contentView.addSubview(schoolCellView)
     }
     
     private func setupAutoLayout() {
         
         schoolCellView.snp.makeConstraints {
-            $0.top.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(88)
-            $0.bottom.equalToSuperview().inset(16)
+            $0.edges.equalToSuperview()
         }
         schoolImageView.snp.makeConstraints {
-            $0.verticalEdges.equalTo(schoolCellView).inset(16)
-            $0.leading.equalTo(schoolCellView).offset(24)
-            $0.size.height.equalTo(56)
+            $0.centerY.equalToSuperview()
+            $0.left.equalTo(schoolCellView).offset(24)
+            $0.size.equalTo(56)
         }
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(schoolCellView).offset(16)
-            $0.leading.equalTo(schoolImageView.snp.trailing).offset(16)
-            $0.trailing.equalTo(schoolCellView).inset(44)
+            $0.top.equalTo(schoolImageView.snp.top)
+            $0.left.equalTo(schoolImageView.snp.right).offset(16)
+            $0.right.equalTo(checkButton.snp.left)
         }
         subTitleLabel.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(4)
-            $0.leading.equalTo(schoolImageView.snp.trailing).offset(16)
-            $0.trailing.equalTo(schoolCellView).inset(44)
-            $0.bottom.equalTo(schoolImageView.snp.bottom).inset(4)
+            $0.left.equalTo(schoolImageView.snp.right).offset(16)
+            $0.right.equalTo(schoolCellView).offset(-44)
         }
         checkButton.snp.makeConstraints {
-            $0.top.trailing.equalTo(schoolCellView).inset(14)
+            $0.top.equalTo(schoolCellView).offset(14)
+            $0.right.equalTo(schoolCellView).offset(-14)
             $0.size.equalTo(20)
         }
     }
@@ -77,9 +75,20 @@ public final class SchoolSearchTableViewCell: UITableViewCell {
         
         backgroundColor = .clear
         
-        schoolCellView.backgroundColor = DesignSystemAsset.Colors.gray700.color
+        contentView.do {
+            $0.layer.cornerRadius = 12
+            $0.layer.masksToBounds = true
+        }
         
-        schoolImageView.backgroundColor = DesignSystemAsset.Colors.white.color
+        schoolImageView.do {
+            $0.layer.cornerRadius = 56 / 2
+            $0.clipsToBounds = true
+            $0.image = DesignSystemAsset.Images.imgSignupSchoolFiled.image
+        }
+        
+        schoolCellView.do {
+            $0.backgroundColor = DesignSystemAsset.Colors.gray700.color
+        }
         
         titleLabel.textColor = DesignSystemAsset.Colors.gray100.color
         
@@ -88,12 +97,7 @@ public final class SchoolSearchTableViewCell: UITableViewCell {
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        
-        schoolCellView.layer.cornerRadius = 12
-        schoolCellView.layer.masksToBounds = true
-
-        schoolImageView.layer.cornerRadius = schoolImageView.bounds.height / 2
-        schoolImageView.layer.masksToBounds = true
+        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 0, left: 0, bottom: 6, right: 0))
     }
     
     public func setupCell(schoolName: String, address: String) {
@@ -106,12 +110,12 @@ public final class SchoolSearchTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
         
         if selected {
-            schoolCellView.layer.borderColor = DesignSystemAsset.Colors.primary400.color.cgColor
-            schoolCellView.layer.borderWidth = 1
+            contentView.layer.borderColor = DesignSystemAsset.Colors.primary400.color.cgColor
+            contentView.layer.borderWidth = 1
             
             checkButton.setImage(DesignSystemAsset.Images.checkSelected.image, for: .normal)
         } else {
-            schoolCellView.layer.borderWidth = 0
+            contentView.layer.borderWidth = 0
             
             checkButton.setImage(DesignSystemAsset.Images.check.image, for: .normal)
         }

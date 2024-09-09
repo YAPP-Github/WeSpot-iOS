@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import Util
+
 import CommonDomain
 import ReactorKit
 import RxSwift
@@ -14,6 +16,7 @@ import LoginDomain
 public final class SignUpNameViewReactor: Reactor {
     
     private let createCheckProfanityUseCase: CreateCheckProfanityUseCaseProtocol
+    private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     public var initialState: State
     
     public struct State {
@@ -21,12 +24,14 @@ public final class SignUpNameViewReactor: Reactor {
         var errorMessage: String?
         var isButtonEnabled: Bool = false
         var isWarningHidden: Bool = true
-        var accountRequest: CreateAccountRequest
+        @Pulse var accountRequest: CreateAccountRequest
+        @Pulse var isConfirm: Bool = false
         var schoolName: String
     }
     
     public enum Action {
         case inputName(String)
+        case didTappedConfirmButton
     }
     
     public enum Mutation {
@@ -34,6 +39,7 @@ public final class SignUpNameViewReactor: Reactor {
         case setErrorMessage(String?)
         case setButtonEnabled(Bool)
         case setWarningHidden(Bool)
+        case setConfirmButton(Bool)
     }
     
     public init(
@@ -54,7 +60,8 @@ public final class SignUpNameViewReactor: Reactor {
             return createCheckProfanityUseCase
                 .execute(body: body)
                 .asObservable()
-                .flatMap { isProfane -> Observable<Mutation> in
+                .withUnretained(self)
+                .flatMap { owner, isProfane -> Observable<Mutation> in
                     if isProfane {
                         return Observable.concat([
                             .just(Mutation.setName(name)),
@@ -64,11 +71,9 @@ public final class SignUpNameViewReactor: Reactor {
                         ])
                     } else {
                         let isValid = self.validateName(name)
-                        let errorMessage = isValid ? nil : (name.count <= 1 ? nil : "2~5자의 한글만 입력 가능해요")
                         let errorMessage = isValid ? nil : (name.count <= 1 ? "" : "2~5자의 한글만 입력 가능해요")
                         let isButtonEnabled = name.count >= 2 && isValid
                         let isWarningHidden = name.count <= 1
-                        
                         return Observable.concat([
                             .just(Mutation.setName(name)),
                             .just(Mutation.setErrorMessage(errorMessage)),
@@ -77,6 +82,9 @@ public final class SignUpNameViewReactor: Reactor {
                         ])
                     }
                 }
+        case .didTappedConfirmButton:
+            globalService.event.onNext(.didTappedAccountNickNameButton(nickName: currentState.name))
+            return .just(.setConfirmButton(true))
         }
     }
     
@@ -96,6 +104,8 @@ public final class SignUpNameViewReactor: Reactor {
             
         case .setWarningHidden(let isHidden):
             newState.isWarningHidden = isHidden
+        case let .setConfirmButton(isConfirm):
+            newState.isConfirm = isConfirm
         }
         
         return newState

@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 
 public protocol CreateExistingMemberUseCaseProtocol {
-    func execute(body: CreateSignUpTokenRequest) -> Single<CreateAccountResponseEntity?>
+    func execute(body: CreateSignUpTokenRequest) -> Single<Bool>
 }
 
 public final class CreateExistingMemberTokenUseCase: CreateExistingMemberUseCaseProtocol {
@@ -22,7 +22,7 @@ public final class CreateExistingMemberTokenUseCase: CreateExistingMemberUseCase
         self.loginRepository = loginRepository
     }
 
-    public func execute(body: CreateSignUpTokenRequest) -> Single<CreateAccountResponseEntity?> {
+    public func execute(body: CreateSignUpTokenRequest) -> Single<Bool> {
         return loginRepository.createExistingMember(body: body)
     }
     

@@ -7,6 +7,7 @@
 
 import Foundation
 import AllDomain
+import Storage
 import Util
 import CommonDomain
 
@@ -27,8 +28,8 @@ public final class ProfileEditViewReactor: Reactor {
         var characterSection: [CharacterEditSection]
         @Pulse var isUpdate: Bool
         @Pulse var isLoading: Bool
-        var backgroundColor: String
-        var iconURL: String
+        @Pulse var backgroundColor: String
+        @Pulse var iconURL: URL?
         var isError: Bool
     }
     
@@ -48,7 +49,7 @@ public final class ProfileEditViewReactor: Reactor {
         case setUserUpdate(Bool)
         case setLoading(Bool)
         case setSelctedBackgroundColor(String)
-        case setSelectedIconURL(String)
+        case setSelectedIconURL(URL)
         case setError(Bool)
     }
     
@@ -58,7 +59,8 @@ public final class ProfileEditViewReactor: Reactor {
         updateUserProfileUseCase: UpdateUserProfileUseCaseProtocol,
         fetchProfileBackgroundUseCase: FetchProfileBackgroundsUseCaseProtocol,
         fetchProfileImageUseCase: FetchProfileImagesUseCaseProtocol,
-        userProfileEntity: UserProfileEntity
+        userProfileEntity: UserProfileEntity,
+        backgroundColor: String
     ) {
         self.initialState = State(
             userProfileEntity: userProfileEntity,
@@ -68,8 +70,7 @@ public final class ProfileEditViewReactor: Reactor {
             characterSection: [],
             isUpdate: false,
             isLoading: false,
-            backgroundColor: "",
-            iconURL: "",
+            backgroundColor: backgroundColor,
             isError: false
         )
         self.updateUserProfileUseCase = updateUserProfileUseCase
@@ -133,32 +134,36 @@ public final class ProfileEditViewReactor: Reactor {
                 }
         case let .didTappedCharacterItem(item):
             globalService.event.onNext(.didTappedCharacterItem(item))
-            let iconURL = currentState.fetchProfileImageResponseEntity?.characters[item].iconUrl.absoluteString
-            return .just(.setSelectedIconURL(iconURL ?? ""))
+            guard let iconURL = currentState.fetchProfileImageResponseEntity?.characters[item].iconUrl else { return .empty() }
+            return .just(.setSelectedIconURL(iconURL))
             
         case let .didTappedBackgroundItem(item):
             globalService.event.onNext(.didTappedBackgroundItem(item))
-            let backgroundColor = currentState.fetchProfileBackgroundsResponseEntity?.backgrounds[item].color
-            return .just(.setSelctedBackgroundColor(backgroundColor ?? ""))
+            guard let backgroundColor = currentState.fetchProfileBackgroundsResponseEntity?.backgrounds[item].color else { return .empty() }
+            return .just(.setSelctedBackgroundColor(backgroundColor))
         case .didTappedUpdateButton:
             
-            let updateUserProfileBody = UpdateUserProfileItemRequest(backgroundColor: currentState.backgroundColor, iconUrl: currentState.iconURL)
-            let updateUserBody = UpdateUserProfileRequest(introduction: currentState.userProfileEntity.introduction, profile: updateUserProfileBody)
+            let originalURL = currentState.iconURL?.absoluteString == nil ? UserDefaultsManager.shared.userProfileImage : currentState.iconURL?.absoluteString
+            let updateUserBody = UpdateUserProfileRequest(introduction: currentState.userProfileEntity.introduction, backgroundColor: currentState.backgroundColor, iconUrl: originalURL ?? "")
             return updateUserProfileUseCase
                 .execute(body: updateUserBody)
                 .asObservable()
-                .flatMap { isUpdate -> Observable<Mutation> in
+                .withUnretained(self)
+                .flatMap { owner, isUpdate -> Observable<Mutation> in
                     if isUpdate {
+                        guard let selectedURLString = originalURL,
+                              let selectedURL = URL(string: selectedURLString) else { return .empty() }
                         return .concat(
                             .just(.setLoading(false)),
                             .just(.setError(false)),
                             .just(.setUserUpdate(isUpdate)),
+                            .just(.setSelctedBackgroundColor(owner.currentState.backgroundColor)),
+                            .just(.setSelectedIconURL(selectedURL)),
                             .just(.setLoading(true))
                         )
                     } else {
                         return .just(.setError(true))
                     }
-                    
                 }
         }
     }
@@ -180,8 +185,10 @@ public final class ProfileEditViewReactor: Reactor {
             newState.isUpdate = isUpdate
         case let .setSelectedIconURL(iconURL):
             newState.iconURL = iconURL
+            UserDefaultsManager.shared.userProfileImage = iconURL.absoluteString
         case let .setSelctedBackgroundColor(backgroundColor):
             newState.backgroundColor = backgroundColor
+            UserDefaultsManager.shared.userBackgroundColor = backgroundColor
         case let .setError(isErorr):
             newState.isError = isErorr
         }

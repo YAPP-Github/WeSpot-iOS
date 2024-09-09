@@ -29,6 +29,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
     private let additionalButtonLine = UIView()
     private let schoolSearchTableView = UITableView()
     private let gradientView = GradientView()
+    private let loadingIndicatorView = WSLottieIndicatorView()
     private let nextButton = WSButton(wsButtonType: .default(12))
     private lazy var schoolSearchTableViewDataSource = RxTableViewSectionedReloadDataSource<SchoolSection>(configureCell: { (dataSource, tableView, indexPath, item) in
         let cell = tableView.dequeueReusableCell(withIdentifier: SchoolSearchTableViewCell.identifier, for: indexPath) as! SchoolSearchTableViewCell
@@ -36,15 +37,10 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         cell.setupCell(schoolName: item.school.name, address: item.school.address)
         return cell
     })
-    private let accountInjector: Injector = DependencyInjector(container: Container())
     
     //MARK: - LifeCycle
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        schoolTextField.becomeFirstResponder()
-        warningLabel.isHidden = true
-        hideKeyboard()
     }
     
     //MARK: - Configure
@@ -122,6 +118,7 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         
         warningLabel.do {
             $0.textColor = DesignSystemAsset.Colors.destructive.color
+            $0.isHidden = true
         }
         
         additionalButton.do {
@@ -149,6 +146,14 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
     
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
+        
+        self.rx.viewWillAppear
+            .delay(.microseconds(100), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.schoolTextField.becomeFirstResponder()
+                owner.hideKeyboard()
+            }
+            .disposed(by: disposeBag)
         
         schoolTextField.rx.controlEvent([.editingDidBegin, .editingDidEnd])
             .map { self.schoolTextField.isEditing }
@@ -178,6 +183,16 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
             .bind(to: additionalButton.rx.isHidden, additionalButtonLine.rx.isHidden)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isLoading)
+            .bind(to: loadingIndicatorView.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.accountRequest.grade == 0 ? "다음" : "수정 완료" }
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: nextButton.rx.title())
+            .disposed(by: disposeBag)
+        
         reactor.state
             .map { $0.schoolName.count <= 20 }
             .distinctUntilChanged()
@@ -193,9 +208,14 @@ public final class SignUpSchoolViewController: BaseViewController<SignUpSchoolVi
         
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                let signUpGradeViewController =  DependencyContainer.shared.injector.resolve(SignUpGradeViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
-                owner.navigationController?.pushViewController(signUpGradeViewController, animated: true)
+            .withLatestFrom(reactor.state.map { $0.accountRequest})
+            .bind(with: self) { owner, response in
+                if response.grade == 0 {
+                    let signUpGradeViewController =  DependencyContainer.shared.injector.resolve(SignUpGradeViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
+                    owner.navigationController?.pushViewController(signUpGradeViewController, animated: true)
+                } else {
+                    owner.navigationController?.popViewController(animated: true)
+                }
             }
             .disposed(by: disposeBag)
     }

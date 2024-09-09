@@ -12,6 +12,7 @@ public enum WSFont {
     case Header01
     case Header02
     case Header03
+    case Header04
     case Body01
     case Body02
     case Body03
@@ -33,6 +34,8 @@ public enum WSFont {
             18
         case .Header03:
             16
+        case .Header04:
+            24
         case .Body01:
             18
         case .Body02:
@@ -68,6 +71,8 @@ public enum WSFont {
             DesignSystemFontFamily.Pretendard.semiBold
         case .Header03:
             DesignSystemFontFamily.Pretendard.semiBold
+        case .Header04:
+            DesignSystemFontFamily.Pretendard.bold
         case .Body01:
             DesignSystemFontFamily.Pretendard.bold
         case .Body02:

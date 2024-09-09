@@ -30,25 +30,19 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
     private let classTextFieldTapGesture = UITapGestureRecognizer()
     private let gradeTextFieldTapGesture = UITapGestureRecognizer()
     private let schoolTextFieldTapGesture = UITapGestureRecognizer()
-    private let comfirmInfoBottomSheetView = ConfirmInfoBottomSheetView()
-    private let policyAgreementBottomSheetView = PolicyAgreementBottomSheetView()
-    private let dimView = UIView()
     private let nextButton = WSButton(wsButtonType: .default(12))
-    private let accountInjector: Injector = DependencyInjector(container: Container())
     
     //MARK: - LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupBottomSheet()
-        showComfirmInfoBottomSheet()
     }
     
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
         
-        view.addSubviews(nameTextField, genderTextField, classTextField, gradeTextField, schoolTextField, nextButton, dimView, comfirmInfoBottomSheetView, policyAgreementBottomSheetView)
+        view.addSubviews(nameTextField, genderTextField, classTextField, gradeTextField, schoolTextField, nextButton)
         nameTextField.addGestureRecognizer(nameTextFieldTapGesture)
         genderTextField.addGestureRecognizer(genderTextFieldTapGesture)
         classTextField.addGestureRecognizer(classTextFieldTapGesture)
@@ -84,31 +78,20 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
         }
-        dimView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        comfirmInfoBottomSheetView.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalTo(304)
-        }
-        policyAgreementBottomSheetView.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalTo(412)
-        }
     }
     
     public override func setupAttributes() {
         super.setupAttributes()
+        
+        self.do {
+            $0.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        }
         
         view.backgroundColor = DesignSystemAsset.Colors.gray900.color
         
         navigationBar.do {
             $0.setNavigationBarUI(property: .leftWithCenterItem(DesignSystemAsset.Images.arrow.image, "회원가입"))
             $0.setNavigationBarAutoLayout(property: .leftWithCenterItem)
-        }
-        
-        dimView.do{
-            $0.backgroundColor = UIColor.black.withAlphaComponent(0.6)
         }
         
         nextButton.do {
@@ -118,6 +101,33 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
     
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
+        
+        Observable.just(())
+            .map { Reactor.Action.viewDidLoad }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+                
+        Observable
+            .combineLatest(
+                reactor.pulse(\.$isShowBottomSheet),
+                reactor.pulse(\.$accountRequest),
+                reactor.pulse(\.$schoolName)
+            )
+            .filter { $0.0 == true }
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(with: self) { owner, arg in
+                owner.showSignUpBottomSheet(argument: arg.1, schoolName: arg.2)
+            }
+            .disposed(by: disposeBag)
+        
+        
+        reactor.pulse(\.$isHideInfoBottomSheet)
+            .filter { $0 == true }
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(with: self) { owner, _ in
+                owner.dismiss(animated: true)
+            }
+            .disposed(by: disposeBag)
         
         reactor.state
             .map { $0.accountRequest.name }
@@ -150,10 +160,37 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .bind(to: schoolTextField.rx.text)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isShowPolicyBottomSheet)
+            .filter { $0 == true }
+            .bind(with: self) { owner, _ in
+                owner.dismiss(animated: true) {
+                    owner.showBottomSheet()
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isConfirm)
+            .filter { $0 == true }
+            .withLatestFrom(reactor.state.map { $0.accountRequest })
+            .bind(with: self) { owner, arg in
+                owner.dismiss(animated: true) {
+                    let signupCompleteViewController = DependencyContainer.shared.injector.resolve(SignUpCompleteViewController.self, argument: arg)
+                    owner.navigationController?.pushViewController(signupCompleteViewController, animated: true)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        nextButton.rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.showBottomSheet()
+            }
+            .disposed(by: disposeBag)
+        
         nameTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self)
+                let signUpNameViewController = DependencyContainer.shared.injector.resolve(SignUpNameViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
                 owner.navigationController?.pushViewController(signUpNameViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -161,7 +198,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         genderTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpGenderViewController = DependencyContainer.shared.injector.resolve(SignUpGenderViewController.self)
+                let signUpGenderViewController = DependencyContainer.shared.injector.resolve(SignUpGenderViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
                 owner.navigationController?.pushViewController(signUpGenderViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -169,7 +206,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         classTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpClassViewController = DependencyContainer.shared.injector.resolve(SignUpGradeViewController.self)
+                let signUpClassViewController = DependencyContainer.shared.injector.resolve(SignUpClassViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
                 owner.navigationController?.pushViewController(signUpClassViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -177,7 +214,7 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         gradeTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpGradeViewController = DependencyContainer.shared.injector.resolve(SignUpGradeViewController.self)
+                let signUpGradeViewController = DependencyContainer.shared.injector.resolve(SignUpGradeViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
                 owner.navigationController?.pushViewController(signUpGradeViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -185,47 +222,11 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
         schoolTextFieldTapGesture.rx.event
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let signUpSchoolViewController =  DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self)
+                let signUpSchoolViewController =  DependencyContainer.shared.injector.resolve(SignUpSchoolViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
                 owner.navigationController?.pushViewController(signUpSchoolViewController, animated: true)
             }
             .disposed(by: disposeBag)
-        
-        comfirmInfoBottomSheetView.editButton.rx.tap
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                owner.hideComfirmInfoBottomSheet()
-            }
-            .disposed(by: disposeBag)
-        
-        comfirmInfoBottomSheetView.confirmButton.rx.tap
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                owner.hideComfirmInfoBottomSheet()
-                owner.showPolicyAgreementBottomSheet()
-            }
-            .disposed(by: disposeBag)
-        
-        policyAgreementBottomSheetView.confirmButton.rx.tap
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                owner.reactor?.action.onNext(.createAccount)
-            }
-            .disposed(by: disposeBag)
-        
-        policyAgreementBottomSheetView.marketingAgreementButton.isCheckedObservable
-            .bind(with: self) { owner, isChecked in
-                owner.reactor?.action.onNext(.setMarketingAgreement(isChecked))
-            }
-            .disposed(by: disposeBag)
-        
-        nextButton.rx.tap
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                owner.hideComfirmInfoBottomSheet()
-                owner.showPolicyAgreementBottomSheet()
-            }
-            .disposed(by: disposeBag)
-        
+                
         reactor.state
             .map { $0.isAccountCreationCompleted }
             .filter { $0 }
@@ -236,36 +237,17 @@ public final class SignUpResultViewController: BaseViewController<SignUpResultVi
             .disposed(by: disposeBag)
     }
     
-    private func setupBottomSheet() {
-        comfirmInfoBottomSheetView.transform = CGAffineTransform(translationX: 0, y: 304)
-        policyAgreementBottomSheetView.transform = CGAffineTransform(translationX: 0, y: 412)
+    private func showBottomSheet() {
+        let policyAgreementBottomSheetViewController = DependencyContainer.shared.injector.resolve(PolicyAgreementBottomSheetViewController.self)
+        policyAgreementBottomSheetViewController.modalPresentationStyle = .overCurrentContext
+        policyAgreementBottomSheetViewController.modalTransitionStyle = .crossDissolve
+        self.present(policyAgreementBottomSheetViewController, animated: true)
     }
     
-    private func showComfirmInfoBottomSheet() {
-        UIView.animate(withDuration: 0.3) {
-            self.dimView.alpha = 1
-            self.comfirmInfoBottomSheetView.transform = .identity
-        }
-    }
-    
-    private func hideComfirmInfoBottomSheet() {
-        UIView.animate(withDuration: 0.3) {
-            self.dimView.alpha = 0
-            self.comfirmInfoBottomSheetView.transform = CGAffineTransform(translationX: 0, y: 304)
-        }
-    }
-    
-    private func showPolicyAgreementBottomSheet() {
-        UIView.animate(withDuration: 0.3) {
-            self.dimView.alpha = 1
-            self.policyAgreementBottomSheetView.transform = .identity
-        }
-    }
-    
-    private func hidePolicyAgreementBottomSheet() {
-        UIView.animate(withDuration: 0.3) {
-            self.dimView.alpha = 0
-            self.policyAgreementBottomSheetView.transform = CGAffineTransform(translationX: 0, y: 412)
-        }
+    private func showSignUpBottomSheet(argument: CreateAccountRequest, schoolName: String) {
+        let signUpInfoBottomSheetViewController = DependencyContainer.shared.injector.resolve(SignUpInfoBottomSheetViewController.self, arguments: argument, schoolName)
+        signUpInfoBottomSheetViewController.modalPresentationStyle = .overCurrentContext
+        signUpInfoBottomSheetViewController.modalTransitionStyle = .crossDissolve
+        self.present(signUpInfoBottomSheetViewController, animated: true)
     }
 }

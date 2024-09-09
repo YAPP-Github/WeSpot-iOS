@@ -14,10 +14,18 @@ public extension Date {
         return dateFormatter.string(from: self)
     }
     
+    func toFormatLocaleString(with format: String = "yyyy-MM") -> String {
+        let dateFormatter = DateFormatter.withLocaleformat(format)
+        return dateFormatter.string(from: self)
+    }
+    
     func toFormatString(with format: DateFormatter.Format) -> String {
         return toFormatString(with: format.type)
     }
     
+    func toFormatLocaleString(with format: DateFormatter.Format) -> String {
+        return toFormatLocaleString(with: format.type)
+    }
     func toFormatRelative() -> String {
         
         let calendar = Calendar.current
@@ -36,6 +44,25 @@ public extension Date {
         }
         
         return self.toFormatString(with: .dashYyyyMMdd)
+    }
+    
+    func toCustomFormatRelative() -> String {
+        let relativeDateformatter: RelativeDateTimeFormatter = RelativeDateTimeFormatter()
+        relativeDateformatter.unitsStyle = .full
+        relativeDateformatter.locale = Locale(identifier: "ko_KR")
+        relativeDateformatter.calendar = .autoupdatingCurrent
+        relativeDateformatter.dateTimeStyle = .numeric
+        
+        
+        let calendar = Calendar.current
+        let now = Date()
+        
+        let components = calendar.dateComponents([.second], from: self, to: now)
+        if let second = components.second, second < 60 {
+            return "방금"
+        }
+        
+        return relativeDateformatter.localizedString(for: self, relativeTo: now)
     }
       
     func isSameDay(as otherDate: Date) -> Bool {
@@ -72,6 +99,8 @@ public extension DateFormatter {
         case ahhmmss
         case MddEEE
         case yyyyMMddYhhmmssXXX
+        case yyyyMMddTHHmmssSSSSSS
+        case yyyyMMddTHHmmssZ
         
         public var type: String {
             switch self {
@@ -95,10 +124,22 @@ public extension DateFormatter {
                 return "a hh:mm:ss"
             case .yyyyMMddYhhmmssXXX:
                 return "yyyy-MM-dd'T'HH:mm:ssXXX"
+            case .yyyyMMddTHHmmssSSSSSS:
+                return "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+            case .yyyyMMddTHHmmssZ:
+                return "yyyy-MM-dd'T'HH:mm:ssZ"
             case .MddEEE:
                 return "M월 dd일 EEEE"
             }
         }
+    }
+    
+    static func withLocaleformat(_ format: String) -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        formatter.timeZone = TimeZone.current
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter
     }
     
     static func withFormat(_ format: String) -> DateFormatter {

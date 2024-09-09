@@ -6,11 +6,14 @@
 //
 
 import Foundation
+import Util
 
 import ReactorKit
 import LoginDomain
 
 public final class SignUpGenderViewReactor: Reactor {
+    
+    private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     
     public struct State {
         var accountRequest: CreateAccountRequest
@@ -34,6 +37,7 @@ public final class SignUpGenderViewReactor: Reactor {
     public  func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .selectGender(let gender):
+            globalService.event.onNext(.didTappedAccountGenderButton(gender: gender))
             return .just(.setGender(gender))
         }
     }

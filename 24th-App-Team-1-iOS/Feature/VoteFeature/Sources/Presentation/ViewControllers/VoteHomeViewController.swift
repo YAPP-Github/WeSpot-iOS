@@ -108,7 +108,7 @@ public final class VoteHomeViewController: BaseViewController<VoteHomeViewReacto
         
         voteLottieView.do {
             $0.lottieView.animation = DesignSystemAnimationAsset.bgVoteMainAnimate.animation
-            $0.isStauts = true
+            $0.isStatus = true
             $0.lottieView.loopMode = .playOnce
         }
         

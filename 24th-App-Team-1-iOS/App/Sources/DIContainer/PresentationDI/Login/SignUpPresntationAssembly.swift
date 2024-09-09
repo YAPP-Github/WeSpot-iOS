@@ -100,7 +100,28 @@ struct SignUpNamePresentationAssembly: Assembly {
 /// SignUpResult DIContainer
 struct SignUpResultPresentationAssembly: Assembly {
     func assemble(container: Container) {
+        
+        container.register(SignUpInfoBottomSheetViewReactor.self) { (_, accountRequest: CreateAccountRequest, schoolName: String) in
+            
+            return SignUpInfoBottomSheetViewReactor(accountRequest: accountRequest, schoolName: schoolName)
+        }
+        
+        container.register(SignUpInfoBottomSheetViewController.self) { (resolver, argument: CreateAccountRequest, schoolName: String) in
+            let reactor = resolver.resolve(SignUpInfoBottomSheetViewReactor.self, arguments: argument, schoolName)!
+            
+            return SignUpInfoBottomSheetViewController(reactor: reactor)
+        }
 
+        container.register(PolicyAgreementBottomSheetViewReactor.self) { _ in
+            return PolicyAgreementBottomSheetViewReactor()
+        }
+        
+        container.register(PolicyAgreementBottomSheetViewController.self) { resolver in
+            let reactor = resolver.resolve(PolicyAgreementBottomSheetViewReactor.self)!
+            
+            return PolicyAgreementBottomSheetViewController(reactor: reactor)
+        }
+        
         container.register(SignUpResultViewReactor.self) { (resolver, accountRequest: CreateAccountRequest, schoolName: String) in
             let createAccountUseCase = resolver.resolve(CreateAccountUseCaseProtocol.self)!
             return SignUpResultViewReactor(accountRequest: accountRequest, createAccountUseCase: createAccountUseCase, schoolName: schoolName)
@@ -117,15 +138,31 @@ struct SignUpResultPresentationAssembly: Assembly {
 /// SignUpComplete DIContainer
 struct SignUpCompletePresentationAssembly: Assembly {
     func assemble(container: Container) {
-
-        container.register(SignUpClassViewReactor.self) { (resolver, accountRequest: CreateAccountRequest, schoolName: String) in
-            return SignUpClassViewReactor(accountRequest: accountRequest, schoolName: schoolName)
+        container.register(SignUpCompleteViewReactor.self) { (resolver, accountRequest: CreateAccountRequest) in
+            let createAccountUseCase = resolver.resolve(CreateAccountUseCaseProtocol.self)!
+            return SignUpCompleteViewReactor(createAccountUseCase: createAccountUseCase, accountRequest: accountRequest)
         }
-
-        container.register(SignUpClassViewController.self) { (resolver, argument: CreateAccountRequest, schoolName: String) in
-            let reactor = resolver.resolve(SignUpClassViewReactor.self, arguments: argument, schoolName)!
-            return SignUpClassViewController(reactor: reactor)
+        
+        container.register(SignUpCompleteViewController.self) { (resolver, accountRequest: CreateAccountRequest) in
+            let reactor = resolver.resolve(SignUpCompleteViewReactor.self, argument: accountRequest)!
+            return SignUpCompleteViewController(reactor: reactor)
         }
-
+        
+        container.register(SignUpIntroduceViewReactor.self) { (resolver, imageURL: String, backgroundColor: String) in
+            let updateUserProfileUseCase = resolver.resolve(UpdateUserProfileUseCaseProtocol.self)!
+            let createCheckProfanityUseCase = resolver.resolve(CreateCheckProfanityUseCaseProtocol.self)!
+            return SignUpIntroduceViewReactor(
+                updateUserProfileUseCase: updateUserProfileUseCase,
+                createCheckProfanityUseCase: createCheckProfanityUseCase,
+                imageURL: imageURL,
+                backgroundColor: backgroundColor
+            )
+        }
+        
+        container.register(SignUpIntroduceViewController.self) { (resolver, imageURL: String, backgroundColor: String) in
+            let reactor = resolver.resolve(SignUpIntroduceViewReactor.self, arguments: imageURL, backgroundColor)!
+            
+            return SignUpIntroduceViewController(reactor: reactor)
+        }
     }
 }

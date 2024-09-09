@@ -39,6 +39,20 @@ public final class WSTextField: UITextField {
         }
     }
     
+    public override var text: String? {
+        didSet {
+            if let text = text {
+                let attributes: [NSAttributedString.Key: Any] = [
+                    .font: WSFont.Body04.font(),
+                    .foregroundColor: DesignSystemAsset.Colors.gray100.color
+                ]
+                self.attributedText = NSAttributedString(string: text, attributes: attributes)
+            } else {
+                self.attributedText = nil
+            }
+        }
+    }
+    
     private var titleText: String?
     private var textFieldState: TextFieldState = .default
     
@@ -87,7 +101,6 @@ public final class WSTextField: UITextField {
         placeholder = placeholderText
         attributedPlaceholder = NSAttributedString(string: placeholderText, attributes: [NSAttributedString.Key.foregroundColor: DesignSystemAsset.Colors.gray400.color])
         backgroundColor = DesignSystemAsset.Colors.gray700.color
-        applyWSFont(.Body04)
     }
     
     

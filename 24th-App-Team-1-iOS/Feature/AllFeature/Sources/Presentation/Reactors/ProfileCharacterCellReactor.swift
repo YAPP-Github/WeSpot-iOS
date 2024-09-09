@@ -7,13 +7,13 @@
 
 import Foundation
 import Util
+import Storage
 
 import ReactorKit
 
 
 public final class ProfileCharacterCellReactor: Reactor {
     
-    public typealias Action = NoAction
     private let globalService: WSGlobalServiceProtocol = WSGlobalStateService.shared
     public var initialState: State
     
@@ -43,6 +43,7 @@ public final class ProfileCharacterCellReactor: Reactor {
     }
     
     init(iconURL: URL, item: Int) {
+        print()
         self.initialState = State(iconURL: iconURL, item: item)
     }
     

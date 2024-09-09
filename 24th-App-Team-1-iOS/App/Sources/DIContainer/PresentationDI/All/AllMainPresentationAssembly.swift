@@ -14,9 +14,9 @@ import Swinject
 
 struct AllMainPresentationAssembly: Assembly {
     func assemble(container: Container) {
-        container.register(AllMainViewReactor.self) { _ in
-        
-            return AllMainViewReactor()
+        container.register(AllMainViewReactor.self) { resolver in
+            let fetchUserProfileUseCase = resolver.resolve(FetchUserProfileUseCaseProtocol.self)!
+            return AllMainViewReactor(fetchUserProfileUseCase: fetchUserProfileUseCase)
         }
         
         container.register(AllMainViewController.self) { resolver in

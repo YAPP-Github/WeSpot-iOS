@@ -24,16 +24,17 @@ extension InfoPlist {
             "CFBundleShortVersionString": .string("1.0"),
             "CFBundleVersion": .string("1"),
             "UILaunchStoryboardName": .string("LaunchScreen"),
+            "UISupportedInterfaceOrientations": .array([.string("UIInterfaceOrientationPortrait")]),
             "UIApplicationSceneManifest": .dictionary([
                 "UIApplicationSupportsMultipleScenes": .boolean(false),
-                "UISceneConfigurations": [
-                    "UIWindowSceneSessionRoleApplication": .array([
+                "UISceneConfigurations": .dictionary([
+                    "UIWindowSceneSessionRoleApplication" : .array([
                         .dictionary([
-                            "UISceneConfigurationName": .string("Default Configuration"),
-                            "UISceneDelegateClassName": .string("$(PRODUCT_MODULE_NAME).SceneDelegate")
+                            "UISceneConfigurationName" : .string("Default Configuration"),
+                            "UISceneDelegateClassName" : .string("$(PRODUCT_MODULE_NAME).SceneDelegate")
                         ])
                     ])
-                ]
+                ])
             ]),
             "LSApplicationQueriesSchemes": [
                 "kakaokompassauth",
@@ -41,12 +42,12 @@ extension InfoPlist {
                 "kakaoplus",
                 "instagram-stories"
             ],
-            "KAKAO_NATIVE_APP_KEY": .string("${KAKAO_NATIVE_APP_KEY}"),
+            "KAKAO_NATIVE_APP_KEY": .string("$(KAKAO_NATIVE_APP_KEY)"),
             "CFBundleURLTypes": .array([
                 .dictionary([
                     "CFBundleTypeRole": .string("Editor"),
                     "CFBundleURLSchemes": .array([
-                        .string("kakao${KAKAO_NATIVE_APP_KEY}")
+                        .string("$(KAKAO_API_KEY)")
                     ])
                 ])
             ]),
@@ -59,7 +60,7 @@ extension InfoPlist {
                 .string("Pretendard-Medium.otf"),
                 .string("Pretendard-SemiBold.otf")
             ]),
-            "BASE_URL": .string("https://7b99aa13-6125-4dea-b4e0-2c99c33e5c51.mock.pstmn.io/api/v1"),
+            "BASE_URL": .string("https://wespot.kro.kr/api/v1"),
             "NSAppleIDUsageDescription": .string("로그인에 Apple ID를 사용합니다."),
             "aps-environment": .string("development") 
         ]

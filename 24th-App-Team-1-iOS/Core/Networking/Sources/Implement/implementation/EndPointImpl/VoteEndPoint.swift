@@ -6,11 +6,19 @@
 //
 
 import Foundation
+import Storage
 
 import Alamofire
 
 
 public enum VoteEndPoint: WSNetworkEndPoint {
+    private var accessToken: String {
+        guard let accessToken = KeychainManager.shared.get(type: .accessToken) else {
+            return ""
+        }
+        return accessToken
+    }
+    
     /// 반 친구 조회 API
     case fetchClassMates
     /// 질문지 조회 API
@@ -92,8 +100,7 @@ public enum VoteEndPoint: WSNetworkEndPoint {
     public var headers: HTTPHeaders {
         return [
             "Content-Type": "application/json",
-            //TODO: AccessToken 값 넣기
-            "Authorization": "Bearer testToken"
+            "Authorization": "Bearer \(accessToken)"
         ]
     }
     

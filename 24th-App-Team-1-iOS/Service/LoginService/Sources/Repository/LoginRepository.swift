@@ -27,37 +27,34 @@ public final class LoginRepository: LoginRepositoryProtocol {
         
         return networkService.request(endPoint: endPoint)
             .asObservable()
-            .logErrorIfDetected(category: Network.error)
             .decodeMap(CreateSignUpTokenResponseDTO.self)
+            .logErrorIfDetected(category: Network.error)
             .map { $0.toDomain() }
             .asSingle()
     }
     
-    public func createExistingMember(body: CreateSignUpTokenRequest) -> Single<CreateAccountResponseEntity?> {
+    public func createExistingMember(body: CreateSignUpTokenRequest) -> Single<Bool> {
         let body = CreateSignUpTokenRequestDTO(socialType: body.socialType, authorizationCode: body.authorizationCode, identityToken: body.identityToken, fcmToken: body.fcmToken)
         let endPoint = LoginEndPoint.createSocialLogin(body)
         
-        dump(body)
-        
         return networkService.request(endPoint: endPoint)
             .asObservable()
+            .map { _ in true }
+            .catchAndReturn(false)
             .logErrorIfDetected(category: Network.error)
-            .decodeMap(CreateAccountResponseDTO.self)
-            .map { $0.toDomain() }
             .asSingle()
     }
     
     
     
     public func createAccount(body: CreateAccountRequest) -> Single<CreateAccountResponseEntity?> {
-        let consents = ConsentsRequestDTO(marketing: body.consents?.marketing)
-        let body = CreateAccountRequestDTO(name: body.name, gender: body.gender, schoolId: body.schoolId, grade: body.grade, classNumber: body.classNumber, consents: consents, signUpToken: body.signUpToken)
+        let consents = ConsentsRequestDTO(marketing: body.consents.marketing)
+        let body = CreateAccountRequestDTO(name: body.name, gender: body.gender.uppercased(), schoolId: body.schoolId, grade: body.grade, classNumber: body.classNumber, consents: consents, signUpToken: body.signUpToken)
         let endPoint = LoginEndPoint.createAccount(body)
-        
         return networkService.request(endPoint: endPoint)
             .asObservable()
-            .logErrorIfDetected(category: Network.error)
             .decodeMap(CreateAccountResponseDTO.self)
+            .logErrorIfDetected(category: Network.error)
             .map { $0.toDomain() }
             .asSingle()
     }

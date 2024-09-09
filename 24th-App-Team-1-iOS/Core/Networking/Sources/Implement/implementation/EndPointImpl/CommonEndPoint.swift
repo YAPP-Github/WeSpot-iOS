@@ -6,10 +6,17 @@
 //
 
 import Foundation
+import Storage
 
 import Alamofire
 
 public enum CommonEndPoint: WSNetworkEndPoint {
+    private var accessToken: String {
+        guard let accessToken = KeychainManager.shared.get(type: .accessToken) else {
+            return ""
+        }
+        return accessToken
+    }
     
     // 비속어 검색 API
     case createProfanityCheck(Encodable)
@@ -19,17 +26,21 @@ public enum CommonEndPoint: WSNetworkEndPoint {
     case fetchBackgrounds
     // 유저 신고 API
     case createUserReport(Encodable)
+    /// 사용자 프로필 수정 API
+    case updateUserProfile(Encodable)
     
     public var path: String {
         switch self {
         case .createProfanityCheck:
             return "/check-profanity"
         case .fetchCharacters:
-            return "/users/signup/characters"
+            return "/users/characters"
         case .fetchBackgrounds:
-            return "/users/signup/backgrounds"
+            return "/users/backgrounds"
         case .createUserReport:
             return "/reports"
+        case .updateUserProfile:
+            return "/users/me"
         }
     }
     
@@ -43,6 +54,8 @@ public enum CommonEndPoint: WSNetworkEndPoint {
             return .get
         case .createUserReport:
             return .post
+        case .updateUserProfile:
+            return .put
         }
     }
     
@@ -56,12 +69,15 @@ public enum CommonEndPoint: WSNetworkEndPoint {
             return .none
         case let .createUserReport(body):
             return .requestBody(body)
+        case let .updateUserProfile(body):
+            return .requestBody(body)
         }
     }
     
     public var headers: HTTPHeaders {
         return [
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "Bearer \(accessToken)"
         ]
     }
 }

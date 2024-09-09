@@ -117,6 +117,12 @@ public final class MessageHomeViewController: BaseViewController<MessageHomeView
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        self.rx.viewWillAppear
+            .bind(with: self) { owner, _ in
+                owner.messageCardView.messageLottieView.toggleAnimation(isStatus: true)
+            }
+            .disposed(by: disposeBag)
+        
         let hour = Calendar.current.component(.hour, from: Date())
         
         if (17..<22).contains(hour) {

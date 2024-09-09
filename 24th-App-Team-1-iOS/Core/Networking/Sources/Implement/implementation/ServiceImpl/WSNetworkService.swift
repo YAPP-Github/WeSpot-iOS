@@ -33,7 +33,6 @@ public final class WSNetworkService: WSNetworkServiceProtocol {
     public func request(endPoint: URLRequestConvertible) -> Single<Data> {
         return Single<Data>.create { [weak self] single in
             let task = self?.session.request(endPoint)
-                .validate(statusCode: 200...299)
                 .responseData { response in
                     switch response.result {
                     case let .success(response):

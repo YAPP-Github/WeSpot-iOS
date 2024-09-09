@@ -79,10 +79,10 @@ struct TargetConfig {
         self.mergeable = mergeable
     }
     
-    func makeApp(with name: String, bundleId: String, product: Product = .app, dependencies: [TargetDependency]) -> Target {
+    func makeApp(with name: String, bundleId: String, product: Product = .app, dependencies: [TargetDependency], destinations: Destinations = [.iPhone]) -> Target {
         .target(
             name: name,
-            destinations: self.destinations,
+            destinations: destinations,
             product: product,
             productName: self.productName,
             bundleId: bundleId,
@@ -144,7 +144,7 @@ extension Target {
      - Returns: Target Type
      */
     public static func feature(module: ModulePaths.Feature, dependencies: [TargetDependency]) -> Self {
-        TargetConfig(infoPlist: .default, sources: .sources, dependencies: dependencies)
+        TargetConfig(infoPlist: .makeInfoPlist(), sources: .sources, dependencies: dependencies)
             .makeTarget(with: module.name, bundleId: module.bundleId, product: .framework)
     }
     
@@ -200,7 +200,7 @@ extension Target {
         - Returns: Target Type
      */
     public static func app(module: ModulePaths.App, dependencies: [TargetDependency]) -> Self {
-        TargetConfig(infoPlist: .makeInfoPlist() ,sources: .sources, resources: .resources, entitlements: .appEntitlements())
+        TargetConfig(infoPlist: .makeInfoPlist() ,sources: .sources, resources: .resources, entitlements: .appEntitlements(), settings: .makeAppSettings())
             .makeApp(with: module.appName, bundleId: module.appBundleId, dependencies: dependencies)
     }
 

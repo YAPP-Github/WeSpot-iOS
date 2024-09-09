@@ -9,7 +9,7 @@ import Foundation
 
 import ReactorKit
 
-public final class ProfileWebViewReactor: Reactor {
+public final class WSWebViewReactor: Reactor {
     
     
     public struct State {

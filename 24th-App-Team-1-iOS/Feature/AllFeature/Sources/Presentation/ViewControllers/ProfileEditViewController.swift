@@ -8,6 +8,7 @@
 import DesignSystem
 import UIKit
 import Util
+import Storage
 
 import Then
 import SnapKit
@@ -140,7 +141,8 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
         }
         
         profileImageView.do {
-            $0.image = DesignSystemAsset.Images.girl.image
+            guard let imageURL = URL(string: UserDefaultsManager.shared.userProfileImage ?? "") else { return }
+            $0.kf.setImage(with: imageURL)
         }
         
         characterCollectionView.do {
@@ -231,7 +233,7 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
             .disposed(by: disposeBag)
 
         reactor.state
-            .compactMap { "\($0.userProfileEntity.name)잘 나타낼 수 있는\n프로필을 선택해 주세요"}
+            .compactMap { "\($0.userProfileEntity.name)님을 잘 나타낼 수 있는\n프로필을 선택해 주세요"}
             .distinctUntilChanged()
             .bind(to: userDescrptionLabel.rx.text)
             .disposed(by: disposeBag)
@@ -242,14 +244,14 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
         
         reactor.state
             .compactMap { $0.userProfileEntity.profile.backgroundColor }
-            .map {UIColor(hex: $0) }
-            .distinctUntilChanged()
+            .map { UIColor(hex: $0) }
             .bind(to: profileContainerView.rx.backgroundColor)
             .disposed(by: disposeBag)
         
         reactor.state
             .compactMap { $0.userProfileEntity.profile.iconUrl }
             .distinctUntilChanged()
+            .observe(on: MainScheduler.asyncInstance)
             .bind(with: self) { owner, iconURL in
                 owner.profileImageView.kf.setImage(with: iconURL)
             }
@@ -259,7 +261,10 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
         reactor.pulse(\.$isUpdate)
             .filter { $0 == true }
             .bind(with: self) { owner, _ in
-                owner.showWSToast(image: .check, message: "수정 완료")
+                owner.showWSToast(image: .check, message: "수정 완료", delay: 1.0) {
+                    owner.navigationController?.popViewController(animated: true)
+                }
+
             }
             .disposed(by: disposeBag)
         
@@ -275,6 +280,20 @@ public final class ProfileEditViewController: BaseViewController<ProfileEditView
             .observe(on: MainScheduler.instance)
             .asDriver(onErrorJustReturn: [])
             .drive(characterCollectionView.rx.items(dataSource: characterDataSouces))
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.iconURL }
+            .bind(with: self) { owner, iconURL in
+                owner.profileImageView.kf.setImage(with: iconURL)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state.map{ $0.backgroundColor }
+            .filter { !$0.isEmpty }
+            .map { UIColor(hex: $0) }
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: profileContainerView.rx.backgroundColor)
             .disposed(by: disposeBag)
     }
 }

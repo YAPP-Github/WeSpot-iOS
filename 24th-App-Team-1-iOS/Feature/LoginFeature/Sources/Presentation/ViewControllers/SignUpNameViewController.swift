@@ -31,9 +31,6 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
     //MARK: - LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
-        nextButton.isEnabled = false
-        nameTextField.becomeFirstResponder()
     }
     
     //MARK: - Configure
@@ -100,10 +97,23 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        self.rx.viewWillAppear
+            .bind(with: self) { owner, _ in
+                owner.nameTextField.becomeFirstResponder()
+            }
+            .disposed(by: disposeBag)
+        
         nameTextField.rx.text.orEmpty
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .map { Reactor.Action.inputName($0) }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        reactor.pulse(\.$accountRequest)
+            .map { $0.name.isEmpty ? "다음" : "수정 완료" }
+            .take(1)
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: nextButton.rx.title())
             .disposed(by: disposeBag)
 
         reactor.state
@@ -142,6 +152,12 @@ public final class SignUpNameViewController: BaseViewController<SignUpNameViewRe
         
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.didTappedConfirmButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isConfirm)
+            .filter { $0 == true }
             .bind(with: self) { owner, _ in
                 let signUpResultViewController = DependencyContainer.shared.injector.resolve(SignUpResultViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName )
                 owner.navigationController?.pushViewController(signUpResultViewController, animated: true)

@@ -22,7 +22,7 @@ public final class MessageCardView: UIView {
     
     // MARK: - Properties
     private let messageContanierView = UIView()
-    private let messageImageView = UIImageView()
+    let messageLottieView = WSLottieView()
     private let messageTitleLabel = WSLabel(wsFont: .Body01)
     public let messageButton = WSButton(wsButtonType: .default(12))
     private let messageTimerNoticeLabel = WSLabel(wsFont: .Body09, text: "쪽지 전달까지 남은 시간")
@@ -52,7 +52,7 @@ public final class MessageCardView: UIView {
     // MARK: - Functions
     private func setupUI() {
         addSubviews(messageContanierView, messageContainerUnderLabel)
-        messageContanierView.addSubviews(messageImageView, messageTitleLabel, messageTimerNoticeLabel,messageTimerImageView, messageTimerLabel, messageButton)
+        messageContanierView.addSubviews(messageLottieView, messageTitleLabel, messageTimerNoticeLabel,messageTimerImageView, messageTimerLabel, messageButton)
     }
     
     private func setupAttributes() {
@@ -62,9 +62,10 @@ public final class MessageCardView: UIView {
             $0.layer.cornerRadius = 18
         }
         
-        messageImageView.do {
-            $0.contentMode = .scaleAspectFit
-            $0.image = DesignSystemAsset.Images.imgMessageHomeLetterOpen.image
+        messageLottieView.do {
+            $0.lottieView.animation = DesignSystemAnimationAsset.bgMessageOpenAnimate.animation
+            $0.isStatus = true
+            $0.lottieView.loopMode = .playOnce
         }
         
         messageTitleLabel.do {
@@ -86,6 +87,7 @@ public final class MessageCardView: UIView {
         messageTimerLabel.do {
             $0.font = DesignSystemFontFamily.Pretendard.bold.font(size: 28)
             $0.textColor = DesignSystemAsset.Colors.gray100.color
+            $0.textAlignment = .center
         }
     }
     
@@ -106,10 +108,10 @@ public final class MessageCardView: UIView {
             $0.horizontalEdges.equalToSuperview().inset(28)
         }
         
-        messageImageView.snp.makeConstraints {
+        messageLottieView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(20)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(messageImageView.snp.width)
+            $0.height.equalTo(messageLottieView.snp.width)
         }
         
         messageTimerNoticeLabel.snp.makeConstraints {
@@ -118,14 +120,14 @@ public final class MessageCardView: UIView {
         }
         
         messageTimerImageView.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(105)
+            $0.right.equalTo(messageTimerLabel.snp.left).offset(-10)
             $0.size.equalTo(20)
             $0.centerY.equalTo(messageTimerLabel)
         }
         
         messageTimerLabel.snp.makeConstraints {
-            $0.leading.equalTo(messageTimerImageView.snp.trailing).offset(10)
             $0.height.equalTo(39)
+            $0.centerX.equalTo(messageLottieView)
             $0.bottom.equalToSuperview().inset(92)
         }
         
@@ -143,7 +145,8 @@ public final class MessageCardView: UIView {
             messageTimerNoticeLabel.isHidden = true
             messageTimerImageView.isHidden = true
             messageTimerLabel.isHidden = true
-            messageImageView.image = DesignSystemAsset.Images.imgMessageHomeLetterOpen.image
+            messageLottieView.lottieView.animation = DesignSystemAnimationAsset.bgMessageOpenAnimate.animation
+            messageLottieView.isStatus = true
             messageTitleLabel.text = "당신을 설레게 한 친구에게\n익명 쪽지로 마음을 표현해보세요"
             messageContainerUnderLabel.text = ""
             messageButton.do {
@@ -155,7 +158,8 @@ public final class MessageCardView: UIView {
             messageTimerNoticeLabel.isHidden = false
             messageTimerImageView.isHidden = false
             messageTimerLabel.isHidden = false
-            messageImageView.image = DesignSystemAsset.Images.imgMessageHomeLetterOpen.image
+            messageLottieView.lottieView.animation = DesignSystemAnimationAsset.bgMessageOpenAnimate.animation
+            messageLottieView.isStatus = true
             messageTitleLabel.text = "당신을 설레게 한 친구에게\n익명 쪽지로 마음을 표현해보세요"
             messageContainerUnderLabel.text = "서로의 쪽지는 밤 10시에 전달해드릴게요"
             messageButton.do {
@@ -166,7 +170,8 @@ public final class MessageCardView: UIView {
             messageTimerNoticeLabel.isHidden = true
             messageTimerImageView.isHidden = true
             messageTimerLabel.isHidden = true
-            messageImageView.image = DesignSystemAsset.Images.imgMessageHomeLetterClose.image
+            messageLottieView.lottieView.animation = DesignSystemAnimationAsset.bgMessageCloseAnimate.animation
+            messageLottieView.isStatus = true
             messageTitleLabel.text = "모두의 소중한 마음이\n상대에게 무사히 전달되었어요"
             messageContainerUnderLabel.text = "내일 저녁 5시에 새로운 쪽지를 보낼 수 있어요"
             messageButton.do {

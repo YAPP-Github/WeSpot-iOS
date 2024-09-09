@@ -19,7 +19,7 @@ final class VoteEmptyCollectionViewCell: UICollectionViewCell {
     private let fourthPositionView: VoteVerticalRankerView = VoteVerticalRankerView()
     private let fifthPositionView: VoteVerticalRankerView = VoteVerticalRankerView()
     private let effectView: UIBlurEffect = UIBlurEffect(style: .dark)
-    private lazy var visualEffectView: WSIntensityVisualEffectView = WSIntensityVisualEffectView(effect: effectView, intensity: 0.3)
+    private lazy var visualEffectView: WSIntensityVisualEffectView = WSIntensityVisualEffectView(effect: effectView, intensity: 0.15)
     private let emptyVoteTitleLabel: WSLabel = WSLabel(wsFont: .Header01)
     var disposeBag: DisposeBag = DisposeBag()
     

@@ -59,9 +59,9 @@ public final class VoteInventoryViewReactor: Reactor {
             sentEntity: nil,
             receiveEntity: nil,
             inventorySection: [
-                .voteSentInfo(header: "", items: []),
-                .voteReceiveInfo(header: "", items: [])
-            ], 
+                .voteSentInfo(items: []),
+                .voteReceiveInfo(items: [])
+            ],
             isLoading: false,
             isEmpty: true,
             inventoryType: .receive
@@ -73,22 +73,26 @@ public final class VoteInventoryViewReactor: Reactor {
         
         switch action {
         case .fetchReceiveItems:
-            let receiveQuery = VoteReceiveRequestQuery(cursorId: "1")
+            let receiveQuery = VoteReceiveRequestQuery(cursorId: "0")
             return fetchVoteReceiveItemUseCase
                 .execute(query: receiveQuery)
                 .asObservable()
                 .flatMap { entity -> Observable<Mutation> in
                     guard let originalEntity = entity else {
                         return .concat(
+                            .just(.setLoading(false)),
                             .just(.setInventoryType(.receive)),
-                            .just(.setEmptyItems(false))
+                            .just(.setEmptyItems(false)),
+                            .just(.setLoading(true))
                         )
                     }
                     
                     if originalEntity.response.isEmpty {
                         return .concat(
+                            .just(.setLoading(false)),
                             .just(.setInventoryType(.receive)),
-                            .just(.setEmptyItems(false))
+                            .just(.setEmptyItems(false)),
+                            .just(.setLoading(true))
                         )
                     } else {
                         let receiveSection: [VoteInventorySection] = originalEntity.response.map { response in
@@ -103,7 +107,7 @@ public final class VoteInventoryViewReactor: Reactor {
                                 )
                             }
                             
-                            return .voteReceiveInfo(header: dateToString, items: receiveItem)
+                            return .voteReceiveInfo(items: receiveItem)
                         }
                         
                         return .concat(
@@ -117,7 +121,7 @@ public final class VoteInventoryViewReactor: Reactor {
                     }
                 }
         case .fetchSentItems:
-            let sentQuery = VoteSentRequestQuery(cursorId: "1")
+            let sentQuery = VoteSentRequestQuery(cursorId: "0")
             return fetchVoteSentItemUseCase
                 .execute(query: sentQuery)
                 .asObservable()
@@ -140,7 +144,6 @@ public final class VoteInventoryViewReactor: Reactor {
                         )
                     } else {
                         let sentSection: [VoteInventorySection] = originalEntity.response.map { response in
-                            let dateToString = response.date.toDate(with: .dashYyyyMMdd).toFormatRelative()
                             let sentItem: [VoteInventoryItem] = response.sentResponse.map {
                                 return .voteSentItem(
                                     VoteSentCellReactor(
@@ -150,7 +153,7 @@ public final class VoteInventoryViewReactor: Reactor {
                                     )
                                 )
                             }
-                            return .voteSentInfo(header: dateToString, items: sentItem)
+                            return .voteSentInfo(items: sentItem)
                         }
                         return .concat(
                             .just(.setLoading(false)),
@@ -161,7 +164,7 @@ public final class VoteInventoryViewReactor: Reactor {
                             .just(.setLoading(true))
                         )
                     }
-            }
+                }
         case .fetchMoreItems:
             switch currentState.inventoryType {
             case .receive:
@@ -171,14 +174,19 @@ public final class VoteInventoryViewReactor: Reactor {
                 return fetchVoteReceiveItemUseCase
                     .execute(query: receiveQuery)
                     .asObservable()
-                    .filter { $0?.isLastPage == false }
                     .compactMap{ $0 }
                     .withUnretained(self)
                     .flatMap { owner ,entity -> Observable<Mutation> in
-                    
                         var originalSection = owner.currentState.inventorySection
+                        if entity.response.isEmpty {
+                            return .concat(
+                                .just(.setLoading(false)),
+                                .just(.setInventoryType(.receive)),
+                                .just(.setInventorySection(originalSection)),
+                                .just(.setLoading(true))
+                            )
+                        }
                         let receiveSection: [VoteInventorySection] = entity.response.map { response in
-                            let dateToString = response.date.toDate(with: .dashYyyyMMdd).toFormatRelative()
                             
                             let receiveItem: [VoteInventoryItem] = response.receiveResponse.map {
                                 return .voteReceiveItem(
@@ -189,7 +197,7 @@ public final class VoteInventoryViewReactor: Reactor {
                                     )
                                 )
                             }
-                            return .voteReceiveInfo(header: dateToString, items: receiveItem)
+                            return .voteReceiveInfo(items: receiveItem)
                         }
                         
                         originalSection.append(contentsOf: receiveSection)
@@ -209,14 +217,20 @@ public final class VoteInventoryViewReactor: Reactor {
                 return fetchVoteSentItemUseCase
                     .execute(query: sentQuery)
                     .asObservable()
-                    .filter { $0?.isLastPage == false }
                     .compactMap { $0 }
                     .withUnretained(self)
                     .flatMap { owner, entity -> Observable<Mutation> in
-                        
                         var originalSection = owner.currentState.inventorySection
+                        if entity.response.isEmpty {
+                            return .concat(
+                                .just(.setLoading(false)),
+                                .just(.setInventoryType(.sent)),
+                                .just(.setInventorySection(originalSection)),
+                                .just(.setLoading(true))
+                            )
+                        }
+                        
                         let sentSection: [VoteInventorySection] = entity.response.map { response in
-                            let dateToString = response.date.toDate(with: .dashYyyyMMdd).toFormatRelative()
                             let sentItem: [VoteInventoryItem] = response.sentResponse.map {
                                 return .voteSentItem(
                                     VoteSentCellReactor(
@@ -226,23 +240,26 @@ public final class VoteInventoryViewReactor: Reactor {
                                     )
                                 )
                             }
-                            return .voteSentInfo(header: dateToString, items: sentItem)
+                            return .voteSentInfo(items: sentItem)
                         }
                         
                         originalSection.append(contentsOf: sentSection)
                         
                         return .concat(
+                            .just(.setLoading(false)),
                             .just(.setInventoryType(.sent)),
                             .just(.setInventorySection(originalSection)),
-                            .just(.setSentItems(entity))
+                            .just(.setSentItems(entity)),
+                            .just(.setLoading(true))
                         )
                     }
             }
             
         case let .didTappedItems(index, section):
-            let voteId = currentState.receiveEntity?.response[section].receiveResponse[index].voteOption.id ?? 0
-            
+            guard currentState.inventoryType == .receive else { return .empty() }
+            let voteId =  currentState.receiveEntity?.response[section].receiveResponse[index].voteOption.id ?? 0
             return .just(.setVoteId(voteId))
+            
         }
     }
     

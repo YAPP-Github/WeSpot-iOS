@@ -6,15 +6,21 @@
 //
 
 import Foundation
+import Storage
 
 import Alamofire
 
 
 public enum ProfileEndPoint: WSNetworkEndPoint {
+    private var accessToken: String {
+        guard let accessToken = KeychainManager.shared.get(type: .accessToken) else {
+            return ""
+        }
+        return accessToken
+    }
+    
     /// 사용자 프로필 조회 API
     case fetchUserProfile
-    /// 사용자 프로필 수정 API
-    case updateUserProfile(Encodable)
     /// 알람 설정 API
     case updateNotification(Encodable)
     /// 알람 설정 조회 API
@@ -29,8 +35,6 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
     public var path: String {
         switch self {
         case .fetchUserProfile:
-            return "/users/me"
-        case .updateUserProfile:
             return "/users/me"
         case .updateNotification:
             return "/users/settings"
@@ -49,8 +53,6 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
         switch self {
         case .fetchUserProfile:
             return .get
-        case .updateUserProfile:
-            return .put
         case .updateNotification:
             return .put
         case .fetchNotification:
@@ -66,8 +68,6 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
     
     public var parameters: WSRequestParameters {
         switch self {
-        case let .updateUserProfile(body):
-            return .requestBody(body)
         case let .updateNotification(body):
             return .requestBody(body)
         case let .fetchUserBlock(query):
@@ -80,7 +80,7 @@ public enum ProfileEndPoint: WSNetworkEndPoint {
     public var headers: HTTPHeaders {
         return [
             "Content-Type": "application/json",
-            "Authorization": "Bearer testToken"
+            "Authorization": "Bearer \(accessToken)"
         ]
     }
 }

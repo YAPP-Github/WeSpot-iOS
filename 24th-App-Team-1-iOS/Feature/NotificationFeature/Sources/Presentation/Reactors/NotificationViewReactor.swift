@@ -21,6 +21,7 @@ public final class NotificationViewReactor: Reactor {
         @Pulse var notificationSection: [NotificationSection]
         var notificationItems: [NotificationItem]
         @Pulse var notificationEntity: NotificationEntity?
+        @Pulse var notificationItemEntity: [NotificationItemEntity]
         @Pulse var isSelected: Bool
         @Pulse var selectedType: NotificationType
         @Pulse var isCurrentDate: Bool
@@ -35,6 +36,7 @@ public final class NotificationViewReactor: Reactor {
     public enum Mutation {
         case setNotificationSectionItems([NotificationItem])
         case setNotificationItems(NotificationEntity)
+        case setNotificationItemEntity([NotificationItemEntity])
         case setSelectedNotificationItem(Bool)
         case setSelectedNotificationDate(Bool)
         case setSelectedType(NotificationType)
@@ -49,6 +51,7 @@ public final class NotificationViewReactor: Reactor {
         self.initialState = State(
             notificationSection: [],
             notificationItems: [],
+            notificationItemEntity: [],
             isSelected: false,
             selectedType: .none,
             isCurrentDate: false
@@ -68,14 +71,13 @@ public final class NotificationViewReactor: Reactor {
                 .flatMap { entity -> Observable<Mutation> in
                     guard let entity else { return .empty() }
                     var notificationSectionItem: [NotificationItem] = []
-  
                     entity.notifications.forEach {
                         notificationSectionItem.append(
                             .userNotificationItem(
                                 NotificationCellReactor(
                                     content: $0.content,
-                                    date: $0.date,
-                                    isNew: $0.isNew, 
+                                    date: $0.createdAt.toDate(with: .yyyyMMddTHHmmssSSSSSS).toCustomFormatRelative(),
+                                    isNew: $0.isNew,
                                     isEnabled: $0.isEnable
                                 )
                             )
@@ -83,11 +85,12 @@ public final class NotificationViewReactor: Reactor {
                     }
                     return .concat(
                         .just(.setNotificationSectionItems(notificationSectionItem)),
+                        .just(.setNotificationItemEntity(entity.notifications)),
                         .just(.setNotificationItems(entity))
                     )
                 }
         case let .didTappedNotificationItem(item):
-            guard let response = currentState.notificationEntity?.notifications[item] else { return .empty() }
+            let response = currentState.notificationItemEntity[item]
             
             let path = String(response.id)
             let type = response.type
@@ -110,30 +113,33 @@ public final class NotificationViewReactor: Reactor {
             return fetchUserNotificationItemsUseCase
                 .execute(query: query)
                 .asObservable()
-                .filter { $0?.hasNext == false }
                 .withUnretained(self)
                 .flatMap { owner ,entity -> Observable<Mutation> in
-                    guard let entity else { return .empty() }
                     var displaySectionItem: [NotificationItem] = owner.currentState.notificationItems
+                    var displayNotificationEntity: [NotificationItemEntity] = owner.currentState.notificationItemEntity
                     var originalSectionItem: [NotificationItem] = []
+                    guard let entity,
+                          !entity.notifications.isEmpty else {
+                        return .just(.setNotificationSectionItems(displaySectionItem))
+                    }
                     
                     entity.notifications.forEach {
                         originalSectionItem.append(
                             .userNotificationItem(
                                 NotificationCellReactor(
                                     content: $0.content,
-                                    date: $0.date,
+                                    date: $0.createdAt.toDate(with: .yyyyMMddTHHmmssSSSSSS).toCustomFormatRelative(),
                                     isNew: $0.isNew,
                                     isEnabled: $0.isEnable
                                 )
                             )
                         )
                     }
-                    
+                    displayNotificationEntity.append(contentsOf: entity.notifications)
                     displaySectionItem.append(contentsOf: originalSectionItem)
-                    
                     return .concat(
                         .just(.setNotificationSectionItems(displaySectionItem)),
+                        .just(.setNotificationItemEntity(displayNotificationEntity)),
                         .just(.setNotificationItems(entity))
                     )
                 }
@@ -155,6 +161,8 @@ public final class NotificationViewReactor: Reactor {
             newState.isSelected = isSelected
         case let .setSelectedNotificationDate(isCurrentDate):
             newState.isCurrentDate = isCurrentDate
+        case let .setNotificationItemEntity(notificationItemEntity):
+            newState.notificationItemEntity = notificationItemEntity
         }
         
         return newState

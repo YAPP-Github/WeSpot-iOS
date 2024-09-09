@@ -10,6 +10,7 @@ import UIKit
 import Util
 
 import Then
+import Storage
 import SnapKit
 import RxSwift
 import RxCocoa
@@ -119,7 +120,7 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         }
         
         editButton.snp.makeConstraints {
-            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-12)
+            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-24)
             $0.horizontalEdges.equalToSuperview().inset(20)
             $0.height.equalTo(52)
         }
@@ -185,8 +186,6 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         scrollView.do {
             $0.canCancelContentTouches = true
         }
-        
-        
     }
     
     
@@ -218,24 +217,13 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        userIntroduceTextField.rx
-            .text.orEmpty
-            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
-            .scan("") { previous, new -> String in
-                if new.count > 20 {
-                  return previous
-                } else {
-                  return new
-                }
-            }.bind(to: userIntroduceTextField.rx.text)
-            .disposed(by: disposeBag)
-        
         userProfileEditButton
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .withLatestFrom(reactor.state.compactMap { $0.userProfileEntity})
             .bind(with: self) { owner, entity in
-                let profileEditViewController = DependencyContainer.shared.injector.resolve(ProfileEditViewController.self, argument: entity)
+                guard let backgroundcolor = UserDefaultsManager.shared.userBackgroundColor else { return }
+                let profileEditViewController = DependencyContainer.shared.injector.resolve(ProfileEditViewController.self, arguments: entity, backgroundcolor)
                 owner.navigationController?.pushViewController(profileEditViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -244,9 +232,8 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                let accountURL = URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSdFlTCYbGL4QDYJlzt8jeeeA-E3ITWIBeYS2B5cAZs2j8wosQ/viewform")!
-                let profileWebViewController = DependencyContainer.shared.injector.resolve(ProfileWebViewController.self, argument: accountURL)
-                owner.navigationController?.pushViewController(profileWebViewController, animated: true)
+                let privacyWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.accountInfo.urlString)
+                owner.navigationController?.pushViewController(privacyWebViewController, animated: true)
             }
             .disposed(by: disposeBag)
         
@@ -278,28 +265,49 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .disposed(by: disposeBag)
         
         
-        NotificationCenter.default
-            .rx.notification(UIResponder.keyboardWillShowNotification, object: nil)
-            .compactMap { $0.userInfo }
-            .map { userInfo -> CGFloat in
-                return (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue.height ?? 0
-            }
-            .bind(with: self) { owner, height in
-                if owner.userIntroduceTextField.isEditing {
-                    owner.containerView.frame.origin.y -= (height - 52)
-                    owner.didChangeButton(true)
-                }
-            }
-            .disposed(by: disposeBag)
+        NotificationCenter.default.rx
+            .notification(UIResponder.keyboardWillChangeFrameNotification)
+                   .compactMap { $0.userInfo }
+                   .map { userInfo -> CGFloat in
+                       let keyboardFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue ?? .zero
+                       let keyboardHeight = UIScreen.main.bounds.height - keyboardFrame.origin.y
+                       return keyboardHeight
+                   }
+                   .bind(with: self) { owner, keyboardHeight in
+                       let spacing: CGFloat = keyboardHeight == 384 ? 140 : 130
+                       owner.scrollView.contentInset.bottom = (keyboardHeight + spacing)
+                       owner.scrollView.verticalScrollIndicatorInsets.bottom = (keyboardHeight + spacing)
+                       owner.didChangeButton(true)
+                   }
+                   .disposed(by: disposeBag)
+        
         
         NotificationCenter.default
             .rx.notification(UIResponder.keyboardWillHideNotification, object: nil)
+            .observe(on: MainScheduler.asyncInstance)
             .bind(with: self) { owner, _ in
-                owner.containerView.frame.origin.y = 0
+                owner.scrollView.contentInset.bottom = .zero
+                owner.scrollView.verticalScrollIndicatorInsets.bottom = .zero
                 owner.didChangeButton(false)
             }
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isEnabled)
+            .bind(to: editButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        
+        userIntroduceTextField
+            .rx.text.orEmpty
+            .scan("") { previous, new -> String in
+                if new.count <= 20 {
+                    return previous
+                }
+                return new
+            }
+            .distinctUntilChanged()
+            .bind(to: userIntroduceTextField.rx.text)
+            .disposed(by: disposeBag)
         
         reactor.state
             .compactMap{ $0.userProfileEntity?.name }
@@ -309,6 +317,7 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         
         reactor.state
             .compactMap{ $0.userProfileEntity?.gender }
+            .map { $0 == "MALE" ? "남" : "여"}
             .distinctUntilChanged()
             .bind(to: userGenderTextFiled.rx.placeholderText)
             .disposed(by: disposeBag)
@@ -320,10 +329,17 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
             .bind(to: userClassInfoTextField.rx.placeholderText)
             .disposed(by: disposeBag)
         
-        reactor.state
-            .compactMap{ $0.userProfileEntity?.introduction }
+        reactor.pulse(\.$userProfileEntity)
+            .compactMap { $0?.introduction }
             .distinctUntilChanged()
             .bind(to: userIntroduceTextField.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.userProfileEntity?.profile.backgroundColor }
+            .distinctUntilChanged()
+            .map { UIColor(hex: $0)}
+            .bind(to: userContainerView.rx.backgroundColor)
             .disposed(by: disposeBag)
         
         reactor.state
@@ -350,6 +366,7 @@ public final class ProfileSettingViewController: BaseViewController<ProfileSetti
         reactor.state
             .map { $0.errorMessage }
             .distinctUntilChanged()
+            .observe(on: MainScheduler.asyncInstance)
             .bind(to: errorLabel.rx.text)
             .disposed(by: disposeBag)
         

@@ -23,7 +23,7 @@ public final class ProfileSettingViewReactor: Reactor {
         @Pulse var isUpdate: Bool
         @Pulse var isLoading: Bool
         var errorMessage: String
-        var isEnabled: Bool
+        @Pulse var isEnabled: Bool
         var introudce: String
     }
     
@@ -86,20 +86,23 @@ public final class ProfileSettingViewReactor: Reactor {
                 .flatMap { owner, isProfanity -> Observable<Mutation> in
                     if isProfanity {
                         return .concat(
-                            .just(.setCheckProfanityValidation(isProfanity)),
-                            .just(.setButtonEnabled(true)),
-                            .just(.setErrorDescriptionMessage("비속어가 포함되어 있어요"))
+                            .just(.setButtonEnabled(false)),
+                            .just(.setErrorDescriptionMessage("비속어가 포함되어 있어요")),
+                            .just(.setCheckProfanityValidation(isProfanity))
                         )
                     } else {
-                        let isDisabled = introduce == owner.currentState.userProfileEntity?.introduction ? false : true
                         
-                        let isValid = self.validationIntroduce(introduce)
+                        let isChanged = introduce != self.currentState.userProfileEntity?.introduction
+                        let isValid = introduce.count <= 20
+                        
+                        let isDisabled = !isChanged || !isValid
                         let errorMessage = isValid ? "" : "20자 이내로 입력 가능해요"
+                                
                         return .concat(
-                            .just(.setCheckProfanityValidation(isProfanity)),
-                            .just(.setUpdateIntroduce(introduce)),
-                            .just(.setButtonEnabled(isDisabled)),
-                            .just(.setErrorDescriptionMessage(errorMessage))
+                            .just(.setCheckProfanityValidation(!isValid)),
+                            .just(.setErrorDescriptionMessage(errorMessage)),
+                            .just(.setButtonEnabled(!isDisabled)),
+                            .just(.setUpdateIntroduce(introduce))
                         )
                     }
                 }
@@ -109,8 +112,7 @@ public final class ProfileSettingViewReactor: Reactor {
             guard let iconURL = currentState.userProfileEntity?.profile.iconUrl.absoluteString,
                   let backgroundColor = currentState.userProfileEntity?.profile.backgroundColor else { return .empty() }
             
-            let updateUserProfileItemBody = UpdateUserProfileItemRequest(backgroundColor: backgroundColor, iconUrl: iconURL)
-            let updateUserProfileBody = UpdateUserProfileRequest(introduction: currentState.introudce, profile: updateUserProfileItemBody)
+            let updateUserProfileBody = UpdateUserProfileRequest(introduction: currentState.introudce, backgroundColor: backgroundColor, iconUrl: iconURL)
             return updateUserProfileUseCase.execute(body: updateUserProfileBody)
                 .asObservable()
                 .flatMap { isUpdate -> Observable<Mutation> in

@@ -1,6 +1,7 @@
 {
-  "colors" : [
+  "images" : [
     {
+      "filename" : "ic_default_profile.svg",
       "idiom" : "universal"
     }
   ],

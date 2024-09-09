@@ -17,8 +17,7 @@ struct VoteMainPresentationAssembly: Assembly {
     func assemble(container: Container) {
         
         container.register(VoteMainViewReactor.self) { resolver in
-            let fetchClassMatesUseCase = resolver.resolve(FetchClassMatesUseCaseProtocol.self)!
-            return VoteMainViewReactor(fetchClassMatesUseCase: fetchClassMatesUseCase)
+            return VoteMainViewReactor()
         }
         
         container.register(VoteMainViewController.self) { resolver in
@@ -27,19 +26,13 @@ struct VoteMainPresentationAssembly: Assembly {
             return VoteMainViewController(reactor: reactor)
         }
         
-    }
-}
-
-
-struct VoteBeginPresentationAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(VoteBeginViewReactor.self) { _ in
-            return VoteBeginViewReactor()
+        container.register(VoteMainViewReactor.self) { (resolver, isProfileChanged: Bool)  in
+            return VoteMainViewReactor(isProfileChanged: isProfileChanged)
         }
         
-        container.register(VoteBeginViewController.self) { resolver in
-            let reactor = resolver.resolve(VoteBeginViewReactor.self)!
-            return VoteBeginViewController(reactor: reactor)
+        container.register(VoteMainViewController.self) { (resolver, isProfileChanged: Bool) in
+            let reactor = resolver.resolve(VoteMainViewReactor.self, argument: isProfileChanged)!
+            return VoteMainViewController(reactor: reactor)
         }
     }
 }

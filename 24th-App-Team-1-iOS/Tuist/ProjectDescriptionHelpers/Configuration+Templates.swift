@@ -22,12 +22,12 @@ public extension Configuration {
         switch type {
         case .dev:
             return .debug(
-                name: type.configurationName,
+                name: BuildTarget.dev.configurationName,
                 xcconfig: .relativeToXCConfig(type)
             )
         case .prd:
             return .release(
-                name: type.configurationName,
+                name: BuildTarget.prd.configurationName,
                 xcconfig: .relativeToXCConfig(type)
             )
         }

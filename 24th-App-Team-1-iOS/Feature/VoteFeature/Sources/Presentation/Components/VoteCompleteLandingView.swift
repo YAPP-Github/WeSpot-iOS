@@ -15,8 +15,8 @@ import RxCocoa
 final class VoteCompleteLandingView: UIView {
     
     private let landingLottieView: WSLottieView = WSLottieView()
-    private lazy var blurView: UIBlurEffect = UIBlurEffect(style: .systemUltraThinMaterial)
-    private lazy var visualEffectView: UIVisualEffectView = UIVisualEffectView(effect: blurView)
+    private let landingBlurEffectView: UIBlurEffect = UIBlurEffect(style: .dark)
+    private lazy var landingBlurView: WSIntensityVisualEffectView = WSIntensityVisualEffectView(effect: landingBlurEffectView, intensity: 0.3)
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,11 +30,11 @@ final class VoteCompleteLandingView: UIView {
     }
     
     private func setupUI() {
-        addSubviews(visualEffectView, landingLottieView)
+        addSubviews(landingBlurView, landingLottieView)
     }
     
     private func setupAutoLayout() {
-        visualEffectView.snp.makeConstraints {
+        landingBlurView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         
@@ -47,16 +47,10 @@ final class VoteCompleteLandingView: UIView {
     
     private func setupAttributes() {
         
-        visualEffectView.do {
-            $0.frame = bounds
-            $0.backgroundColor = .black.withAlphaComponent(0.1)
-            $0.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        }
-        
         landingLottieView.do {
             $0.lottieView.loopMode = .loop
             $0.lottieView.animation = DesignSystemAnimationAsset.bgVoteSwipeAnimate.animation
-            $0.isStauts = true
+            $0.isStatus = true
         }
     }
 }

@@ -6,10 +6,18 @@
 //
 
 import Foundation
+import Storage
 
 import Alamofire
 
 public enum ReissueEndPoint: WSNetworkEndPoint {
+    private var accessToken: String {
+        guard let accessToken = KeychainManager.shared.get(type: .accessToken) else {
+            return ""
+        }
+        return accessToken
+    }
+    
     case createReissueToken(body: Encodable)
     
     public var path: String {
@@ -39,7 +47,7 @@ public enum ReissueEndPoint: WSNetworkEndPoint {
         case .createReissueToken:
             return [
                 "Content-Type": "application/json",
-                "Authorization": "Bearer testToken"
+                "Authorization": "Bearer \(accessToken)"
             ]
         }
     }

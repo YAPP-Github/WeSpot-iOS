@@ -12,6 +12,7 @@ import Extensions
 import FirebaseCore
 import FirebaseMessaging
 import RxKakaoSDKAuth
+import KakaoSDKCommon
 import KakaoSDKAuth
 import RxKakaoSDKCommon
 
@@ -23,11 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         
         let appKey = Bundle.main.kakaoNativeAppKey
-        if !appKey.isEmpty {
-            RxKakaoSDK.initSDK(appKey: appKey)
-        } else {
-            return false
-        }
+        RxKakaoSDK.initSDK(appKey: appKey)
         
         //MARK: Firebase
         FirebaseApp.configure()
@@ -46,21 +43,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         application.registerForRemoteNotifications()
         Messaging.messaging().delegate = self
-        
         return true
     }
-    
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        if (AuthApi.isKakaoTalkLoginUrl(url)) {
-            return AuthController.rx.handleOpenUrl(url: url)
-        }
-        return false
-    }
-    
-    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print("Failed to register: \(error)")
-    }
-    
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
@@ -68,7 +52,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     // 백그라운드에서 푸시 알림을 탭했을 때 실행
     func application(_ application: UIApplication,
                      didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        print("APNS token: \(deviceToken)")
         Messaging.messaging().apnsToken = deviceToken
     }
     

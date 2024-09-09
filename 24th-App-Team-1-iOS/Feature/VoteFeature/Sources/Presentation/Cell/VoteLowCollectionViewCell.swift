@@ -19,6 +19,8 @@ final class VoteLowCollectionViewCell: UICollectionViewCell {
     private let rankLabel: WSLabel = WSLabel(wsFont: .Body01)
     private let userContainerView: UIView = UIView()
     private let userProfileImageView: UIImageView = UIImageView()
+    private lazy var effectView: UIBlurEffect = UIBlurEffect(style: .dark)
+    private lazy var visualEffectView: WSIntensityVisualEffectView = WSIntensityVisualEffectView(effect: effectView, intensity: 0.15)
     private let userNameLabel: WSLabel = WSLabel(wsFont: .Body02)
     private let introduceLabel: WSLabel = WSLabel(wsFont: .Body09)
     private let voteCountLabel: WSLabel = WSLabel(wsFont: .Body02)
@@ -37,7 +39,7 @@ final class VoteLowCollectionViewCell: UICollectionViewCell {
     
     private func setupUI() {
         userContainerView.addSubview(userProfileImageView)
-        contentView.addSubviews(rankLabel, userContainerView, userNameLabel, introduceLabel, voteCountLabel)
+        contentView.addSubviews(rankLabel, userContainerView, userNameLabel, introduceLabel, voteCountLabel, visualEffectView)
     }
     
     private func setupAutoLayout() {
@@ -55,8 +57,7 @@ final class VoteLowCollectionViewCell: UICollectionViewCell {
         }
         
         userProfileImageView.snp.makeConstraints {
-            $0.size.equalTo(30)
-            $0.center.equalToSuperview()
+            $0.edges.equalToSuperview()
         }
         
         userNameLabel.snp.makeConstraints {
@@ -78,19 +79,21 @@ final class VoteLowCollectionViewCell: UICollectionViewCell {
             $0.width.equalTo(38)
             $0.centerY.equalToSuperview()
         }
+        
+        visualEffectView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
     
     private func setupAttributes() {
         userContainerView.do {
             $0.layer.cornerRadius = 48 / 2
             $0.clipsToBounds = true
-            //TODO: 테스트 코드
             $0.backgroundColor = DesignSystemAsset.Colors.primary300.color
         }
         
         userProfileImageView.do {
-            //TODO: 테스트 코드
-            $0.image = DesignSystemAsset.Images.icCommonProfile427323024.image
+            $0.image = DesignSystemAsset.Images.imgVoteProfileBlueFiled.image
             $0.contentMode = .scaleAspectFill
         }
         
@@ -158,5 +161,31 @@ extension VoteLowCollectionViewCell: ReactorKit.View {
             .map { $0.introduction }
             .bind(to: introduceLabel.rx.text)
             .disposed(by: disposeBag)
+        
+        reactor.state
+            .filter { $0.voteCount == 0 }
+            .withUnretained(self)
+            .map { $0.0.updateLowRankerBackgrounImage(ranker: $0.1.rank)}
+            .bind(to: userProfileImageView.rx.image)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.voteCount != 0 }
+            .bind(to: visualEffectView.rx.isHidden)
+            .disposed(by: disposeBag)
     }
+}
+
+extension VoteLowCollectionViewCell {
+    private func updateLowRankerBackgrounImage(ranker: Int) -> UIImage {
+        switch ranker {
+        case 3:
+            return DesignSystemAsset.Images.imgVoteProfileGrayFiled.image
+        case 4:
+            return DesignSystemAsset.Images.imgVoteProfilePinkFiled.image
+        default:
+            return UIImage()
+        }
+    }
+    
 }

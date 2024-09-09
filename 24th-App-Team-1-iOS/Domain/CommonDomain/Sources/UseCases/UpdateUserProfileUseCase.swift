@@ -17,13 +17,13 @@ public protocol UpdateUserProfileUseCaseProtocol {
 
 public final class UpdateUserProfileUseCase: UpdateUserProfileUseCaseProtocol {
     
-    public let profileRepository: ProfileRepositoryProtocol
+    public let commonRepository: CommonRepositoryProtocol
     
-    public init(profileRepository: ProfileRepositoryProtocol) {
-        self.profileRepository = profileRepository
+    public init(commonRepository: CommonRepositoryProtocol) {
+        self.commonRepository = commonRepository
     }
     
     public func execute(body: UpdateUserProfileRequest) -> Single<Bool> {
-        return profileRepository.updateUserProfileItem(body: body)
+        return commonRepository.updateUserProfileItem(body: body)
     }
 }

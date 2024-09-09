@@ -117,6 +117,12 @@ public final class SignUpClassViewController: BaseViewController<SignUpClassView
             .disposed(by: disposeBag)
         
         reactor.state
+            .map { $0.accountRequest.gender.isEmpty ? "다음" : "수정 완료" }
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: nextButton.rx.title())
+            .disposed(by: disposeBag)
+        
+        reactor.state
             .map { $0.isEnabledButton }
             .bind(to: warningLabel.rx.isHidden)
             .disposed(by: disposeBag)
@@ -128,9 +134,21 @@ public final class SignUpClassViewController: BaseViewController<SignUpClassView
         
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                let signUpGenderViewController = DependencyContainer.shared.injector.resolve(SignUpGenderViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
-                owner.navigationController?.pushViewController(signUpGenderViewController, animated: true)
+            .map { Reactor.Action.didTappedNextButton}
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        
+        reactor.pulse(\.$isSelected)
+            .filter { $0 == true }
+            .withLatestFrom(reactor.state.map { $0.accountRequest})
+            .bind(with: self) { owner, response in
+                if response.gender.isEmpty {
+                    let signUpGenderViewController = DependencyContainer.shared.injector.resolve(SignUpGenderViewController.self, arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
+                    owner.navigationController?.pushViewController(signUpGenderViewController, animated: true)
+                } else {
+                    owner.navigationController?.popViewController(animated: true)
+                }
             }
             .disposed(by: disposeBag)
     }

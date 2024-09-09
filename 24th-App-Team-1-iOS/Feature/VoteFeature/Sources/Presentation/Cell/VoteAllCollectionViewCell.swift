@@ -68,7 +68,6 @@ final class VoteAllCollectionViewCell: UICollectionViewCell {
         descrptionLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.horizontalEdges.equalToSuperview().inset(30)
-            $0.height.equalTo(60)
         }
         
         completeAllCollectionView.snp.makeConstraints {

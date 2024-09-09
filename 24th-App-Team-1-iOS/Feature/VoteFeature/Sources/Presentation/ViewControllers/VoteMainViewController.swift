@@ -7,6 +7,7 @@
 
 import UIKit
 import Util
+import Storage
 
 import Then
 import SnapKit
@@ -63,10 +64,30 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
 
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
-            
-        Observable.just(())
-            .map { Reactor.Action.viewDidLoad }
-            .bind(to: reactor.action)
+        
+        reactor.pulse(\.$isProfileUpdate)
+            .filter { $0 == true }
+            .bind(with: self) { owner, _ in
+                owner.showWSToast(image: .check, message: "프로필 설정 완료")
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.isProfileChanged }
+            .filter { $0 == false }
+            .take(1)
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(with: self) { owner, _ in
+                WSAlertBuilder(showViewController: owner)
+                     .setAlertType(type: .titleWithMeesage)
+                     .setTitle(title: "프로필 설정을 해볼까요", titleAlignment: .left)
+                     .setMessage(message: "친구들이 알아볼 수 있도록\n캐릭터 선택과 한 줄 소개 작성을 완료해 주세요")
+                     .setCancel(text: "다음에 할게요")
+                     .setConfirm(text: "네 좋아요")
+                     .action(.confirm) {
+                         NotificationCenter.default.post(name: .showProfileImageViewController, object: nil)
+                     }
+                     .show()
+            }
             .disposed(by: disposeBag)
         
         voteToggleView.mainButton
@@ -85,7 +106,7 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
         
         navigationBar.rightBarButton
             .rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 NotificationCenter.default.post(name: .showNotifcationViewController, object: nil)
             }
@@ -105,19 +126,13 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
                 owner.navigationController?.pushViewController(voteEffectViewController, animated: true)
             }
             .disposed(by: disposeBag)
-                
+        
+        
         reactor.pulse(\.$isSelected)
             .filter { $0 == true }
-            .withLatestFrom(reactor.pulse(\.$voteClassMateEntity).compactMap { $0?.user.isEmpty})
-            .bind(with: self) { owner, isCheck in
-                if isCheck {
-                    let voteBegingViewController = DependencyContainer.shared.injector.resolve(VoteBeginViewController.self)
-                    owner.navigationController?.pushViewController(voteBegingViewController, animated: true)
-                    
-                } else {
-                    let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self)
-                    owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
-                }
+            .bind(with: self) { owner, _ in
+                let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self)
+                owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
             }
             .disposed(by: disposeBag)
     }

@@ -33,9 +33,6 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
     //MARK: - LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
-        setupBottomSheet()
-        showBottomSheet()
     }
     
     //MARK: - Configure
@@ -112,9 +109,22 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        self.rx.viewDidLoad
+            .bind(with: self) { owner, _ in
+                owner.setupBottomSheet()
+                owner.showBottomSheet()
+            }
+            .disposed(by: disposeBag)
+        
         reactor.state
             .map { $0.isGradeSelected }
             .bind(to: nextButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.accountRequest.classNumber == 0 ? "다음" : "수정 완료" }
+            .observe(on: MainScheduler.asyncInstance)
+            .bind(to: nextButton.rx.title())
             .disposed(by: disposeBag)
         
         gradeTextFieldtapGesture.rx.event
@@ -159,9 +169,20 @@ public final class SignUpGradeViewController: BaseViewController<SignUpGradeView
         
         nextButton.rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                let signUpClassViewController = DependencyContainer.shared.injector.resolve(SignUpClassViewController.self,  arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
-                owner.navigationController?.pushViewController(signUpClassViewController, animated: true)
+            .map { Reactor.Action.didTappedNextButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isSelected)
+            .filter { $0 == true }
+            .withLatestFrom(reactor.state.map { $0.accountRequest })
+            .bind(with: self) { owner, response in
+                if response.classNumber == 0 {
+                    let signUpClassViewController = DependencyContainer.shared.injector.resolve(SignUpClassViewController.self,  arguments: reactor.currentState.accountRequest, reactor.currentState.schoolName)
+                    owner.navigationController?.pushViewController(signUpClassViewController, animated: true)
+                } else {
+                    owner.navigationController?.popViewController(animated: true)
+                }
             }
             .disposed(by: disposeBag)
     }
