@@ -79,10 +79,10 @@ struct TargetConfig {
         self.mergeable = mergeable
     }
     
-    func makeApp(with name: String, bundleId: String, product: Product = .app, dependencies: [TargetDependency]) -> Target {
+    func makeApp(with name: String, bundleId: String, product: Product = .app, dependencies: [TargetDependency], destinations: Destinations = [.iPhone]) -> Target {
         .target(
             name: name,
-            destinations: self.destinations,
+            destinations: destinations,
             product: product,
             productName: self.productName,
             bundleId: bundleId,
