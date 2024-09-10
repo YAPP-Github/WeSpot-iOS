@@ -39,7 +39,6 @@
 			<key>NSPrivacyAccessedAPIType</key>
 			<string>UserDefaults</string>
 		</dict>
-		<dict/>
 	</array>
 	<key>NSPrivacyTracking</key>
 	<false/>
