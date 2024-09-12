@@ -37,7 +37,7 @@
 				<string>1C8F.1</string>
 			</array>
 			<key>NSPrivacyAccessedAPIType</key>
-			<string>UserDefaults</string>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
 		</dict>
 	</array>
 	<key>NSPrivacyTracking</key>
