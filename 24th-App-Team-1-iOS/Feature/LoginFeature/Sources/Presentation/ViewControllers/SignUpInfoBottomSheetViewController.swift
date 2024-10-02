@@ -82,15 +82,14 @@ public final class SignUpInfoBottomSheetViewController: BaseViewController<SignU
         }
         editButton.snp.makeConstraints {
             $0.top.equalTo(profileImageView.snp.bottom).offset(39.5)
-            $0.leading.equalToSuperview().offset(20)
+            $0.leading.equalToSuperview().inset(20)
             $0.height.equalTo(52)
-            $0.width.greaterThanOrEqualTo(162)
         }
         confirmButton.snp.makeConstraints {
             $0.top.equalTo(profileImageView.snp.bottom).offset(39.5)
             $0.leading.equalTo(editButton.snp.trailing).offset(11)
             $0.height.equalTo(52)
-            $0.width.greaterThanOrEqualTo(162)
+            $0.width.equalTo(editButton)
             $0.trailing.equalToSuperview().inset(20)
         }
     }
@@ -115,7 +114,7 @@ public final class SignUpInfoBottomSheetViewController: BaseViewController<SignU
         }
         
         profileImageView.do {
-            $0.image = DesignSystemAsset.Images.profile.image
+            $0.image = DesignSystemAsset.Images.icDefaultProfile.image
         }
         
         titleLabel.do {

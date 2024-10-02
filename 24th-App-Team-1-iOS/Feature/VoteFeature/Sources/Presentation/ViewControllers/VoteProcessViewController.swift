@@ -179,23 +179,23 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
         
         questionTableView.rx
             .itemSelected
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), latest: false, scheduler: MainScheduler.instance)
             .map { Reactor.Action.didTappedQuestionItem($0.item) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         resultButton.rx
             .tap
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), latest: false, scheduler: MainScheduler.instance)
             .map { Reactor.Action.didTappedResultButton }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
    
         Observable
-            .zip (
-                reactor.state.map { $0.processCount },
-                reactor.state.compactMap { $0.voteResponseEntity?.response.count }
+            .combineLatest (
+                reactor.pulse(\.$processCount),
+                reactor.pulse(\.$voteResponseEntity).compactMap { $0?.response.count }.distinctUntilChanged()
             )
             .observe(on: MainScheduler.asyncInstance)
             .map { "\($0.0)/\($0.1)"}
@@ -223,6 +223,8 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             )
             .filter { $0.1.count == $0.2 && $0.0?.response.count != $0.2 }
             .compactMap { ($0.0, $0.1, $0.2 + 1) }
+            .debug("process Check")
+            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, response in
                 let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self, arguments: response.0, response.1, response.2)
                 owner.navigationController?.pushViewController(voteProcessViewController, animated: true)

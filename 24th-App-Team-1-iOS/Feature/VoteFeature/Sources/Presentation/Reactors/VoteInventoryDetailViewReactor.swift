@@ -19,6 +19,7 @@ public final class VoteInventoryDetailViewReactor: Reactor {
         @Pulse var receiveEntity: VoteIndividualEntity?
         @Pulse var isLoading: Bool
         var voteId: Int
+        var voteDate: String
     }
     
     public enum Action {
@@ -32,12 +33,14 @@ public final class VoteInventoryDetailViewReactor: Reactor {
     
     public init(
         fetchIndividualItemUseCase: FetchIndividualItemUseCaseProtocol,
-        voteId: Int
+        voteId: Int,
+        voteDate: String
     ) {
         self.initialState = State(
             receiveEntity: nil,
             isLoading: false,
-            voteId: voteId
+            voteId: voteId,
+            voteDate: voteDate
         )
         self.fetchIndividualItemUseCase = fetchIndividualItemUseCase
     }
@@ -47,7 +50,7 @@ public final class VoteInventoryDetailViewReactor: Reactor {
         
         switch action {
         case .viewDidLoad:
-            let query = VoteIndividualQuery(date: Date().toFormatString(with: .dashYyyyMMdd))
+            let query = VoteIndividualQuery(date: currentState.voteDate)
             return fetchIndividualItemUseCase
                 .execute(id: currentState.voteId, query: query)
                 .asObservable()

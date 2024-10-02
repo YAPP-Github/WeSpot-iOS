@@ -22,17 +22,17 @@ public extension UIViewController {
     }
     
     func shareToInstagramStory(to view: UIView) {
-        guard let url = URL(string: "itms-apps://itunes.apple.com/app/"+"6661029016") else { return }
-        
+        guard let url = URL(string: "instagram-stories://share?source_application="+"123444") else { return }
+
         view.setNeedsLayout()
         let image = view.asImage()
         var imageData = image.pngData()
-        
+
         let pastboardItems: [String: Any] = ["com.instagram.sharedSticker.stickerImage": imageData]
         let pastboardOptions = [UIPasteboard.OptionsKey.expirationDate: Date().addingTimeInterval(300)]
-        
+
         UIPasteboard.general.setItems([pastboardItems], options: pastboardOptions)
-        
+
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
         } else {
@@ -44,7 +44,7 @@ public extension UIViewController {
     }
     
     func shareToKakaoTalk() {
-        let shareURL = URL(string: "itms-apps://itunes.apple.com/app/"+"6661029016")!
+        let shareURL = URL(string: "https://apps.apple.com/kr/app/instagram/id6661029016")!
         
         
         let shareViewController = UIActivityViewController(activityItems: [WSURLItemSource(wespotAppURL: shareURL)], applicationActivities: nil)

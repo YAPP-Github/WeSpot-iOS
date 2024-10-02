@@ -14,17 +14,18 @@ import Swinject
 struct VoteInventoryDetailPresentationAssembly: Assembly {
     
     func assemble(container: Container) {
-        container.register(VoteInventoryDetailViewReactor.self) { (resolver, voteId: Int) in
+        container.register(VoteInventoryDetailViewReactor.self) { (resolver, voteId: Int, voteDate: String) in
             let fetchIndividualUseCase = resolver.resolve(FetchIndividualItemUseCaseProtocol.self)!
             
             return VoteInventoryDetailViewReactor(
                 fetchIndividualItemUseCase: fetchIndividualUseCase,
-                voteId: voteId
+                voteId: voteId,
+                voteDate: voteDate
             )
         }
         
-        container.register(VoteInventoryDetailViewController.self) { (resolver, voteId: Int) in
-            let reactor = resolver.resolve(VoteInventoryDetailViewReactor.self, argument: voteId)!
+        container.register(VoteInventoryDetailViewController.self) { (resolver, voteId: Int, voteDate: String) in
+            let reactor = resolver.resolve(VoteInventoryDetailViewReactor.self, arguments: voteId, voteDate)!
             
             return VoteInventoryDetailViewController(reactor: reactor)
         }

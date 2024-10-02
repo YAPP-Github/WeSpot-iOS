@@ -136,7 +136,7 @@ public final class VoteInventoryDetailViewController: BaseViewController<VoteInv
         
         detailBackgroundImageView.do {
             $0.image = DesignSystemAsset.Images.bgResultGradation.image
-            $0.contentMode = .scaleAspectFill
+            $0.contentMode = .scaleToFill
         }
         
         detailContainerView.do {
@@ -193,9 +193,18 @@ public final class VoteInventoryDetailViewController: BaseViewController<VoteInv
         
         detailConfirmButton
             .rx.tap
-            .throttle(.microseconds(300), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
-                owner.shareToKakaoTalk()
+                let paymentWebViewController = DependencyContainer.shared.injector.resolve(WSWebViewController.self, argument: WSURLType.payment.urlString)
+                owner.navigationController?.pushViewController(paymentWebViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        detailSharedButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToInstagramStory(to: owner.view)
             }
             .disposed(by: disposeBag)
         

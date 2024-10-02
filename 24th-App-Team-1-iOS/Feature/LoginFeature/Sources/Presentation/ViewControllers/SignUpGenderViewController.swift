@@ -51,16 +51,15 @@ public final class SignUpGenderViewController: BaseViewController<SignUpGenderVi
         }
         boyCardButton.snp.makeConstraints {
             $0.top.equalTo(subTitleLabel.snp.bottom).offset(16)
-            $0.leading.greaterThanOrEqualTo(view.safeAreaLayoutGuide).offset(26)
-            $0.width.equalTo(152)
+            $0.left.equalTo(view.safeAreaLayoutGuide).inset(26)
             $0.height.equalTo(180)
         }
         girlCardButton.snp.makeConstraints {
             $0.top.equalTo(subTitleLabel.snp.bottom).offset(16)
-            $0.leading.equalTo(boyCardButton.snp.trailing).offset(20)
-            $0.trailing.greaterThanOrEqualTo(view.safeAreaLayoutGuide).inset(26)
-            $0.width.equalTo(152)
+            $0.left.equalTo(boyCardButton.snp.right).offset(20)
+            $0.right.equalTo(view.safeAreaLayoutGuide).inset(26)
             $0.height.equalTo(180)
+            $0.width.equalTo(boyCardButton)
         }
     }
     
