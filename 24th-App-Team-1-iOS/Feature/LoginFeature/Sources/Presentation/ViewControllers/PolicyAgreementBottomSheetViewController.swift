@@ -24,7 +24,7 @@ public final class PolicyAgreementBottomSheetViewController: BaseViewController<
     private let allAggreementButton = SelectPolicyAgreementView(text: "전체 동의하기", font: .Body04, isHiddenDetailButton: true)
     private let serviceAgreementButton = SelectPolicyAgreementView(text: "(필수) 서비스 이용약관")
     private let privacyAgreementButton = SelectPolicyAgreementView(text: "(필수) 개인정보 수집 및 이용 안내")
-    public let marketingAgreementButton = SelectPolicyAgreementView(text: "(선택) 이벤트 및 마케팇 수신 동의")
+    public let marketingAgreementButton = SelectPolicyAgreementView(text: "(선택) 이벤트 및 마케팅 수신 동의")
     
     
     public override func viewDidLoad() {

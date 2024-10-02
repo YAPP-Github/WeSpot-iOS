@@ -35,6 +35,8 @@ public enum WSURLType {
     case privacyTerms
     /// 마케팅 정보 수신 이용 약관
     case marketingTerms
+    /// 결제 렌딩 링크
+    case payment
     
     
     public var urlString: URL {
@@ -65,6 +67,8 @@ public enum WSURLType {
             return URL(string: "https://www.notion.so/2fa1c3002e14460f91462204b0daefbf")!
         case .marketingTerms:
             return URL(string: "https://www.notion.so/b14afbb4f9194b5881fd198c8538aba8")!
+        case .payment:
+            return URL(string: "https://payforresult.imweb.me/")!
         }
     }
 }

@@ -159,9 +159,12 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
     public override func bind(reactor: Reactor) {
         super.bind(reactor: reactor)
         
+        self.inventoryTableView
+            .rx.setDelegate(self)
+            .disposed(by: disposeBag)
         
-        Observable.just(())
-            .map { Reactor.Action.fetchReceiveItems }
+        self.rx.viewWillAppear
+            .map { _ in Reactor.Action.fetchReceiveItems }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -197,19 +200,20 @@ public final class VoteInventoryViewController: BaseViewController<VoteInventory
             .map { _ in Reactor.Action.fetchMoreItems }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
-        inventoryTableView
-            .rx.setDelegate(self)
-            .disposed(by: disposeBag)
        
-        reactor.pulse(\.$voteId)
-            .filter { $0 != nil }
-            .bind(with: self) { owner, voteId in
-                guard let voteId else { return }
-                let voteInventoryDetailViewController = DependencyContainer.shared.injector.resolve(VoteInventoryDetailViewController.self, argument: voteId)
+        Observable
+            .zip(
+                reactor.pulse(\.$voteId),
+                reactor.pulse(\.$voteDate)
+            )
+            .filter { $0.0 != nil }
+            .bind(with: self) { owner, response in
+                guard let voteId = response.0 else { return }
+                let voteInventoryDetailViewController = DependencyContainer.shared.injector.resolve(VoteInventoryDetailViewController.self, arguments: voteId, response.1)
                 owner.navigationController?.pushViewController(voteInventoryDetailViewController, animated: true)
             }
             .disposed(by: disposeBag)
+        
         
         reactor.pulse(\.$inventorySection)
             .asDriver(onErrorJustReturn: [])
@@ -269,11 +273,11 @@ extension VoteInventoryViewController: UITableViewDelegate {
         guard let titleView = tableView.dequeueReusableHeaderFooterView(withIdentifier: VoteInventoryId.voteInventoryHeaderCell) as? VoteInventoryHeaderFooterView else { return UITableViewHeaderFooterView() }
         switch inventoryTableViewDataSources[section] {
         case .voteReceiveInfo:
-            guard let dateToString = self.reactor?.currentState.receiveEntity?.response[section].date.toDate(with: .dashYyyyMMdd).toFormatRelative() else { return UITableViewHeaderFooterView() }
+            guard let dateToString = self.reactor?.currentState.receiveResponseEntity?[section].date.toDate(with: .dashYyyyMMdd).toFormatRelative() else { return UITableViewHeaderFooterView() }
             titleView.bind(text: dateToString)
             return titleView
         case .voteSentInfo:
-            guard let dateSentString = self.reactor?.currentState.sentEntity?.response[section].date.toDate(with: .dashYyyyMMdd).toFormatRelative() else { return UITableViewHeaderFooterView() }
+            guard let dateSentString = self.reactor?.currentState.sentResponseEntity?[section].date.toDate(with: .dashYyyyMMdd).toFormatRelative() else { return UITableViewHeaderFooterView() }
             titleView.bind(text: dateSentString)
             return titleView
         }

@@ -25,11 +25,14 @@ public final class VoteInventoryViewReactor: Reactor {
     public struct State {
         @Pulse var sentEntity: VoteSentEntity?
         @Pulse var receiveEntity: VoteRecevieEntity?
+        @Pulse var receiveResponseEntity: [VoteReceiveItemEntity]?
+        @Pulse var sentResponseEntity: [VoteSentItemEntity]?
         @Pulse var inventorySection: [VoteInventorySection]
         @Pulse var isLoading: Bool
         var isEmpty: Bool
         var inventoryType: InventoryType
         @Pulse var voteId: Int?
+        @Pulse var voteDate: String
     }
     
     public enum Action {
@@ -43,8 +46,10 @@ public final class VoteInventoryViewReactor: Reactor {
         case setInventorySection([VoteInventorySection])
         case setReceiveItems(VoteRecevieEntity)
         case setSentItems(VoteSentEntity)
+        case setReceiveResposeItem([VoteReceiveItemEntity])
+        case setSentResponseItem([VoteSentItemEntity])
         case setEmptyItems(Bool)
-        case setVoteId(Int)
+        case setVoteId(Int, String)
         case setLoading(Bool)
         case setInventoryType(InventoryType)
     }
@@ -64,7 +69,8 @@ public final class VoteInventoryViewReactor: Reactor {
             ],
             isLoading: false,
             isEmpty: true,
-            inventoryType: .receive
+            inventoryType: .receive,
+            voteDate: ""
         )
     }
     
@@ -96,7 +102,6 @@ public final class VoteInventoryViewReactor: Reactor {
                         )
                     } else {
                         let receiveSection: [VoteInventorySection] = originalEntity.response.map { response in
-                            let dateToString = response.date.toDate(with: .dashYyyyMMdd).toFormatRelative()
                             let receiveItem: [VoteInventoryItem] = response.receiveResponse.map {
                                 return .voteReceiveItem(
                                     VoteReceiveCellReactor(
@@ -114,8 +119,9 @@ public final class VoteInventoryViewReactor: Reactor {
                             .just(.setLoading(false)),
                             .just(.setEmptyItems(true)),
                             .just(.setInventoryType(.receive)),
-                            .just(.setInventorySection(receiveSection)),
                             .just(.setReceiveItems(originalEntity)),
+                            .just(.setReceiveResposeItem(originalEntity.response)),
+                            .just(.setInventorySection(receiveSection)),
                             .just(.setLoading(true))
                         )
                     }
@@ -160,6 +166,7 @@ public final class VoteInventoryViewReactor: Reactor {
                             .just(.setEmptyItems(true)),
                             .just(.setInventoryType(.sent)),
                             .just(.setInventorySection(sentSection)),
+                            .just(.setSentResponseItem(originalEntity.response)),
                             .just(.setSentItems(originalEntity)),
                             .just(.setLoading(true))
                         )
@@ -169,6 +176,7 @@ public final class VoteInventoryViewReactor: Reactor {
             switch currentState.inventoryType {
             case .receive:
                 let cursorId = String(currentState.receiveEntity?.lastCursorId ?? 0)
+                var receiveResponse = currentState.receiveResponseEntity ?? []
                 let receiveQuery = VoteReceiveRequestQuery(cursorId: cursorId)
                 
                 return fetchVoteReceiveItemUseCase
@@ -199,19 +207,21 @@ public final class VoteInventoryViewReactor: Reactor {
                             }
                             return .voteReceiveInfo(items: receiveItem)
                         }
-                        
+                        receiveResponse.append(contentsOf: entity.response)
                         originalSection.append(contentsOf: receiveSection)
                         return .concat(
                             .just(.setLoading(false)),
-                            .just(.setInventoryType(.receive)),
-                            .just(.setInventorySection(originalSection)),
                             .just(.setReceiveItems(entity)),
+                            .just(.setInventorySection(originalSection)),
+                            .just(.setReceiveResposeItem(receiveResponse)),
+                            .just(.setInventoryType(.receive)),
                             .just(.setLoading(true))
                         )
                     }
                 
             case .sent:
                 let cursorId = String(currentState.sentEntity?.lastCursorId ?? 0)
+                var sentResponse = currentState.sentResponseEntity ?? []
                 let sentQuery = VoteSentRequestQuery(cursorId: cursorId)
                 
                 return fetchVoteSentItemUseCase
@@ -242,13 +252,14 @@ public final class VoteInventoryViewReactor: Reactor {
                             }
                             return .voteSentInfo(items: sentItem)
                         }
-                        
+                        sentResponse.append(contentsOf: entity.response)
                         originalSection.append(contentsOf: sentSection)
                         
                         return .concat(
                             .just(.setLoading(false)),
                             .just(.setInventoryType(.sent)),
                             .just(.setInventorySection(originalSection)),
+                            .just(.setSentResponseItem(sentResponse)),
                             .just(.setSentItems(entity)),
                             .just(.setLoading(true))
                         )
@@ -257,8 +268,9 @@ public final class VoteInventoryViewReactor: Reactor {
             
         case let .didTappedItems(index, section):
             guard currentState.inventoryType == .receive else { return .empty() }
-            let voteId =  currentState.receiveEntity?.response[section].receiveResponse[index].voteOption.id ?? 0
-            return .just(.setVoteId(voteId))
+            let voteId = currentState.receiveResponseEntity?[section].receiveResponse[index].voteOption.id ?? 0
+            let voteDate = currentState.receiveResponseEntity?[section].date ?? ""
+            return .just(.setVoteId(voteId, voteDate))
             
         }
     }
@@ -279,8 +291,13 @@ public final class VoteInventoryViewReactor: Reactor {
             newState.inventorySection = inventorySection
         case let .setEmptyItems(isEmpty):
             newState.isEmpty = isEmpty
-        case let .setVoteId(voteId):
+        case let .setVoteId(voteId, voteDate):
             newState.voteId = voteId
+            newState.voteDate = voteDate
+        case let .setReceiveResposeItem(receiveResponseEntity):
+            newState.receiveResponseEntity = receiveResponseEntity
+        case let .setSentResponseItem(sentResponseEntity):
+            newState.sentResponseEntity = sentResponseEntity
         }
         
         return newState

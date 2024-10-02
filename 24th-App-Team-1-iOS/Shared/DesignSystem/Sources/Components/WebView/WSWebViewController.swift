@@ -71,5 +71,12 @@ public final class WSWebViewController: UIViewController, ReactorKit.View {
             .distinctUntilChanged()
             .bind(to: webView.rx.loadURL)
             .disposed(by: disposeBag)
+        
+        navigationBar.leftBarButton
+            .rx.tap
+            .bind(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
     }
 }
