@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct CreateVoteReqeuest {
+public struct CreateVoteReqeuest: Codable {
     public let votes: [CreateVoteReqeuest]
     
     public init(votes: [CreateVoteReqeuest]) {
@@ -15,7 +15,7 @@ public struct CreateVoteReqeuest {
     }
 }
 
-public struct CreateVoteItemReqeuest: Equatable {
+public struct CreateVoteItemReqeuest: Codable {
     public let userId: Int
     public let voteOptionId: Int
     

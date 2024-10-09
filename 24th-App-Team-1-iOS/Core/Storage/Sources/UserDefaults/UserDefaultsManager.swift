@@ -7,6 +7,7 @@
 
 import Foundation
 import LoginDomain
+import VoteDomain
 
 public class UserDefaultsManager {
     
@@ -25,6 +26,7 @@ public class UserDefaultsManager {
         case userProfileImage
         case userBackgroundColor
         case fcmToken
+        case voteStub
         case expiredDate
     }
     
@@ -55,11 +57,14 @@ public class UserDefaultsManager {
     @UserDefaultsWrapper(key: Key.userBackgroundColor.rawValue, defaultValue: "")
         public var userBackgroundColor: String?
     
-    @UserDefaultsWrapper(key: Key.expiredDate.rawValue, defaultValue: nil)
-        public var expiredDate: Date?
+    @UserDefaultsWrapper(key: Key.expiredDate.rawValue, defaultValue: Date())
+        public var expiredDate: Date
     
     @UserDefaultsWrapper(key: Key.fcmToken.rawValue, defaultValue: "")
         public var fcmToken: String?
+    
+    @UserDefaultsWrapper(key: Key.voteStub.rawValue, defaultValue: [])
+        public var voteRequest: [CreateVoteItemReqeuest]
     
     
     public func clearAllData() {

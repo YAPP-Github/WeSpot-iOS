@@ -48,7 +48,7 @@ public final class SignUpCompleteViewReactor: Reactor {
         
         switch action {
         case .viewDidLoad:
-            guard let expiredDate = UserDefaultsManager.shared.expiredDate else { return .empty() }
+            let expiredDate = UserDefaultsManager.shared.expiredDate
             let currentDate = Date.now
                 .toFormatLocaleString(with: .dashYyyyMMddhhmmss)
                 .toLocalDate(with: .dashYyyyMMddhhmmss)

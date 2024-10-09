@@ -15,7 +15,7 @@ import Swinject
 
 struct VotePresentationAssembly: Assembly {
     func assemble(container: Container) {
-        container.register(VoteProcessViewReactor.self) { (resolver, voteResponseEntity: VoteResponseEntity?, voteOptionStub: [CreateVoteItemReqeuest], processCount: Int) in
+        container.register(VoteProcessViewReactor.self) { (resolver, voteResponseEntity: VoteResponseEntity?) in
             let createVoteUseCase = resolver.resolve(CreateVoteUseCaseProtocol.self)!
             let createUserReportUseCase = resolver.resolve(CreateReportUserUseCaseProtocol.self)!
             let fetchVoteOptionsUseCase = resolver.resolve(FetchVoteOptionsUseCaseProtocol.self)!
@@ -23,9 +23,7 @@ struct VotePresentationAssembly: Assembly {
                 createVoteUseCase: createVoteUseCase,
                 createUserReportUseCase: createUserReportUseCase,
                 fetchVoteOptionsUseCase: fetchVoteOptionsUseCase,
-                voteResponseEntity: voteResponseEntity,
-                voteOptionStub: voteOptionStub,
-                processCount: processCount
+                voteResponseEntity: voteResponseEntity
             )
         }
         
@@ -41,8 +39,8 @@ struct VotePresentationAssembly: Assembly {
             )
         }
         
-        container.register(VoteProcessViewController.self) { (resolver, voteResponseEntity: VoteResponseEntity?, voteOptionStub: [CreateVoteItemReqeuest], processCount: Int) in
-            let reactor = resolver.resolve(VoteProcessViewReactor.self, arguments: voteResponseEntity, voteOptionStub, processCount)!
+        container.register(VoteProcessViewController.self) { (resolver, voteResponseEntity: VoteResponseEntity?) in
+            let reactor = resolver.resolve(VoteProcessViewReactor.self, argument: voteResponseEntity)!
             
             return VoteProcessViewController(reactor: reactor)
         }

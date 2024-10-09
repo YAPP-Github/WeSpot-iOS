@@ -8,6 +8,7 @@
 import Foundation
 import Util
 import VoteDomain
+import Storage
 
 import ReactorKit
 
@@ -36,6 +37,7 @@ public final class VoteHomeViewReactor: Reactor {
         
         switch action {
         case .didTappedVoteButton:
+            UserDefaultsManager.shared.voteRequest = []
             globalService.event.onNext(.didTappedVoteButton(true))
                     
             return .empty()
