@@ -80,4 +80,14 @@ public final class CommonRepository: CommonRepositoryProtocol {
             .map { $0.toDomain() }
             .asSingle()
     }
+    
+    public func fetchVoteOptions() -> Single<VoteResponseEntity?> {
+        let endPoint = CommonEndPoint.fetchVoteOptions
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .logErrorIfDetected(category: Network.error)
+            .decodeMap(VoteResponseDTO.self)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
 }

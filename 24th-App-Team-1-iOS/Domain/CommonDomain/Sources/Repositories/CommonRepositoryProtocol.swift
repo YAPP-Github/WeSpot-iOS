@@ -15,4 +15,5 @@ public protocol CommonRepositoryProtocol {
     func updateUserProfileItem(body: UpdateUserProfileRequest) -> Single<Bool>
     func fetchProfileBackgrounds() -> Single<FetchProfileBackgroundsResponseEntity?>
     func createReportUserItem(body: CreateUserReportRequest) -> Single<CreateReportUserEntity?>
+    func fetchVoteOptions() -> Single<VoteResponseEntity?>
 }

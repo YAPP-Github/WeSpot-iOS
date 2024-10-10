@@ -1,13 +1,13 @@
 //
 //  VoteOptionResponseDTO.swift
-//  VoteService
+//  CommonService
 //
-//  Created by Kim dohyun on 7/22/24.
+//  Created by Kim dohyun on 10/10/24.
 //
 
 import Foundation
 
-import VoteDomain
+import CommonDomain
 
 public struct VoteResponseDTO: Decodable {
     public let response: [VoteItemResponseDTO]

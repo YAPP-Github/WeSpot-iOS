@@ -7,7 +7,7 @@
 
 import Foundation
 import Util
-import VoteDomain
+import CommonDomain
 
 import ReactorKit
 
@@ -23,13 +23,14 @@ public final class VoteMainViewReactor: Reactor {
         var voteTypes: VoteTypes
         @Pulse var isShowEffectView: Bool
         @Pulse var isSelected: Bool
+        @Pulse var voteResponseEntity: VoteResponseEntity?
         @Pulse var isProfileChanged: Bool
         @Pulse var isProfileUpdate: Bool
     }
     
     public enum Mutation {
         case setVoteTypes(VoteTypes)
-        case setSelectedVoteButton(Bool)
+        case setSelectedVoteButton(Bool, VoteResponseEntity?)
         case setShowEffectView(Bool)
         case setUserProfileUpdate(Bool)
     }
@@ -48,8 +49,8 @@ public final class VoteMainViewReactor: Reactor {
         let fetchVoteResponse = globalService.event
             .flatMap { event -> Observable<Mutation> in
                 switch event {
-                case let .didTappedVoteButton(isSelected):
-                    return .just(.setSelectedVoteButton(isSelected))
+                case let .didTappedVoteButton(isSelected, response):
+                    return .just(.setSelectedVoteButton(isSelected, response))
                 case .didTappedResultButton:
                     return .just(.setShowEffectView(true))
                 case let .didTappedIntroduceButton(isUpdate):
@@ -71,8 +72,9 @@ public final class VoteMainViewReactor: Reactor {
     public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case let .setSelectedVoteButton(isSelected):
+        case let .setSelectedVoteButton(isSelected, response):
             newState.isSelected = isSelected
+            newState.voteResponseEntity = response
         case let .setVoteTypes(voteTypes):
             globalService.event.onNext(.toggleStatus(voteTypes))
             newState.voteTypes = voteTypes

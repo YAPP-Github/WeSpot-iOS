@@ -28,6 +28,11 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
         super.viewDidLoad()
     }
     
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.post(name: .hideTabBar, object: nil)
+    }
+    
     //MARK: - Configure
     public override func setupUI() {
         super.setupUI()
@@ -81,6 +86,7 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
     }
     
     public override func bind(reactor: VoteBeginViewReactor) {
+        super.bind(reactor: reactor)
         inviteButton
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)

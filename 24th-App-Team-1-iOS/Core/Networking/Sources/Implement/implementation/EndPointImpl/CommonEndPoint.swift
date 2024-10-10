@@ -28,6 +28,8 @@ public enum CommonEndPoint: WSNetworkEndPoint {
     case createUserReport(Encodable)
     /// 사용자 프로필 수정 API
     case updateUserProfile(Encodable)
+    /// 질문지 조회 API
+    case fetchVoteOptions
     
     public var path: String {
         switch self {
@@ -41,6 +43,8 @@ public enum CommonEndPoint: WSNetworkEndPoint {
             return "/reports"
         case .updateUserProfile:
             return "/users/me"
+        case .fetchVoteOptions:
+            return "votes/options"
         }
     }
     
@@ -56,6 +60,8 @@ public enum CommonEndPoint: WSNetworkEndPoint {
             return .post
         case .updateUserProfile:
             return .put
+        case .fetchVoteOptions:
+            return .get
         }
     }
     
@@ -71,6 +77,8 @@ public enum CommonEndPoint: WSNetworkEndPoint {
             return .requestBody(body)
         case let .updateUserProfile(body):
             return .requestBody(body)
+        default:
+            return .none
         }
     }
     

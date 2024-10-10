@@ -1,8 +1,8 @@
 //
 //  VoteOptionEntity.swift
-//  VoteDomain
+//  CommonDomain
 //
-//  Created by Kim dohyun on 7/22/24.
+//  Created by Kim dohyun on 10/10/24.
 //
 
 import Foundation

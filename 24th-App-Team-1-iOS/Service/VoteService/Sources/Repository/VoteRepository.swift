@@ -20,16 +20,6 @@ public final class VoteRepository: VoteRepositoryProtocol {
     private let networkService: WSNetworkServiceProtocol = WSNetworkService()
     
     public init() { }
-        
-    public func fetchVoteOptions() -> Single<VoteResponseEntity?> {
-        let endPoint = VoteEndPoint.fetchVoteOptions
-        return networkService.request(endPoint: endPoint)
-            .asObservable()
-            .logErrorIfDetected(category: Network.error)
-            .decodeMap(VoteResponseDTO.self)
-            .map { $0.toDomain() }
-            .asSingle()
-    }
     
     public func fetchWinnerVoteOptions(query: VoteWinnerRequestQuery) -> Single<VoteWinnerResponseEntity?> {
         let query = VoteWinnerRequestDTO(date: query.date)

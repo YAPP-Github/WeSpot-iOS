@@ -147,16 +147,6 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$isInviteView)
-            .distinctUntilChanged()
-            .filter { $0 == false}
-            .observe(on: MainScheduler.asyncInstance)
-            .bind(with: self) { owner, _ in
-                let voteBeginViewController = DependencyContainer.shared.injector.resolve(VoteBeginViewController.self)
-                owner.navigationController?.pushViewController(voteBeginViewController, animated: true)
-            }
-            .disposed(by: disposeBag)
-        
         navigationBar.rightBarButton
             .rx.tap
             .throttle(.microseconds(300), scheduler: MainScheduler.instance)

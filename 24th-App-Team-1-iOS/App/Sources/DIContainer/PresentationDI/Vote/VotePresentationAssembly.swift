@@ -22,7 +22,6 @@ struct VotePresentationAssembly: Assembly {
             return VoteProcessViewReactor(
                 createVoteUseCase: createVoteUseCase,
                 createUserReportUseCase: createUserReportUseCase,
-                fetchVoteOptionsUseCase: fetchVoteOptionsUseCase,
                 voteResponseEntity: voteResponseEntity
             )
         }
@@ -34,8 +33,7 @@ struct VotePresentationAssembly: Assembly {
             
             return VoteProcessViewReactor(
                 createVoteUseCase: createVoteUseCase,
-                createUserReportUseCase: createUserReportUseCase,
-                fetchVoteOptionsUseCase: fetchVoteOptionsUseCase
+                createUserReportUseCase: createUserReportUseCase
             )
         }
         
