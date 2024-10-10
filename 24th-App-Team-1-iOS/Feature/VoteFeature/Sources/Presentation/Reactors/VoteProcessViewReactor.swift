@@ -24,6 +24,7 @@ public final class VoteProcessViewReactor: Reactor {
         @Pulse var voteResponseEntity: VoteResponseEntity?
         @Pulse var voteUserEntity: VoteUserEntity?
         @Pulse var processCount: Int
+        @Pulse var finalVoteCount: Int
         @Pulse var reportEntity: CreateReportUserEntity?
         @Pulse var isLoading: Bool
         @Pulse var isInviteView: Bool
@@ -42,6 +43,7 @@ public final class VoteProcessViewReactor: Reactor {
     public enum Mutation {
         case setLoading(Bool)
         case setQuestionRowItems([VoteProcessItem])
+        case setVoteCount(Int)
         case setVoteOptionItems(VoteItemEntity)
         case setVoteInviteView(Bool)
         case setProcessCount(Int)
@@ -63,6 +65,7 @@ public final class VoteProcessViewReactor: Reactor {
             questionSection: [.votePrcessInfo([])],
             voteResponseEntity: voteResponseEntity,
             processCount: 1,
+            finalVoteCount: 1,
             isLoading: false,
             isInviteView: false
         )
@@ -72,16 +75,19 @@ public final class VoteProcessViewReactor: Reactor {
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
-        let index = UserDefaultsManager.shared.voteRequest.count
         switch action {
         case .viewDidLoad:
+            let index = UserDefaultsManager.shared.voteRequest.count
+            
             var voteSectionItems: [VoteProcessItem] = []
             let processCount = UserDefaultsManager.shared.voteRequest.count + 1
+            let finalCount = currentState.voteResponseEntity?.response.count ?? 0
             guard processCount == 1 else {
                 guard let response = currentState.voteResponseEntity?.response[index] else {
                     return .concat(
                         .just(.setLoading(false)),
                         .just(.setVoteInviteView(false)),
+                        .just(.setVoteCount(finalCount)),
                         .just(.setLoading(true))
                     )
                 }
@@ -101,6 +107,7 @@ public final class VoteProcessViewReactor: Reactor {
                     .just(.setVoteInviteView(true)),
                     .just(.setQuestionRowItems(voteSectionItems)),
                     .just(.setProcessCount(processCount)),
+                    .just(.setVoteCount(finalCount)),
                     .just(.setVoteUserItems(response.userInfo)),
                     .just(.setVoteResponseItems(currentState.voteResponseEntity)),
                     .just(.setLoading(true))
@@ -122,6 +129,7 @@ public final class VoteProcessViewReactor: Reactor {
                     }
                     
                     let response = entity.response[index]
+                    let finalCount = entity.response.count
                     response.voteInfo.forEach {
                         voteSectionItems.append(
                             .voteQuestionItem(
@@ -138,6 +146,7 @@ public final class VoteProcessViewReactor: Reactor {
                         .just(.setLoading(false)),
                         .just(.setVoteInviteView(true)),
                         .just(.setQuestionRowItems(voteSectionItems)),
+                        .just(.setVoteCount(finalCount)),
                         .just(.setVoteUserItems(response.userInfo)),
                         .just(.setVoteResponseItems(entity)),
                         .just(.setLoading(true))
@@ -224,6 +233,8 @@ public final class VoteProcessViewReactor: Reactor {
         case let .setProcessCount(processCount):
             
             newState.processCount = processCount
+        case let .setVoteCount(finalVoteCount):
+            newState.finalVoteCount = finalVoteCount
         }
         return newState
     }

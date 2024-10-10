@@ -1,50 +1,43 @@
 //
-//  VoteBeginView.swift
+//  VoteBeginViewController.swift
 //  VoteFeature
 //
-//  Created by Kim dohyun on 7/16/24.
+//  Created by Kim dohyun on 10/10/24.
 //
 
-import DesignSystem
 import UIKit
-import Util
+import DesignSystem
 import Storage
+import Util
 
-import Then
 import SnapKit
+import Then
 import RxSwift
 import RxCocoa
-import ReactorKit
+
 
 fileprivate typealias VoteBeginStr = VoteStrings
-public final class VoteBeginView: UIView {
-
+public final class VoteBeginViewController: BaseViewController<VoteBeginViewReactor> {
     //MARK: - Properties
     private let beginInfoLabel: WSLabel = WSLabel(wsFont: .Header01)
     let inviteButton: WSButton = WSButton(wsButtonType: .default(12))
     private let beginImageView: UIImageView = UIImageView()
     
-    //MARK: - LifeCycle
     
-    
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupUI()
-        setupAttributes()
-        setupAutoLayout()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    public override func viewDidLoad() {
+        super.viewDidLoad()
     }
     
     //MARK: - Configure
-    public func setupUI() {
-        addSubviews(beginInfoLabel, beginImageView, inviteButton)
+    public override func setupUI() {
+        super.setupUI()
+        view.addSubviews(beginInfoLabel, beginImageView, inviteButton)
     }
-    public func setupAutoLayout() {
+    public override func setupAutoLayout() {
+        super.setupAutoLayout()
+        
         beginInfoLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(60)
+            $0.top.equalTo(navigationBar.snp.bottom)
             $0.horizontalEdges.equalToSuperview().inset(30)
             $0.height.equalTo(60)
         }
@@ -62,8 +55,8 @@ public final class VoteBeginView: UIView {
         }
     }
     
-    public func setupAttributes() {
-        
+    public override func setupAttributes() {
+        super.setupAttributes()
         beginInfoLabel.do {
             guard let grade = UserDefaultsManager.shared.grade,
                   let classNumber = UserDefaultsManager.shared.classNumber else { return }
@@ -78,5 +71,22 @@ public final class VoteBeginView: UIView {
         inviteButton.do {
             $0.setupButton(text: VoteBeginStr.voteInviteButtonText)
         }
+        
+        navigationBar.do {
+            $0.setNavigationBarUI(
+                property: .leftIcon(DesignSystemAsset.Images.arrow.image)
+            )
+            $0.setNavigationBarAutoLayout(property: .leftIcon)
+        }
+    }
+    
+    public override func bind(reactor: VoteBeginViewReactor) {
+        inviteButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                owner.shareToKakaoTalk()
+            }
+            .disposed(by: disposeBag)
     }
 }

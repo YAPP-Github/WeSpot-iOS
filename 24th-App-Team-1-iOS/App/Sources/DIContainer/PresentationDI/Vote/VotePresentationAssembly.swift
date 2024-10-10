@@ -50,5 +50,15 @@ struct VotePresentationAssembly: Assembly {
             
             return VoteProcessViewController(reactor: reactor)
         }
+        
+        container.register(VoteBeginViewReactor.self) { _ in
+            return VoteBeginViewReactor()
+        }
+        
+        container.register(VoteBeginViewController.self) { resolver in
+            let reactor = resolver.resolve(VoteBeginViewReactor.self)!
+            
+            return VoteBeginViewController(reactor: reactor)
+        }
     }
 }

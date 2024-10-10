@@ -10,6 +10,7 @@ import UIKit
 import Util
 
 import Then
+import Storage
 import SnapKit
 import RxSwift
 import RxCocoa
@@ -116,6 +117,7 @@ public final class NotificationViewController: BaseViewController<NotificationVi
             .bind(with: self) { owner, response in
                 switch response.0 {
                 case .vote:
+                    UserDefaultsManager.shared.voteRequest = []
                     NotificationCenter.default.post(name: .showVoteProccessController, object: nil)
                 case .voteRecevied:
                     NotificationCenter.default.post(name: .showVoteInventoryViewController, object: nil)
