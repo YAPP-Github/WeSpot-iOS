@@ -8,6 +8,7 @@
 import Foundation
 import Extensions
 import NotificationDomain
+import CommonDomain
 
 import ReactorKit
 
@@ -16,6 +17,7 @@ public final class NotificationViewReactor: Reactor {
     
     private let fetchUserNotificationItemsUseCase: FetchUserNotificationItemUseCaseProtocol
     private let updateUserNotifcationItemUseCase: UpdateUserNotificationItemUseCaseProtocol
+    private let fetchVoteOptionUseCase: FetchVoteOptionsUseCaseProtocol
     
     public struct State {
         @Pulse var notificationSection: [NotificationSection]
@@ -46,7 +48,8 @@ public final class NotificationViewReactor: Reactor {
     
     public init(
         fetchUserNotificationItemsUseCase: FetchUserNotificationItemUseCaseProtocol,
-        updateUserNotifcationItemUseCase: UpdateUserNotificationItemUseCaseProtocol
+        updateUserNotifcationItemUseCase: UpdateUserNotificationItemUseCaseProtocol,
+        fetchVoteOptionUseCase: FetchVoteOptionsUseCaseProtocol
     ) {
         self.initialState = State(
             notificationSection: [],
@@ -58,10 +61,12 @@ public final class NotificationViewReactor: Reactor {
         )
         self.fetchUserNotificationItemsUseCase = fetchUserNotificationItemsUseCase
         self.updateUserNotifcationItemUseCase = updateUserNotifcationItemUseCase
+        self.fetchVoteOptionUseCase = fetchVoteOptionUseCase
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
         
+        //TODO: ViewDidLoad에서 데이터(투표) 조회
         switch action {
         case .viewDidLoad:
             let query =  NotificationReqeustQuery(cursorId: 0)

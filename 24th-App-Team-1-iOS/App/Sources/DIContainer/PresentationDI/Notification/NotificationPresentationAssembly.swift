@@ -7,6 +7,7 @@
 
 import Foundation
 import NotificationFeature
+import CommonDomain
 import NotificationDomain
 
 import Swinject
@@ -18,9 +19,11 @@ struct NotificationPresentationAssembly: Assembly {
         container.register(NotificationViewReactor.self) { resolver in
             let fetchUserNotificationItemUseCase = resolver.resolve(FetchUserNotificationItemUseCaseProtocol.self)!
             let updateUserNotificationItemUseCase = resolver.resolve(UpdateUserNotificationItemUseCaseProtocol.self)!
+            let fetchVoteOptionUseCase = resolver.resolve(FetchVoteOptionsUseCaseProtocol.self)!
             return NotificationViewReactor(
                 fetchUserNotificationItemsUseCase: fetchUserNotificationItemUseCase,
-                updateUserNotifcationItemUseCase: updateUserNotificationItemUseCase
+                updateUserNotifcationItemUseCase: updateUserNotificationItemUseCase,
+                fetchVoteOptionUseCase: fetchVoteOptionUseCase
             )
         }
         
