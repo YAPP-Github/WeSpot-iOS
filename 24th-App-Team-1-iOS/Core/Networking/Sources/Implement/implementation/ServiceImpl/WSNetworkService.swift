@@ -17,7 +17,7 @@ public final class WSNetworkService: WSNetworkServiceProtocol {
         let networkMonitor: WSNetworkMonitor = WSNetworkMonitor()
         let networkConfigure: URLSessionConfiguration = URLSessionConfiguration.af.default
         let interceptor = WSNetworkInterceptor()
-               
+        networkConfigure.timeoutIntervalForRequest = 60
         let networkSession: Session = Session(
             configuration: networkConfigure,
             interceptor: interceptor,

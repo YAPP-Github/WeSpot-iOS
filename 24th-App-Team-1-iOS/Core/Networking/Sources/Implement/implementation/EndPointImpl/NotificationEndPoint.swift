@@ -38,7 +38,7 @@ public enum NotificationEndPoint: WSNetworkEndPoint {
         case .fetchNotificationItems:
             return .get
         case .updateNotification:
-            return .put
+            return .patch
         }
     }
     

@@ -22,6 +22,7 @@ public final class NotificationViewReactor: Reactor {
     public struct State {
         @Pulse var notificationSection: [NotificationSection]
         var notificationItems: [NotificationItem]
+        @Pulse var voteResponseEntity: VoteResponseEntity?
         @Pulse var notificationEntity: NotificationEntity?
         @Pulse var notificationItemEntity: [NotificationItemEntity]
         @Pulse var isSelected: Bool
@@ -39,6 +40,7 @@ public final class NotificationViewReactor: Reactor {
         case setNotificationSectionItems([NotificationItem])
         case setNotificationItems(NotificationEntity)
         case setNotificationItemEntity([NotificationItemEntity])
+        case setVoteResponseItems(VoteResponseEntity?)
         case setSelectedNotificationItem(Bool)
         case setSelectedNotificationDate(Bool)
         case setSelectedType(NotificationType)
@@ -100,6 +102,28 @@ public final class NotificationViewReactor: Reactor {
             let path = String(response.id)
             let type = response.type
             let isCurrentDate = Date().isFutureDay(response.date.toDate(with: .dashYyyyMMdd))
+            guard type != .vote else {
+                return fetchVoteOptionUseCase
+                    .execute()
+                    .asObservable()
+                    .withUnretained(self)
+                    .flatMap { owner, response -> Observable<Mutation> in
+                        return owner.updateUserNotifcationItemUseCase
+                            .execute(path: path)
+                            .asObservable()
+                            .flatMap { isSelected -> Observable<Mutation> in
+                                return .concat(
+                                    .just(.setVoteResponseItems(response)),
+                                    .just(.setSelectedType(type)),
+                                    .just(.setSelectedNotificationDate(isCurrentDate)),
+                                    .just(.setSelectedNotificationItem(isSelected))
+                                )
+                            }
+                        
+                    }
+                
+            }
+        
             return updateUserNotifcationItemUseCase
                 .execute(path: path)
                 .asObservable()
@@ -168,6 +192,8 @@ public final class NotificationViewReactor: Reactor {
             newState.isCurrentDate = isCurrentDate
         case let .setNotificationItemEntity(notificationItemEntity):
             newState.notificationItemEntity = notificationItemEntity
+        case let .setVoteResponseItems(voteResponseEntity):
+            newState.voteResponseEntity = voteResponseEntity
         }
         
         return newState

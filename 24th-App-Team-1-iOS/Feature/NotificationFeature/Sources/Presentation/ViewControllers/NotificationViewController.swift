@@ -112,13 +112,15 @@ public final class NotificationViewController: BaseViewController<NotificationVi
         Observable
             .zip(
                 reactor.pulse(\.$selectedType),
-                reactor.pulse(\.$isCurrentDate)
+                reactor.pulse(\.$isCurrentDate),
+                reactor.pulse(\.$voteResponseEntity)
             )
             .bind(with: self) { owner, response in
                 switch response.0 {
                 case .vote:
                     UserDefaultsManager.shared.voteRequest = []
-                    NotificationCenter.default.post(name: .showVoteProccessController, object: nil)
+                    let userInfo: [AnyHashable: Any] = ["voteOption": response.2]
+                    NotificationCenter.default.post(name: .showVoteProccessController, object: nil, userInfo: userInfo)
                 case .voteRecevied:
                     NotificationCenter.default.post(name: .showVoteInventoryViewController, object: nil)
                 case .voteResults:
