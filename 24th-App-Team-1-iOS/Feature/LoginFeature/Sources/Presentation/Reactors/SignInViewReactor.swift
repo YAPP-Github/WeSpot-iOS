@@ -26,10 +26,10 @@ public final class SignInViewReactor: Reactor {
     
     public struct State {
         @Pulse var signUpTokenResponse: CreateSignUpTokenResponseEntity?
+        @Pulse var existingAccountResponse: CreateExistingTokenEntity?
+        @Pulse var isLoading: Bool
         var accountResponse: CreateAccountResponseEntity?
         var accountRequest: CreateAccountRequest
-        @Pulse var isExisting: Bool
-        @Pulse var isLoading: Bool
     }
     
     public enum Action {
@@ -39,7 +39,7 @@ public final class SignInViewReactor: Reactor {
     
     public enum Mutation {
         case setSignUpTokenResponse(CreateSignUpTokenResponseEntity)
-        case setAccountExisting(Bool)
+        case setAccountExisting(CreateExistingTokenEntity)
         case setLoading(Bool)
     }
     
@@ -48,9 +48,8 @@ public final class SignInViewReactor: Reactor {
         self.createNewMemberUseCase = createNewMemberUseCase
         self.createExistingUseCase = createExistingUseCase
         self.initialState = State(
-            accountRequest: CreateAccountRequest(),
-            isExisting: false,
-            isLoading: false
+            isLoading: false,
+            accountRequest: CreateAccountRequest()
         )
     }
     
@@ -130,6 +129,9 @@ public final class SignInViewReactor: Reactor {
                 .execute(body: body)
                 .asObservable()
                 .flatMap { response -> Observable<Mutation> in
+                    guard let response else {
+                        return .empty()
+                    }
                     return .concat(
                         .just(.setLoading(false)),
                         .just(.setAccountExisting(response)),
@@ -149,8 +151,13 @@ public final class SignInViewReactor: Reactor {
                 .toFormatLocaleString(with: .dashYyyyMMddhhmmss)
                 .toLocalDate(with: .dashYyyyMMddhhmmss)
             UserDefaultsManager.shared.expiredDate = expiredDate
-        case .setAccountExisting(let isExisting):
-            newState.isExisting = isExisting
+        case let .setAccountExisting(existingAccountResponse):
+            let refreshToken = existingAccountResponse.refreshToken
+            let accessToken = existingAccountResponse.accessToken
+            
+            newState.existingAccountResponse = existingAccountResponse
+            KeychainManager.shared.set(value: refreshToken, type: .refreshToken)
+            KeychainManager.shared.set(value: accessToken, type: .accessToken)
         case .setLoading(let isLoading):
             newState.isLoading = isLoading
         }

@@ -9,7 +9,6 @@ import Foundation
 
 import Alamofire
 import RxSwift
-import CommonDomain
 
 public final class WSNetworkService: WSNetworkServiceProtocol {
     

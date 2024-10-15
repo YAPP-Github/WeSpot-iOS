@@ -229,8 +229,9 @@ public final class SignInViewController: BaseViewController<SignInViewReactor> {
             }
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$isExisting)
-            .filter { $0 == true }
+        
+        reactor.pulse(\.$existingAccountResponse)
+            .filter { $0 != nil }
             .bind { _ in
                 NotificationCenter.default.post(name: .showVoteMainViewController, object: nil)
             }

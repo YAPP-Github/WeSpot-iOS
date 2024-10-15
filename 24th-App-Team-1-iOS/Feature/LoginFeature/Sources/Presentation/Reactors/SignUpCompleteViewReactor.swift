@@ -79,6 +79,8 @@ public final class SignUpCompleteViewReactor: Reactor {
         case let .setAccountToken(accountEntity):
             newState.accountEntity = accountEntity
             KeychainManager.shared.set(value: accountEntity.accessToken, type: .accessToken)
+            KeychainManager.shared.set(value: accountEntity.refreshToken, type: .refreshToken)
+            
             UserDefaultsManager.shared.refreshToken = accountEntity.refreshToken
             UserDefaultsManager.shared.userName = accountEntity.name
             UserDefaultsManager.shared.classNumber = currentState.accountRequest.classNumber
