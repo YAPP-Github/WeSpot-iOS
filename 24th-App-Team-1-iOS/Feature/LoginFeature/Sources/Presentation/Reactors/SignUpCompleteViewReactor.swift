@@ -83,8 +83,6 @@ public final class SignUpCompleteViewReactor: Reactor {
             
             UserDefaultsManager.shared.refreshToken = accountEntity.refreshToken
             UserDefaultsManager.shared.userName = accountEntity.name
-            UserDefaultsManager.shared.classNumber = currentState.accountRequest.classNumber
-            UserDefaultsManager.shared.grade = currentState.accountRequest.grade
         case let .setExpiredDate(isExpired):
             newState.isExpired = isExpired
         }

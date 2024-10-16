@@ -7,7 +7,7 @@
 
 import Foundation
 
-import AllDomain
+import CommonDomain
 import ReactorKit
 
 public final class AllMainViewReactor: Reactor {

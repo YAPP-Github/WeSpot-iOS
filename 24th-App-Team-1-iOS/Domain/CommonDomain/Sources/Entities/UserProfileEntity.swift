@@ -1,12 +1,11 @@
 //
 //  UserProfileEntity.swift
-//  AllDomain
+//  CommonDomain
 //
-//  Created by Kim dohyun on 8/12/24.
+//  Created by 김도현 on 10/16/24.
 //
 
 import Foundation
-
 
 public struct UserProfileEntity: Identifiable {
     public let id: Int
@@ -39,7 +38,6 @@ public struct UserProfileEntity: Identifiable {
     }
 }
 
-
 public struct UserProfileResponseEntity {
     public let backgroundColor: String
     public let iconUrl: URL
@@ -49,3 +47,4 @@ public struct UserProfileResponseEntity {
         self.iconUrl = iconUrl
     }
 }
+

@@ -63,9 +63,6 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
     public override func setupAttributes() {
         super.setupAttributes()
         beginInfoLabel.do {
-            guard let grade = UserDefaultsManager.shared.grade,
-                  let classNumber = UserDefaultsManager.shared.classNumber else { return }
-            $0.text = "투표할 수 있는\n\(grade)학년 \(classNumber)반 친구들이 부족해요"
             $0.textColor = DesignSystemAsset.Colors.gray100.color
         }
         
@@ -87,12 +84,24 @@ public final class VoteBeginViewController: BaseViewController<VoteBeginViewReac
     
     public override func bind(reactor: VoteBeginViewReactor) {
         super.bind(reactor: reactor)
+        
+        Observable.just(())
+            .map { Reactor.Action.viewDidLoad }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         inviteButton
             .rx.tap
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 owner.shareToKakaoTalk()
             }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.profileEntity }
+            .map { "투표할 수 있는\n\($0.grade)학년 \($0.classNumber)반 친구들이 부족해요" }
+            .bind(to: beginInfoLabel.rx.text)
             .disposed(by: disposeBag)
     }
 }

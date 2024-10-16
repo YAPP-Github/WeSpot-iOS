@@ -21,6 +21,18 @@ public final class CommonRepository: CommonRepositoryProtocol {
     
     public init() { }
     
+    public func fetchUserProfileItems() -> Single<UserProfileEntity?> {
+        let endPoint = CommonEndPoint.fetchUserProfile
+        
+        return networkService.request(endPoint: endPoint)
+            .asObservable()
+            .decodeMap(UserProfileResponseDTO.self)
+            .logErrorIfDetected(category: Network.error)
+            .map { $0.toDomain() }
+            .asSingle()
+    }
+    
+    
     
     public func updateUserProfileItem(body: UpdateUserProfileRequest) -> Single<Bool> {
         

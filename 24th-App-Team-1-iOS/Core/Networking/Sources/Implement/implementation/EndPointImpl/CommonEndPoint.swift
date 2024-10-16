@@ -18,6 +18,7 @@ public enum CommonEndPoint: WSNetworkEndPoint {
         return accessToken
     }
     
+    case fetchUserProfile
     // 비속어 검색 API
     case createProfanityCheck(Encodable)
     // 프로필 캐릭터 정보 API
@@ -33,6 +34,8 @@ public enum CommonEndPoint: WSNetworkEndPoint {
     
     public var path: String {
         switch self {
+        case .fetchUserProfile:
+            return "/users/me"
         case .createProfanityCheck:
             return "/check-profanity"
         case .fetchCharacters:
@@ -50,6 +53,8 @@ public enum CommonEndPoint: WSNetworkEndPoint {
     
     public var method: HTTPMethod {
         switch self {
+        case .fetchUserProfile:
+            return .get
         case .createProfanityCheck:
             return .post
         case .fetchCharacters:

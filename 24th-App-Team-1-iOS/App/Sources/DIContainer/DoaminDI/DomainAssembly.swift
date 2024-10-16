@@ -116,8 +116,8 @@ struct DomainAssembly: Assembly {
         
         // Profile
         container.register(FetchUserProfileUseCaseProtocol.self) { resolver in
-            let repository = resolver.resolve(ProfileRepositoryProtocol.self)!
-            return FetchUserProfileUseCase(profileRepository: repository)
+            let repository = resolver.resolve(CommonRepositoryProtocol.self)!
+            return FetchUserProfileUseCase(commonRepository: repository)
         }
         
         container.register(UpdateUserProfileUseCaseProtocol.self) { resolver in

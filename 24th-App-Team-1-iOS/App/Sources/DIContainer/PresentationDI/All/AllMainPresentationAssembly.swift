@@ -7,7 +7,7 @@
 
 import Foundation
 import AllFeature
-import AllDomain
+import CommonDomain
 
 import Swinject
 

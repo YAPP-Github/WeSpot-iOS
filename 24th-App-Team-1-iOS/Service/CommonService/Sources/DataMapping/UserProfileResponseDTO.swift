@@ -1,13 +1,13 @@
 //
 //  UserProfileResponseDTO.swift
-//  AlleService
+//  CommonService
 //
-//  Created by Kim dohyun on 8/12/24.
+//  Created by 김도현 on 10/16/24.
 //
 
 import Foundation
 
-import AllDomain
+import CommonDomain
 
 public struct UserProfileResponseDTO: Decodable {
     public let id: Int

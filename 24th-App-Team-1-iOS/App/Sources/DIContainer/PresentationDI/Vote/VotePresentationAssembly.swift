@@ -49,8 +49,9 @@ struct VotePresentationAssembly: Assembly {
             return VoteProcessViewController(reactor: reactor)
         }
         
-        container.register(VoteBeginViewReactor.self) { _ in
-            return VoteBeginViewReactor()
+        container.register(VoteBeginViewReactor.self) { resolver in
+            let fetchUserProfileUseCase = resolver.resolve(FetchUserProfileUseCaseProtocol.self)!
+            return VoteBeginViewReactor(fetchUserProfileUseCase: fetchUserProfileUseCase)
         }
         
         container.register(VoteBeginViewController.self) { resolver in

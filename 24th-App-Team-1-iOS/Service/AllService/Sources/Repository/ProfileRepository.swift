@@ -22,17 +22,6 @@ public final class ProfileRepository: ProfileRepositoryProtocol {
     
     public init() { }
  
-    public func fetchUserProfileItems() -> Single<UserProfileEntity?> {
-        let endPoint = ProfileEndPoint.fetchUserProfile
-        
-        return networkService.request(endPoint: endPoint)
-            .asObservable()
-            .decodeMap(UserProfileResponseDTO.self)
-            .logErrorIfDetected(category: Network.error)
-            .map { $0.toDomain() }
-            .asSingle()
-    }
-    
     public func fetchUserAlarmItems() -> Single<UserAlarmEntity?> {
         let endPoint = ProfileEndPoint.fetchNotification
         return networkService.request(endPoint: endPoint)
