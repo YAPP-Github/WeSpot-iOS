@@ -19,9 +19,9 @@ extension InfoPlist {
         
         
         var basePlist: [String: Plist.Value] = [
-            "CFBundleDisplayName": .string("wespot"),
+            "CFBundleDisplayName": .string("Wespot"),
             "UIUserInterfaceStyle": .string("Dark"),
-            "CFBundleShortVersionString": .string("1.1.0"),
+            "CFBundleShortVersionString": .string("1.2.0"),
             "CFBundleVersion": .string("1"),
             "UILaunchStoryboardName": .string("LaunchScreen"),
             "UISupportedInterfaceOrientations": .array([.string("UIInterfaceOrientationPortrait")]),
