@@ -1,8 +1,8 @@
 //
 //  FetchVoteOptionsUseCase.swift
-//  VoteDomain
+//  CommonDomain
 //
-//  Created by Kim dohyun on 7/22/24.
+//  Created by Kim dohyun on 10/10/24.
 //
 
 import Foundation
@@ -16,13 +16,13 @@ public protocol FetchVoteOptionsUseCaseProtocol {
 
 public final class FetchVoteOptionsUseCase: FetchVoteOptionsUseCaseProtocol {
     
-    private let voteRepository: VoteRepositoryProtocol
+    private let commonRepository: CommonRepositoryProtocol
     
-    public init(voteRepository: VoteRepositoryProtocol) {
-        self.voteRepository = voteRepository
+    public init(commonRepository: CommonRepositoryProtocol) {
+        self.commonRepository = commonRepository
     }
     
     public func execute() -> Single<VoteResponseEntity?> {
-        return voteRepository.fetchVoteOptions()
+        return commonRepository.fetchVoteOptions()
     }
 }

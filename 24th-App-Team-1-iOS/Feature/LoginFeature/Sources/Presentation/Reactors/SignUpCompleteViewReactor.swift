@@ -48,7 +48,7 @@ public final class SignUpCompleteViewReactor: Reactor {
         
         switch action {
         case .viewDidLoad:
-            guard let expiredDate = UserDefaultsManager.shared.expiredDate else { return .empty() }
+            let expiredDate = UserDefaultsManager.shared.expiredDate
             let currentDate = Date.now
                 .toFormatLocaleString(with: .dashYyyyMMddhhmmss)
                 .toLocalDate(with: .dashYyyyMMddhhmmss)
@@ -79,10 +79,10 @@ public final class SignUpCompleteViewReactor: Reactor {
         case let .setAccountToken(accountEntity):
             newState.accountEntity = accountEntity
             KeychainManager.shared.set(value: accountEntity.accessToken, type: .accessToken)
+            KeychainManager.shared.set(value: accountEntity.refreshToken, type: .refreshToken)
+            
             UserDefaultsManager.shared.refreshToken = accountEntity.refreshToken
             UserDefaultsManager.shared.userName = accountEntity.name
-            UserDefaultsManager.shared.classNumber = currentState.accountRequest.classNumber
-            UserDefaultsManager.shared.grade = currentState.accountRequest.grade
         case let .setExpiredDate(isExpired):
             newState.isExpired = isExpired
         }

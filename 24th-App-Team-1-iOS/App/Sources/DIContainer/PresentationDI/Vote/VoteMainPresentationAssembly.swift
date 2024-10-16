@@ -8,6 +8,7 @@
 import Foundation
 import VoteFeature
 import VoteDomain
+import CommonDomain
 
 import Swinject
 
@@ -42,7 +43,8 @@ struct VoteMainPresentationAssembly: Assembly {
 struct VoteHomePresentationAssembly: Assembly {
     func assemble(container: Container) {
         container.register(VoteHomeViewReactor.self) { resolver in
-            return VoteHomeViewReactor()
+            let fetchVoteOptionsUseCase = resolver.resolve(FetchVoteOptionsUseCaseProtocol.self)!
+            return VoteHomeViewReactor(fetchVoteOptionUseCase: fetchVoteOptionsUseCase)
         }
         
         container.register(VoteHomeViewController.self) { resovler in

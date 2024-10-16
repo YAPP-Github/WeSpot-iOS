@@ -50,6 +50,7 @@ public final class SignUpIntroduceViewReactor: Reactor {
                 imageURL: String,
                 backgroundColor: String
     ) {
+        let backgroundColor = backgroundColor.isEmpty ? "2E2F33" : backgroundColor
         self.updateUserProfileUseCase = updateUserProfileUseCase
         self.createCheckProfanityUseCase = createCheckProfanityUseCase
         self.initialState = State(

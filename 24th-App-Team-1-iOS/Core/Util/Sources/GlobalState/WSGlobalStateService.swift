@@ -6,9 +6,10 @@
 //
 
 import Foundation
-import VoteDomain
+import CommonDomain
 
 import RxSwift
+
 
 
 public protocol WSGlobalServiceProtocol {
@@ -35,7 +36,7 @@ public enum WSGlobalStateType {
     case didChangedAccountSchoolName(schoolName: String)
     case didTappedFriendButton(_ isSelected: Bool)
     case didTappedResultButton
-    case didTappedVoteButton(_ isSelected: Bool)
+    case didTappedVoteButton(_ isSelected: Bool, voteOption: VoteResponseEntity?)
     case toogleMessageType(_ type: MessageTypes)
     case didTappedCharacterItem(_ item: Int)
     case didTappedBackgroundItem(_ item: Int)

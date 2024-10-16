@@ -8,28 +8,37 @@
 import Foundation
 
 @propertyWrapper
-public struct UserDefaultsWrapper<T> {
+public struct UserDefaultsWrapper<T: Codable> {
     let key: String
-    let defaultValue: T?
+    let defaultValue: T
     
-    public init(key: String, defaultValue: T? = nil) {
+    public init(key: String, defaultValue: T) {
         self.key = key
         self.defaultValue = defaultValue
     }
     
-    public var wrappedValue: T? {
+    public var wrappedValue: T {
         get {
-            if let value = UserDefaults.standard.object(forKey: key) as? T {
-                return value
+            guard let data = UserDefaults.standard.data(forKey: key) else {
+                return defaultValue
             }
-            return defaultValue
+            
+            let decoder = JSONDecoder()
+            do {
+                let value = try decoder.decode(T.self, from: data)
+                return value
+            } catch {
+                return defaultValue
+            }
         }
         set {
-            if let value = newValue {
-                UserDefaults.standard.set(value, forKey: key)
-            } else {
-                UserDefaults.standard.removeObject(forKey: key)
-            }
+            let encoder = JSONEncoder()
+             do {
+                 let data = try encoder.encode(newValue)
+                 UserDefaults.standard.set(data, forKey: key)
+             } catch {
+                 print("Encoding failed: \(error)")
+             }
         }
     }
 }

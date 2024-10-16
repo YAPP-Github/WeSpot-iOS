@@ -63,8 +63,8 @@ struct DomainAssembly: Assembly {
         }
         
         container.register(FetchVoteOptionsUseCaseProtocol.self) { resolver in
-            let repository = resolver.resolve(VoteRepositoryProtocol.self)!
-            return FetchVoteOptionsUseCase(voteRepository: repository)
+            let repository = resolver.resolve(CommonRepositoryProtocol.self)!
+            return FetchVoteOptionsUseCase(commonRepository: repository)
         }
         
         container.register(CreateVoteUseCaseProtocol.self) { resolver in
@@ -116,8 +116,8 @@ struct DomainAssembly: Assembly {
         
         // Profile
         container.register(FetchUserProfileUseCaseProtocol.self) { resolver in
-            let repository = resolver.resolve(ProfileRepositoryProtocol.self)!
-            return FetchUserProfileUseCase(profileRepository: repository)
+            let repository = resolver.resolve(CommonRepositoryProtocol.self)!
+            return FetchUserProfileUseCase(commonRepository: repository)
         }
         
         container.register(UpdateUserProfileUseCaseProtocol.self) { resolver in

@@ -21,8 +21,6 @@ public enum VoteEndPoint: WSNetworkEndPoint {
     
     /// 반 친구 조회 API
     case fetchClassMates
-    /// 질문지 조회 API
-    case fetchVoteOptions
     /// 투표 하기 API
     case addVotes(Encodable)
     /// 투표 결과 전체 조회하기
@@ -40,8 +38,6 @@ public enum VoteEndPoint: WSNetworkEndPoint {
         switch self {
         case .fetchClassMates:
             return "/users/classmates"
-        case .fetchVoteOptions:
-            return "/votes/options"
         case .addVotes:
             return "/votes"
         case .fetchResultVotes:
@@ -60,8 +56,6 @@ public enum VoteEndPoint: WSNetworkEndPoint {
     public var method: HTTPMethod {
         switch self {
         case .fetchClassMates:
-            return .get
-        case .fetchVoteOptions:
             return .get
         case .addVotes:
             return .post

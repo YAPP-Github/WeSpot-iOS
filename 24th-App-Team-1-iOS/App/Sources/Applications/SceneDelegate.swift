@@ -11,6 +11,7 @@ import Storage
 import DesignSystem
 
 import LoginFeature
+import CommonDomain
 import LoginDomain
 import LoginService
 import VoteFeature
@@ -73,8 +74,10 @@ public class SceneDelegate: UIResponder, UISceneDelegate {
         window = UIWindow(windowScene: scene)
         
         let accessToken = KeychainManager.shared.get(type: .accessToken)
+        let refreshToken = KeychainManager.shared.get(type: .refreshToken)
         
-        if accessToken == nil { // accessToken 값이 없으면 (회원가입 안됨)
+        
+        if accessToken == nil || refreshToken == nil { // accessToken 값이 없으면 (회원가입 안됨)
             let signInViewController = DependencyContainer.shared.injector.resolve(SignInViewController.self)
             window?.rootViewController = UINavigationController(rootViewController: signInViewController)
             
@@ -132,9 +135,15 @@ extension SceneDelegate {
             topViewController.navigationController?.pushViewController(notificationViewController, animated: true)
         }
         
-        NotificationCenter.default.addObserver(forName: .showVoteProccessController, object: nil, queue: .main) { _ in
-            let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self)
-            topViewController.navigationController?.pushViewController(voteProcessViewController, animated: true)
+        NotificationCenter.default.addObserver(forName: .showVoteProccessController, object: nil, queue: .main) { notification in
+            let voteOption = notification.userInfo?["voteOption"] as? VoteResponseEntity
+            if !(voteOption?.response.isEmpty ?? true) {
+                let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self, argument: voteOption)
+                topViewController.navigationController?.pushViewController(voteProcessViewController, animated: true)
+            } else {
+                let voteBeginViewController = DependencyContainer.shared.injector.resolve(VoteBeginViewController.self)
+                topViewController.navigationController?.pushViewController(voteBeginViewController, animated: true)
+            }
         }
         
         NotificationCenter.default.addObserver(forName: .showVoteInventoryViewController, object: nil, queue: .main) { _ in

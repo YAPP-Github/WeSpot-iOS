@@ -25,7 +25,7 @@ public final class WSNetworkMonitor: EventMonitor {
     }
     
     
-    public func request(_ request: DataRequest, didParseResponse response: DataResponse<Data?, AFError>) {
+    public func request<Value>(_ request: DataRequest, didParseResponse response: DataResponse<Value, AFError>) {
         WSLogger.debug(category: Network.default, message: "✅Response WSNetwork LOG✅")
         WSLogger.debug(category: Network.default, message: "URL : \((request.request?.url?.absoluteString ?? ""))")
         WSLogger.debug(category: Network.default, message: "Results : \((response.result))")

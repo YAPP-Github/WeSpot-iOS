@@ -10,7 +10,6 @@ import Foundation
 import RxSwift
 
 public protocol ProfileRepositoryProtocol {
-    func fetchUserProfileItems() -> Single<UserProfileEntity?>
     func fetchUserAlarmItems() -> Single<UserAlarmEntity?>
     func updateUserAlarmItem(body: UpdateUserProfileAlarmRequest) -> Single<Bool>
     func fetchUserBlockItems(query: UserBlockRequestQuery) -> Single<UserBlockEntity?>

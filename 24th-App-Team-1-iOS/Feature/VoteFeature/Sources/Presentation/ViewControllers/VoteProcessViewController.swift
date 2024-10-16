@@ -9,6 +9,7 @@ import DesignSystem
 import Extensions
 import UIKit
 import Util
+import Storage
 
 import Then
 import SnapKit
@@ -30,7 +31,6 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
     private let loadingIndicator: WSLottieIndicatorView = WSLottieIndicatorView()
     private let questionTableView: UITableView = UITableView()
     private let resultButton: WSButton = WSButton(wsButtonType: .default(12))
-    private let voteBeginView: VoteBeginView = VoteBeginView()
     private let questionDataSources: RxTableViewSectionedReloadDataSource<VoteProcessSection> = .init { dataSources, tableView, indexPath, sectionItem in
         
         switch sectionItem {
@@ -40,10 +40,6 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             voteProcessCell.reactor = cellReactor
             return voteProcessCell
         }
-    }
-
-    public override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
     }
     
     //MARK: - LifeCycle
@@ -61,7 +57,7 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
     public override func setupUI() {
         super.setupUI()
         profileView.addSubview(faceImageView)
-        view.addSubviews(questionLabel, profileView, questionTableView, resultButton, voteBeginView)
+        view.addSubviews(questionLabel, profileView, questionTableView, resultButton)
     }
     
     public override func setupAutoLayout() {
@@ -92,10 +88,6 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             $0.horizontalEdges.equalToSuperview().inset(20)
             $0.height.equalTo(52)
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(12)
-        }
-        
-        voteBeginView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
         }
     }
     
@@ -141,9 +133,8 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             $0.isHidden = true
         }
         
-        voteBeginView.do {
-            $0.isHidden = true
-            $0.backgroundColor = DesignSystemAsset.Colors.gray900.color
+        self.navigationController?.do {
+            $0.interactivePopGestureRecognizer?.isEnabled = false
         }
     }
     
@@ -156,19 +147,6 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$isInviteView)
-            .observe(on: MainScheduler.asyncInstance)
-            .bind(to: voteBeginView.rx.isHidden)
-            .disposed(by: disposeBag)
-
-        voteBeginView.inviteButton
-            .rx.tap
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, _ in
-                owner.shareToKakaoTalk()
-            }
-            .disposed(by: disposeBag)
-        
         navigationBar.rightBarButton
             .rx.tap
             .throttle(.microseconds(300), scheduler: MainScheduler.instance)
@@ -177,11 +155,20 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             }
             .disposed(by: disposeBag)
         
-        questionTableView.rx
-            .itemSelected
-            .throttle(.milliseconds(300), latest: false, scheduler: MainScheduler.instance)
-            .map { Reactor.Action.didTappedQuestionItem($0.item) }
+        navigationBar.leftBarButton
+            .rx.tap
+            .map { Reactor.Action.didTappedLeftBarButtonItem }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        Observable
+            .combineLatest(
+                questionTableView.rx.itemSelected.throttle(.milliseconds(300), latest: false, scheduler: MainScheduler.instance),
+                reactor.pulse(\.$processCount).distinctUntilChanged(),
+                reactor.pulse(\.$finalVoteCount).distinctUntilChanged()
+            )
+            .withUnretained(self)
+            .bind(onNext: { $0.0.showVoteProcessViewController($0.1.0.item, processCount: $0.1.1, finalCount: $0.1.2)})
             .disposed(by: disposeBag)
         
         resultButton.rx
@@ -191,47 +178,26 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-   
         Observable
-            .combineLatest (
-                reactor.pulse(\.$processCount),
-                reactor.pulse(\.$voteResponseEntity).compactMap { $0?.response.count }.distinctUntilChanged()
-            )
-            .observe(on: MainScheduler.asyncInstance)
-            .map { "\($0.0)/\($0.1)"}
-            .distinctUntilChanged()
-            .bind(to: navigationBar.navigationTitleLabel.rx.text)
-            .disposed(by: disposeBag)
-        
-        
-        Observable
-            .zip(
-                reactor.state.compactMap { $0.voteResponseEntity?.response.count },
-                reactor.state.map { $0.processCount }
+            .combineLatest(
+                reactor.pulse(\.$processCount).distinctUntilChanged(),
+                reactor.pulse(\.$finalVoteCount).distinctUntilChanged()
             )
             .map { $0.0 != $0.1 }
-            .observe(on: MainScheduler.asyncInstance )
-            .distinctUntilChanged()
+            .observe(on: MainScheduler.asyncInstance)
             .bind(to: resultButton.rx.isHidden)
             .disposed(by: disposeBag)
         
         Observable
             .combineLatest(
-                reactor.pulse(\.$voteResponseEntity),
-                reactor.pulse(\.$voteOptionsStub),
-                reactor.pulse (\.$processCount )
+                reactor.pulse(\.$processCount).distinctUntilChanged(),
+                reactor.pulse(\.$finalVoteCount).distinctUntilChanged()
             )
-            .filter { $0.1.count == $0.2 && $0.0?.response.count != $0.2 }
-            .compactMap { ($0.0, $0.1, $0.2 + 1) }
-            .debug("process Check")
-            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
-            .bind(with: self) { owner, response in
-                let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self, arguments: response.0, response.1, response.2)
-                owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
-            }
+            .observe(on: MainScheduler.asyncInstance)
+            .map {"\($0.0)/\($0.1)"}
+            .bind(to: navigationBar.navigationTitleLabel.rx.text)
             .disposed(by: disposeBag)
-
-        
+   
         reactor.state
             .compactMap { $0.createVoteEntity }
             .distinctUntilChanged()
@@ -289,6 +255,17 @@ public final class VoteProcessViewController: BaseViewController<VoteProcessView
 
 
 extension VoteProcessViewController {
+    private func showVoteProcessViewController(_ item: Int, processCount: Int, finalCount: Int) {
+        self.reactor?.action.onNext(.didTappedQuestionItem(item))
+        guard processCount != finalCount else {
+            return
+        }
+        let entity = self.reactor?.currentState.voteResponseEntity
+        let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self, argument: entity)
+        self.navigationController?.pushViewController(voteProcessViewController, animated: true)
+    }
+    
+    
     private func createAlertController() {
         let processAlertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let reportAction = UIAlertAction(title: VoteProcessStr.voteReportAlertText, style: .default) { _ in
@@ -303,7 +280,6 @@ extension VoteProcessViewController {
                 }
                 .show()
         }
-        //TODO: 링크 주어질시 Action 추가하기
         let choiceAction = UIAlertAction(title: VoteProcessStr.voteChoiceAlertText, style: .default)
         let cancelAction = UIAlertAction(title: VoteProcessStr.voteCancelAlertText, style: .cancel)
         

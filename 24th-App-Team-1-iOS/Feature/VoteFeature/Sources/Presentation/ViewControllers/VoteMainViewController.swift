@@ -72,6 +72,26 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
             }
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$voteResponseEntity)
+            .compactMap { $0?.response }
+            .filter { $0.isEmpty }
+            .bind(with: self) { owner, _ in
+                let voteBeginViewController = DependencyContainer.shared.injector.resolve(VoteBeginViewController.self)
+                owner.navigationController?.pushViewController(voteBeginViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        
+        reactor.pulse(\.$voteResponseEntity)
+            .map { $0 }
+            .filter { !($0?.response.isEmpty ?? true) }
+            .bind(with: self) { owner, entity in
+                let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self, argument: entity)
+                owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        
         reactor.state.map { $0.isProfileChanged }
             .filter { $0 == false }
             .take(1)
@@ -127,13 +147,5 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
             }
             .disposed(by: disposeBag)
         
-        
-        reactor.pulse(\.$isSelected)
-            .filter { $0 == true }
-            .bind(with: self) { owner, _ in
-                let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self)
-                owner.navigationController?.pushViewController(voteProcessViewController, animated: true)
-            }
-            .disposed(by: disposeBag)
     }
 }

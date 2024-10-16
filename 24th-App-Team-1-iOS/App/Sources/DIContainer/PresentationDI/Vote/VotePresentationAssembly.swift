@@ -15,17 +15,14 @@ import Swinject
 
 struct VotePresentationAssembly: Assembly {
     func assemble(container: Container) {
-        container.register(VoteProcessViewReactor.self) { (resolver, voteResponseEntity: VoteResponseEntity?, voteOptionStub: [CreateVoteItemReqeuest], processCount: Int) in
+        container.register(VoteProcessViewReactor.self) { (resolver, voteResponseEntity: VoteResponseEntity?) in
             let createVoteUseCase = resolver.resolve(CreateVoteUseCaseProtocol.self)!
             let createUserReportUseCase = resolver.resolve(CreateReportUserUseCaseProtocol.self)!
             let fetchVoteOptionsUseCase = resolver.resolve(FetchVoteOptionsUseCaseProtocol.self)!
             return VoteProcessViewReactor(
                 createVoteUseCase: createVoteUseCase,
                 createUserReportUseCase: createUserReportUseCase,
-                fetchVoteOptionsUseCase: fetchVoteOptionsUseCase,
-                voteResponseEntity: voteResponseEntity,
-                voteOptionStub: voteOptionStub,
-                processCount: processCount
+                voteResponseEntity: voteResponseEntity
             )
         }
         
@@ -36,13 +33,12 @@ struct VotePresentationAssembly: Assembly {
             
             return VoteProcessViewReactor(
                 createVoteUseCase: createVoteUseCase,
-                createUserReportUseCase: createUserReportUseCase,
-                fetchVoteOptionsUseCase: fetchVoteOptionsUseCase
+                createUserReportUseCase: createUserReportUseCase
             )
         }
         
-        container.register(VoteProcessViewController.self) { (resolver, voteResponseEntity: VoteResponseEntity?, voteOptionStub: [CreateVoteItemReqeuest], processCount: Int) in
-            let reactor = resolver.resolve(VoteProcessViewReactor.self, arguments: voteResponseEntity, voteOptionStub, processCount)!
+        container.register(VoteProcessViewController.self) { (resolver, voteResponseEntity: VoteResponseEntity?) in
+            let reactor = resolver.resolve(VoteProcessViewReactor.self, argument: voteResponseEntity)!
             
             return VoteProcessViewController(reactor: reactor)
         }
@@ -51,6 +47,17 @@ struct VotePresentationAssembly: Assembly {
             let reactor = resolver.resolve(VoteProcessViewReactor.self)!
             
             return VoteProcessViewController(reactor: reactor)
+        }
+        
+        container.register(VoteBeginViewReactor.self) { resolver in
+            let fetchUserProfileUseCase = resolver.resolve(FetchUserProfileUseCaseProtocol.self)!
+            return VoteBeginViewReactor(fetchUserProfileUseCase: fetchUserProfileUseCase)
+        }
+        
+        container.register(VoteBeginViewController.self) { resolver in
+            let reactor = resolver.resolve(VoteBeginViewReactor.self)!
+            
+            return VoteBeginViewController(reactor: reactor)
         }
     }
 }

@@ -18,6 +18,7 @@ public enum CommonEndPoint: WSNetworkEndPoint {
         return accessToken
     }
     
+    case fetchUserProfile
     // 비속어 검색 API
     case createProfanityCheck(Encodable)
     // 프로필 캐릭터 정보 API
@@ -28,9 +29,13 @@ public enum CommonEndPoint: WSNetworkEndPoint {
     case createUserReport(Encodable)
     /// 사용자 프로필 수정 API
     case updateUserProfile(Encodable)
+    /// 질문지 조회 API
+    case fetchVoteOptions
     
     public var path: String {
         switch self {
+        case .fetchUserProfile:
+            return "/users/me"
         case .createProfanityCheck:
             return "/check-profanity"
         case .fetchCharacters:
@@ -41,11 +46,15 @@ public enum CommonEndPoint: WSNetworkEndPoint {
             return "/reports"
         case .updateUserProfile:
             return "/users/me"
+        case .fetchVoteOptions:
+            return "votes/options"
         }
     }
     
     public var method: HTTPMethod {
         switch self {
+        case .fetchUserProfile:
+            return .get
         case .createProfanityCheck:
             return .post
         case .fetchCharacters:
@@ -56,6 +65,8 @@ public enum CommonEndPoint: WSNetworkEndPoint {
             return .post
         case .updateUserProfile:
             return .put
+        case .fetchVoteOptions:
+            return .get
         }
     }
     
@@ -71,6 +82,8 @@ public enum CommonEndPoint: WSNetworkEndPoint {
             return .requestBody(body)
         case let .updateUserProfile(body):
             return .requestBody(body)
+        default:
+            return .none
         }
     }
     
