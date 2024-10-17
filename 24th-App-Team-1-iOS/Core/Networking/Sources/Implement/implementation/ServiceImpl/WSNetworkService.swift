@@ -13,7 +13,7 @@ import RxSwift
 public final class WSNetworkService: WSNetworkServiceProtocol {
     
     //MARK: Property
-    private let session: Session = {
+    private static let session: Session = {
         let networkMonitor: WSNetworkMonitor = WSNetworkMonitor()
         let networkConfigure: URLSessionConfiguration = URLSessionConfiguration.af.default
         let interceptor = WSNetworkInterceptor()
@@ -30,8 +30,8 @@ public final class WSNetworkService: WSNetworkServiceProtocol {
     
     //MARK: Functions
     public func request(endPoint: URLRequestConvertible) -> Single<Data> {
-        return Single<Data>.create { [weak self] single in
-            let task = self?.session.request(endPoint)
+        return Single<Data>.create { single in
+            WSNetworkService.session.request(endPoint)
                 .responseData { response in
                     switch response.result {
                     case let .success(response):
@@ -49,9 +49,7 @@ public final class WSNetworkService: WSNetworkServiceProtocol {
                         }
                     }
                 }
-            return Disposables.create {
-                task?.cancel()
-            }
+            return Disposables.create()
         }
     }
 }

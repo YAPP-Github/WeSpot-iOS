@@ -53,14 +53,14 @@ public extension UIViewController {
     }
     
     func topMostViewController() -> UIViewController? {
-        if let presentedViewController = self.presentedViewController {
-            return presentedViewController.topMostViewController()
+        if let tabBarController = self as? UITabBarController {
+            return tabBarController.selectedViewController?.topMostViewController()
         }
         if let navigationController = self as? UINavigationController {
             return navigationController.topViewController?.topMostViewController()
         }
-        if let tabBarController = self as? UITabBarController {
-            return tabBarController.selectedViewController?.topMostViewController()
+        if let presentedViewController = self.presentedViewController {
+            return presentedViewController.topMostViewController()
         }
         return self
     }

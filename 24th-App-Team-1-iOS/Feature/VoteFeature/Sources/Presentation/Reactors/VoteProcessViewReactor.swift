@@ -138,7 +138,7 @@ public final class VoteProcessViewReactor: Reactor {
             
         case .didTappedReportButton:
             
-            let userReportQuery = CreateUserReportRequest(type: CreateUserReportType.message.rawValue, targetId: currentState.voteUserEntity?.id ?? 0)
+            let userReportQuery = CreateUserReportRequest(type: CreateUserReportType.vote.rawValue, targetId: currentState.voteUserEntity?.id ?? 0)
             return createUserReportUseCase
                 .execute(body: userReportQuery)
                 .asObservable()

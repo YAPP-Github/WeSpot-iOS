@@ -9,11 +9,11 @@ import Foundation
 
 
 public struct CreateUserReportRequestDTO: Encodable {
-    public let type: String
+    public let reportType: String
     public let targetId: Int
     
-    public init(type: String, targetId: Int) {
-        self.type = type
+    public init(reportType: String, targetId: Int) {
+        self.reportType = reportType
         self.targetId = targetId
     }
 }
