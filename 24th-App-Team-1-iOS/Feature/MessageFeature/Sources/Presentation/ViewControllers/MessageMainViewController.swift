@@ -25,6 +25,11 @@ public final class MessageMainViewController: BaseViewController<MessageMainView
         super.viewDidLoad()
         
     }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.post(name: .showTabBar, object: nil)
+    }
 
     //MARK: - Configure
     public override func setupUI() {
@@ -60,6 +65,16 @@ public final class MessageMainViewController: BaseViewController<MessageMainView
                 owner.noticeAlertViewController()
             }
             .disposed(by: disposeBag)
+        
+        
+        navigationBar.rightBarButton
+            .rx.tap
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, _ in
+                NotificationCenter.default.post(name: .showNotifcationViewController, object: nil)
+            }
+            .disposed(by: disposeBag)
+        
 
     }
 }

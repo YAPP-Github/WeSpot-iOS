@@ -82,7 +82,7 @@ public final class CommonRepository: CommonRepositoryProtocol {
     }
     
     public func createReportUserItem(body: CreateUserReportRequest) -> Single<CreateReportUserEntity?> {
-        let body = CreateUserReportRequestDTO(type: body.type, targetId: body.targetId)
+        let body = CreateUserReportRequestDTO(reportType: body.type, targetId: body.targetId)
         let endPoint = CommonEndPoint.createUserReport(body)
         
         return networkService.request(endPoint: endPoint)

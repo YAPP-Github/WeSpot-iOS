@@ -126,7 +126,6 @@ public final class VoteMainViewController: BaseViewController<VoteMainViewReacto
         
         navigationBar.rightBarButton
             .rx.tap
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, _ in
                 NotificationCenter.default.post(name: .showNotifcationViewController, object: nil)
             }

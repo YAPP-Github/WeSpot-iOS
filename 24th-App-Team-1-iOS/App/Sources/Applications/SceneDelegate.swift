@@ -103,9 +103,6 @@ extension SceneDelegate {
     
     //TODO: Coordinator 패턴으로 수정
     private func setupViewControllers() {
-        guard let topViewController = self.window?.rootViewController?.topMostViewController() else {
-            return
-        }
         
         NotificationCenter.default.addObserver(forName: .showProfileImageViewController, object: nil, queue: .main) { [weak self] _ in
             guard let self else { return }
@@ -130,37 +127,45 @@ extension SceneDelegate {
             self.window?.rootViewController = UINavigationController(rootViewController: signInViewController)
         }
         
-        NotificationCenter.default.addObserver(forName: .showNotifcationViewController, object: nil, queue: .main) { _ in
+        NotificationCenter.default.addObserver(forName: .showNotifcationViewController, object: nil, queue: .main) { [weak self] _ in
+            guard let self else { return }
+            let topViewController = self.window?.rootViewController?.topMostViewController()
             let notificationViewController = DependencyContainer.shared.injector.resolve(NotificationViewController.self)
-            topViewController.navigationController?.pushViewController(notificationViewController, animated: true)
+            topViewController?.navigationController?.pushViewController(notificationViewController, animated: true)
         }
         
-        NotificationCenter.default.addObserver(forName: .showVoteProccessController, object: nil, queue: .main) { notification in
+        NotificationCenter.default.addObserver(forName: .showVoteProccessController, object: nil, queue: .main) { [weak self] notification in
+            guard let self else { return }
+            let topViewController = self.window?.rootViewController?.topMostViewController()
             let voteOption = notification.userInfo?["voteOption"] as? VoteResponseEntity
             if !(voteOption?.response.isEmpty ?? true) {
                 let voteProcessViewController = DependencyContainer.shared.injector.resolve(VoteProcessViewController.self, argument: voteOption)
-                topViewController.navigationController?.pushViewController(voteProcessViewController, animated: true)
+                topViewController?.navigationController?.pushViewController(voteProcessViewController, animated: true)
             } else {
                 let voteBeginViewController = DependencyContainer.shared.injector.resolve(VoteBeginViewController.self)
-                topViewController.navigationController?.pushViewController(voteBeginViewController, animated: true)
+                topViewController?.navigationController?.pushViewController(voteBeginViewController, animated: true)
             }
         }
         
-        NotificationCenter.default.addObserver(forName: .showVoteInventoryViewController, object: nil, queue: .main) { _ in
+        NotificationCenter.default.addObserver(forName: .showVoteInventoryViewController, object: nil, queue: .main) { [weak self] _ in
+            guard let self else { return }
+            let topViewController = self.window?.rootViewController?.topMostViewController()
             let voteInventoryViewController = DependencyContainer.shared.injector.resolve(VoteInventoryViewController.self)
-            topViewController.navigationController?.pushViewController(voteInventoryViewController, animated: true)
+            topViewController?.navigationController?.pushViewController(voteInventoryViewController, animated: true)
         }
         
-        NotificationCenter.default.addObserver(forName: .showVoteCompleteViewController, object: nil, queue: .main) { notification in
+        NotificationCenter.default.addObserver(forName: .showVoteCompleteViewController, object: nil, queue: .main) { [weak self] notification in
+            guard let self,
+                  let isCurrnetDate = notification.userInfo?["isCurrnetDate"] as? Bool else { return }
+            let topViewController = self.window?.rootViewController?.topMostViewController()
             
-            guard let isCurrnetDate = notification.userInfo?["isCurrnetDate"] as? Bool else { return }
             
             if isCurrnetDate {
                 let voteCompleteViewController = DependencyContainer.shared.injector.resolve(VoteCompleteViewController.self)
-                topViewController.navigationController?.pushViewController(voteCompleteViewController, animated: true)
+                topViewController?.navigationController?.pushViewController(voteCompleteViewController, animated: true)
             } else {
                 let voteEffectViewController = DependencyContainer.shared.injector.resolve(VoteEffectViewController.self)
-                topViewController.navigationController?.pushViewController(voteEffectViewController, animated: true)
+                topViewController?.navigationController?.pushViewController(voteEffectViewController, animated: true)
             }
             
         }
